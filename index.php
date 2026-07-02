@@ -489,7 +489,7 @@ if($action !== null){
 
   if($action==='live_create'){
     $b=qff_body(); qff_check_csrf($b); qff_require_admin();
-    $type=isset($b['type'])?$b['type']:''; if(!in_array($type,array('cloud','poll','qa','game','assign','rating','rank','scale','points'),true)) qff_err('bad type');
+    $type=isset($b['type'])?$b['type']:''; if(!in_array($type,array('cloud','poll','qa','game','assign','rating','rank','scale','points','deck'),true)) qff_err('bad type');
     if($type==='game'){
       $quiz=qff_norm_quiz(isset($b['quiz'])?$b['quiz']:null);
       $s=array('code'=>qff_gen_code(),'type'=>'game','prompt'=>$quiz['title'],'quiz'=>$quiz,'open'=>true,'phase'=>'lobby','qIndex'=>-1,'qStart'=>0,'qStarts'=>array(),'created'=>(int)round(microtime(true)*1000),'players'=>array());
@@ -9144,7 +9144,7 @@ const I18N = {
     live_qa_mod:"Moderare întrebări", live_qa_mod_off:"Fără (toate apar)", live_qa_mod_on:"Cu aprobare",
     live_qa_mod_hint:"Cu aprobare, întrebările apar publicului doar după ce le aprobi tu.",
     qa_approve:"Aprobă", qa_pending:"În așteptare", qa_pending_count:(n)=>`${n} în așteptare`, live_sent_mod:"Trimisă spre aprobare.",
-    deck_export:"Exportă", deck_import:"Importă", deck_import_empty:"Fișierul nu conține activități valide.", deck_import_bad:"Fișier invalid.", deck_imported:(n)=>`${n} activități importate.`,
+    deck_export:"Exportă", deck_import:"Importă", deck_templates:"Exemple gata (ASFAN)", deck_import_empty:"Fișierul nu conține activități valide.", deck_import_bad:"Fișier invalid.", deck_imported:(n)=>`${n} activități importate.`,
     live_mode_single:"O activitate", live_mode_deck:"Prezentare",
     deck_title:"Titlul prezentării", deck_title_ph:"ex. Atelier Atlantykron — feedback",
     deck_slides:"Activități", deck_empty:"Nicio activitate încă. Alege un tip mai sus și adaugă.",
@@ -9300,7 +9300,7 @@ const I18N = {
     live_qa_mod:"Question moderation", live_qa_mod_off:"Off (all shown)", live_qa_mod_on:"Require approval",
     live_qa_mod_hint:"With approval, questions appear to the audience only after you approve them.",
     qa_approve:"Approve", qa_pending:"Pending", qa_pending_count:(n)=>`${n} pending`, live_sent_mod:"Sent for approval.",
-    deck_export:"Export", deck_import:"Import", deck_import_empty:"No valid activities in the file.", deck_import_bad:"Invalid file.", deck_imported:(n)=>`${n} activities imported.`,
+    deck_export:"Export", deck_import:"Import", deck_templates:"Ready examples (ASFAN)", deck_import_empty:"No valid activities in the file.", deck_import_bad:"Invalid file.", deck_imported:(n)=>`${n} activities imported.`,
     live_mode_single:"Single activity", live_mode_deck:"Presentation",
     deck_title:"Presentation title", deck_title_ph:"e.g. Atlantykron workshop — feedback",
     deck_slides:"Activities", deck_empty:"No activities yet. Pick a type above and add one.",
@@ -9456,7 +9456,7 @@ const I18N = {
     live_qa_mod:"Modération des questions", live_qa_mod_off:"Désactivée (tout s'affiche)", live_qa_mod_on:"Exiger une approbation",
     live_qa_mod_hint:"Avec approbation, les questions n'apparaissent au public qu'après ton approbation.",
     qa_approve:"Approuver", qa_pending:"En attente", qa_pending_count:(n)=>`${n} en attente`, live_sent_mod:"Envoyé pour approbation.",
-    deck_export:"Exporter", deck_import:"Importer", deck_import_empty:"Aucune activité valide dans le fichier.", deck_import_bad:"Fichier invalide.", deck_imported:(n)=>`${n} activités importées.`,
+    deck_export:"Exporter", deck_import:"Importer", deck_templates:"Exemples prêts (ASFAN)", deck_import_empty:"Aucune activité valide dans le fichier.", deck_import_bad:"Fichier invalide.", deck_imported:(n)=>`${n} activités importées.`,
     live_mode_single:"Activité unique", live_mode_deck:"Présentation",
     deck_title:"Titre de la présentation", deck_title_ph:"ex. Atelier Atlantykron — retours",
     deck_slides:"Activités", deck_empty:"Aucune activité. Choisis un type ci-dessus et ajoutes-en une.",
@@ -9612,7 +9612,7 @@ const I18N = {
     live_qa_mod:"Moderazione domande", live_qa_mod_off:"Off (tutte visibili)", live_qa_mod_on:"Richiedi approvazione",
     live_qa_mod_hint:"Con l'approvazione, le domande appaiono al pubblico solo dopo che le approvi.",
     qa_approve:"Approva", qa_pending:"In attesa", qa_pending_count:(n)=>`${n} in attesa`, live_sent_mod:"Inviato per approvazione.",
-    deck_export:"Esporta", deck_import:"Importa", deck_import_empty:"Nessuna attività valida nel file.", deck_import_bad:"File non valido.", deck_imported:(n)=>`${n} attività importate.`,
+    deck_export:"Esporta", deck_import:"Importa", deck_templates:"Esempi pronti (ASFAN)", deck_import_empty:"Nessuna attività valida nel file.", deck_import_bad:"File non valido.", deck_imported:(n)=>`${n} attività importate.`,
     live_mode_single:"Attività singola", live_mode_deck:"Presentazione",
     deck_title:"Titolo della presentazione", deck_title_ph:"es. Workshop Atlantykron — feedback",
     deck_slides:"Attività", deck_empty:"Ancora nessuna attività. Scegli un tipo qui sopra e aggiungine una.",
@@ -9768,7 +9768,7 @@ const I18N = {
     live_qa_mod:"Moderación de preguntas", live_qa_mod_off:"Off (se muestran todas)", live_qa_mod_on:"Requerir aprobación",
     live_qa_mod_hint:"Con aprobación, las preguntas aparecen al público solo después de que las apruebes.",
     qa_approve:"Aprobar", qa_pending:"Pendiente", qa_pending_count:(n)=>`${n} pendientes`, live_sent_mod:"Enviado para aprobación.",
-    deck_export:"Exportar", deck_import:"Importar", deck_import_empty:"No hay actividades válidas en el archivo.", deck_import_bad:"Archivo no válido.", deck_imported:(n)=>`${n} actividades importadas.`,
+    deck_export:"Exportar", deck_import:"Importar", deck_templates:"Ejemplos listos (ASFAN)", deck_import_empty:"No hay actividades válidas en el archivo.", deck_import_bad:"Archivo no válido.", deck_imported:(n)=>`${n} actividades importadas.`,
     live_mode_single:"Actividad única", live_mode_deck:"Presentación",
     deck_title:"Título de la presentación", deck_title_ph:"p. ej. Taller Atlantykron — opiniones",
     deck_slides:"Actividades", deck_empty:"Aún no hay actividades. Elige un tipo arriba y añade una.",
@@ -9924,7 +9924,7 @@ const I18N = {
     live_qa_mod:"Moderação de perguntas", live_qa_mod_off:"Off (todas visíveis)", live_qa_mod_on:"Exigir aprovação",
     live_qa_mod_hint:"Com aprovação, as perguntas aparecem ao público só depois de as aprovares.",
     qa_approve:"Aprovar", qa_pending:"Pendente", qa_pending_count:(n)=>`${n} pendentes`, live_sent_mod:"Enviado para aprovação.",
-    deck_export:"Exportar", deck_import:"Importar", deck_import_empty:"Nenhuma atividade válida no ficheiro.", deck_import_bad:"Ficheiro inválido.", deck_imported:(n)=>`${n} atividades importadas.`,
+    deck_export:"Exportar", deck_import:"Importar", deck_templates:"Exemplos prontos (ASFAN)", deck_import_empty:"Nenhuma atividade válida no ficheiro.", deck_import_bad:"Ficheiro inválido.", deck_imported:(n)=>`${n} atividades importadas.`,
     live_mode_single:"Atividade única", live_mode_deck:"Apresentação",
     deck_title:"Título da apresentação", deck_title_ph:"ex. Workshop Atlantykron — comentários",
     deck_slides:"Atividades", deck_empty:"Ainda não há atividades. Escolhe um tipo acima e adiciona uma.",
@@ -10080,7 +10080,7 @@ const I18N = {
     live_qa_mod:"Fragen-Moderation", live_qa_mod_off:"Aus (alle sichtbar)", live_qa_mod_on:"Freigabe verlangen",
     live_qa_mod_hint:"Mit Freigabe erscheinen die Fragen dem Publikum erst, nachdem du sie freigegeben hast.",
     qa_approve:"Freigeben", qa_pending:"Ausstehend", qa_pending_count:(n)=>`${n} ausstehend`, live_sent_mod:"Zur Freigabe gesendet.",
-    deck_export:"Exportieren", deck_import:"Importieren", deck_import_empty:"Keine gültigen Aktivitäten in der Datei.", deck_import_bad:"Ungültige Datei.", deck_imported:(n)=>`${n} Aktivitäten importiert.`,
+    deck_export:"Exportieren", deck_import:"Importieren", deck_templates:"Fertige Beispiele (ASFAN)", deck_import_empty:"Keine gültigen Aktivitäten in der Datei.", deck_import_bad:"Ungültige Datei.", deck_imported:(n)=>`${n} Aktivitäten importiert.`,
     live_mode_single:"Einzelne Aktivität", live_mode_deck:"Präsentation",
     deck_title:"Titel der Präsentation", deck_title_ph:"z. B. Atlantykron-Workshop — Rückmeldungen",
     deck_slides:"Aktivitäten", deck_empty:"Noch keine Aktivitäten. Wähle oben einen Typ und füge eine hinzu.",
@@ -11782,6 +11782,7 @@ function viewLiveHub(){
       +'<div class="deck-compose"><div class="deck-compose-h">'+esc(t("deck_add_new"))+'</div>'
         +'<div class="field"><label>'+esc(t("live_prompt"))+'</label><input id="lb-prompt" class="input" maxlength="200" placeholder="'+esc(t("live_prompt_ph"))+'" value="'+esc(lb.prompt||"")+'"></div>'+extra
         +'<button class="btn btn-ghost btn-block" data-action="deckadd">➕ '+esc(t("deck_add_slide"))+'</button></div>'
+      +'<div class="deck-added-h" style="margin-top:14px">'+esc(t("deck_templates"))+'</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">'+deckTemplates().map(function(tp){return '<button class="btn btn-ghost sm" data-action="decktpl" data-id="'+tp.id+'">📋 '+esc(tp.btn)+'</button>';}).join("")+'</div>'
       +'<div class="deck-io"><button class="btn btn-ghost sm" data-action="deckexport"'+(dsl.length<1?' disabled':'')+'>⬇ '+esc(t("deck_export"))+'</button><button class="btn btn-ghost sm" data-action="deckimport">⬆ '+esc(t("deck_import"))+'</button><input type="file" id="deck-file" accept="application/json,.json" style="display:none"></div>'
       +'<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="decklaunch"'+(dsl.length<1?' disabled':'')+'>🚀 '+esc(t("deck_launch"))+'</button>'
     +'</div>';
@@ -11799,6 +11800,10 @@ function viewLiveHub(){
 function afterLiveHub(){ const el=document.getElementById("lb-join"); if(el){ el.addEventListener("keydown",ev=>{ if(ev.key==="Enter"){ ev.preventDefault(); const v=(el.value||"").trim(); if(v) openJoin(v); else toast(t("live_need_code")); } }); }
   const df=document.getElementById("deck-file"); if(df && !df._b){ df._b=true; df.addEventListener("change",ev=>{ const file=ev.target.files&&ev.target.files[0]; if(file) deckImportFile(file); ev.target.value=""; }); } }
 function deckIcon(tp){ return ({cloud:"☁️",poll:"📊",qa:"💬",rating:"⭐",rank:"🔢",scale:"📈",points:"🎯"})[tp]||"•"; }
+function deckTemplates(){ return [{"id": "asfan_a", "btn": "ASFAN A · Așteptări (început)", "deck": {"title": "ASFAN · Seara OZN/UAP — Dorințe & așteptări", "slides": [{"type": "poll", "prompt": "De ce te-ai alăturat în această seară?", "options": ["Curiozitate despre OZN / fenomene aeriene neidentificate", "Interes pentru contactul cu inteligențe non-umane", "Comunitatea și prietenii din ASFAN", "Subiectele științifice și astronomice"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Într-un singur cuvânt: ce aștepți de la seara aceasta?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Ce subiect te-ar atrage cel mai mult?", "options": ["Observații OZN / UAP recente", "Căutarea vieții și programele SETI", "Protocoale de contact (Om · IA · NHI)", "SF și imaginarul despre întâlnirea cu Celălalt"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "rating", "prompt": "Cât de familiar ești cu ufologia? (0 = total novice, 10 = cercetător / practician)", "options": [], "statements": [], "scale": 10, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Ce întrebare ai vrea să primească răspuns în seara aceasta?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Cum ți-ar plăcea să arate viitoarele întâlniri ASFAN?", "options": ["Prezentări de la invitați + sesiune de întrebări", "Discuții libere, de grup", "Ateliere practice", "Observații / vizionări comune"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}]}}, {"id": "asfan_b", "btn": "ASFAN B · Feedback (final)", "deck": {"title": "ASFAN · Seara OZN/UAP — Feedback prezentări", "slides": [{"type": "rating", "prompt": "Cum evaluezi, în ansamblu, prezentările de azi? (1 = de îmbunătățit, 5 = excelente)", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Care prezentare ți-a plăcut cel mai mult?", "options": ["⟨Titlu prezentare 1⟩", "⟨Titlu prezentare 2⟩", "⟨Titlu prezentare 3⟩", "⟨Titlu prezentare 4⟩"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Informația a fost clară și ușor de urmărit?", "options": ["Foarte clară", "Destul de clară", "Pe alocuri confuză", "Greu de urmărit"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Ritmul întâlnirii ți s-a părut…?", "options": ["Prea lent", "Potrivit", "Prea alert"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Un singur cuvânt care descrie seara de azi.", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "qa", "prompt": "Ce ai schimba sau adăuga pentru data viitoare?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": true}, {"type": "poll", "prompt": "Ai recomanda o întâlnire ASFAN unui prieten?", "options": ["Cu siguranță da", "Probabil da", "Poate", "Probabil nu"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}]}}]; }
+function loadDeckTemplate(id){ var tpl=deckTemplates().find(function(x){return x.id===id;}); if(!tpl) return;
+  state.deck={ title:tpl.deck.title, slides:tpl.deck.slides.map(function(sl){ return { type:sl.type, prompt:sl.prompt, options:(sl.options||[]).slice(), statements:(sl.statements||[]).slice(), scale:sl.scale||5, budget:sl.budget||100, multi:sl.multi||1, mod:!!sl.mod, filter:!!sl.filter }; }) };
+  state.liveMode="deck"; render(); toast(t("deck_imported", state.deck.slides.length)); }
 function deckAdd(){ syncBuilder(); const lb=state.liveBuilder;
   if(!lb.prompt.trim()){ toast(t("live_need_prompt")); return; }
   const sl={ type:lb.type, prompt:lb.prompt.trim(), scale:lb.scale||5, budget:lb.budget||100, multi:lb.multi||1, mod:!!lb.mod, filter:!!lb.filter, options:[], statements:[] };
@@ -12279,6 +12284,7 @@ document.addEventListener("click",(e)=>{
     case "joincode": { const v=(document.getElementById("lb-join")||{}).value||""; if(v.trim()) openJoin(v.trim()); else toast(t("live_need_code")); break; }
     case "livemode": syncBuilder(); state.liveMode=(v==="deck"?"deck":"single"); render(); break;
     case "deckadd": deckAdd(); break;
+    case "decktpl": loadDeckTemplate(el.dataset.id); break;
     case "deckrm": { syncBuilder(); const i=parseInt(el.dataset.i,10); state.deck.slides.splice(i,1); render(); break; }
     case "deckup": { syncBuilder(); const i=parseInt(el.dataset.i,10); if(i>0){ const a=state.deck.slides; const tm=a[i]; a[i]=a[i-1]; a[i-1]=tm; } render(); break; }
     case "deckdown": { syncBuilder(); const i=parseInt(el.dataset.i,10); const a=state.deck.slides; if(i<a.length-1){ const tm=a[i]; a[i]=a[i+1]; a[i+1]=tm; } render(); break; }
