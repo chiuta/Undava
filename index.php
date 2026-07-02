@@ -11133,14 +11133,18 @@ function renderModal(){
   }
   if(state.modal==="login"){
     const setup = state.server && !QFF.adminExists;
-    m.innerHTML=`<div class="modal-bg" data-action="closemodal-bg"><div class="modal" data-stop="1">
+    m.innerHTML=`<div class="modal-bg"><div class="modal" data-stop="1">
       <h3>🔐 ${esc(t(setup?"admin_setup":"admin_login"))}</h3>
       <div class="about" style="margin:0 0 12px">${esc(t(setup?"admin_setup_d":"admin_login_d"))}</div>
-      <input id="adm-pw" class="input" type="password" placeholder="${esc(t("password"))}" autocomplete="current-password">
+      <input id="adm-pw" class="input" type="password" placeholder="${esc(t("password"))}" autocomplete="${setup?"new-password":"current-password"}">
       ${setup?`<input id="adm-pw2" class="input" type="password" placeholder="${esc(t("password_again"))}" style="margin-top:8px" autocomplete="new-password">`:""}
-      <button class="btn btn-primary btn-block" style="margin-top:14px" data-action="${setup?"dosetup":"dologin"}">${esc(t(setup?"admin_create":"login"))}</button>
-      <button class="btn btn-ghost btn-block" style="margin-top:8px" data-action="closemodal">${esc(t("close"))}</button>
+      <button type="button" class="btn btn-primary btn-block" style="margin-top:14px" data-action="${setup?"dosetup":"dologin"}">${esc(t(setup?"admin_create":"login"))}</button>
+      <button type="button" class="btn btn-ghost btn-block" style="margin-top:8px" data-action="closemodal">${esc(t("close"))}</button>
     </div></div>`;
+    const _pw=document.getElementById("adm-pw"), _pw2=document.getElementById("adm-pw2");
+    if(_pw){ setTimeout(function(){ try{_pw.focus();}catch(e){} },30);
+      _pw.addEventListener("keydown",function(ev){ if(ev.key==="Enter"){ ev.preventDefault(); if(setup&&_pw2){ _pw2.focus(); } else { doLogin(); } } });
+      if(_pw2) _pw2.addEventListener("keydown",function(ev){ if(ev.key==="Enter"){ ev.preventDefault(); doSetup(); } }); }
   }
 }
 
