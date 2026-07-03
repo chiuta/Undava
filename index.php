@@ -190,20 +190,22 @@ function qff_fb_write_all($rows){
 
 
 /* ----- live sessions (flat-file, one JSON per code) ----- */
+function qff_live_valid($s){ if(!is_array($s)||!isset($s['prompt'])) return false; $t=isset($s['type'])?$s['type']:''; if($t==='game'||$t==='assign') return isset($s['quiz']['questions'])&&is_array($s['quiz']['questions'])&&isset($s['players'])&&is_array($s['players']); if($t==='deck') return isset($s['slides'])&&is_array($s['slides']); if($t==='survey') return isset($s['questions'])&&is_array($s['questions']); if($t==='poll'||$t==='rank'||$t==='points') return isset($s['options'])&&is_array($s['options'])&&isset($s['entries'])&&is_array($s['entries']); if($t==='scale') return isset($s['statements'])&&is_array($s['statements'])&&isset($s['entries'])&&is_array($s['entries']); if($t==='cloud'||$t==='qa'||$t==='rating') return isset($s['entries'])&&is_array($s['entries']); return false; }
 function qff_live_path($code){ global $DATA; return $DATA.'/live/'.$code.'.json'; }
 function qff_safe_code($c){ $c=strtoupper((string)$c); $c=preg_replace('/[^A-Z0-9]/','',$c); return substr($c,0,12); }
-function qff_gen_code(){ $al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; do{ $c=''; for($i=0;$i<4;$i++) $c.=$al[random_int(0,strlen($al)-1)]; } while(file_exists(qff_live_path($c))); return $c; }
-function qff_live_load($code){ $f=qff_live_path($code); if(!file_exists($f)) return null; $j=json_decode((string)file_get_contents($f),true); return is_array($j)?$j:null; }
+function qff_gen_code(){ global $DATA; $dir=$DATA.'/live'; if(!is_dir($dir)) @mkdir($dir,0775,true); $al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for($try=0;$try<64;$try++){ $c=''; for($i=0;$i<4;$i++) $c.=$al[random_int(0,strlen($al)-1)]; $fh=@fopen(qff_live_path($c),'x'); if($fh){ fclose($fh); return $c; } } return $c; }
+function qff_live_load($code){ $f=qff_live_path($code); if(!file_exists($f)) return null; $fh=@fopen($f,'r'); if(!$fh){ $j=json_decode((string)@file_get_contents($f),true); return qff_live_valid($j)?$j:null; } @flock($fh,LOCK_SH); $raw=stream_get_contents($fh); @flock($fh,LOCK_UN); fclose($fh); $j=json_decode((string)$raw,true); return qff_live_valid($j)?$j:null; }
 function qff_live_write($s){ global $DATA; if(!is_dir($DATA.'/live')) @mkdir($DATA.'/live',0775,true); return qff_atomic(qff_live_path($s['code']), json_encode($s, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT)); }
 function qff_live_mutate($code,$fn){
   global $DATA; $dir=$DATA.'/live'; if(!is_dir($dir)) @mkdir($dir,0775,true);
   $f=qff_live_path($code); if(!file_exists($f)) return array(null,'missing');
   $fh=fopen($f,'r+'); if(!$fh) return array(null,'io'); if(!flock($fh,LOCK_EX)){ fclose($fh); return array(null,'io'); }
   $raw=stream_get_contents($fh); $s=json_decode($raw,true);
-  if(!is_array($s)){ flock($fh,LOCK_UN); fclose($fh); return array(null,'corrupt'); }
+  if(!qff_live_valid($s)){ flock($fh,LOCK_UN); fclose($fh); return array(null,'corrupt'); }
   $res=$fn($s);
   if($res===false){ flock($fh,LOCK_UN); fclose($fh); return array($s,'reject'); }
-  $s=$res; ftruncate($fh,0); rewind($fh); fwrite($fh, json_encode($s, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT)); fflush($fh); flock($fh,LOCK_UN); fclose($fh);
+  $s=$res; $json=json_encode($s, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT); $tr=ftruncate($fh,0); rewind($fh); $w=fwrite($fh,$json); fflush($fh); flock($fh,LOCK_UN); fclose($fh);
+  if($tr===false || $w===false || $w < strlen($json)) return array(null,'writefail');
   return array($s,'ok');
 }
 function qff_live_public($s,$admin){
@@ -266,6 +268,15 @@ function qff_deck_public($s,$admin){
   $pub['deck']=array('current'=>$cur,'total'=>$n,'open'=>!empty($s['open']),'title'=>$s['prompt']);
   return $pub;
 }
+function qff_survey_public($s,$admin){
+  $qs=isset($s['questions'])?$s['questions']:array(); $out=array(); $done=isset($s['done'])?$s['done']:array();
+  foreach($qs as $q){ $entries=isset($q['entries'])?$q['entries']:array(); $cnt=array(); $disp=array(); $c=0;
+    foreach($entries as $e){ if(!empty($e['hidden'])) continue; $w=trim((string)$e['text']); if($w==='') continue; $c++; $k=function_exists('mb_strtolower')?mb_strtolower($w):strtolower($w); if(!isset($cnt[$k])){ $cnt[$k]=0; $disp[$k]=$w; } $cnt[$k]++; }
+    $res=array(); foreach($cnt as $k=>$n) $res[]=array('text'=>$disp[$k],'count'=>$n);
+    usort($res,function($a,$b){ if($b['count']!==$a['count']) return $b['count']-$a['count']; return strcmp($a['text'],$b['text']); }); $res=array_slice($res,0,150);
+    $out[]=array('q'=>$q['q'],'multi'=>(int)(isset($q['multi'])?$q['multi']:1),'results'=>$res,'count'=>$c); }
+  return array('code'=>$s['code'],'type'=>'survey','prompt'=>$s['prompt'],'open'=>!empty($s['open']),'questions'=>$out,'count'=>count($done),'isAdmin'=>$admin);
+}
 function qff_profanity_list(){ return array(
   'fuck','fucking','fucker','shit','bullshit','bitch','bastard','asshole','dickhead','motherfucker','cunt','wanker','prick','slut','whore','faggot','nigger','retard','douche','jackass','dumbass','pussy',
   'pula','pizda','pizdă','muie','muist','curva','curvă','cur','fut','futu','fute','futut','căcat','cacat','rahat','dracu','dracului','bou','proasta','proastă','prost','tampit','tâmpit','javra','javră','coaie','gaozar','gãozar','sugi','pulă'
@@ -290,6 +301,7 @@ function qff_live_build_entry($type,$cfg,$b,$now){
   return $base;
 }
 function qff_safe_pid($p){ $p=preg_replace('/[^a-f0-9]/','',(string)$p); return substr($p,0,32); }
+function qff_safe_voter($v){ return substr(preg_replace('/[^a-zA-Z0-9]/','',(string)$v),0,40); }
 function qff_game_pub_player($p){ return array('id'=>$p['id'],'name'=>$p['name'],'avatar'=>isset($p['avatar'])?(int)$p['avatar']:0,'score'=>(int)$p['score']); }
 function qff_game_leaderboard($s){ $ps=isset($s['players'])?$s['players']:array(); usort($ps,function($a,$b){ if($b['score']!==$a['score']) return $b['score']-$a['score']; return ((int)(isset($a['joined'])?$a['joined']:0))-((int)(isset($b['joined'])?$b['joined']:0)); }); return $ps; }
 function qff_game_state($s,$pid,$admin){
@@ -343,6 +355,10 @@ function qff_game_state($s,$pid,$admin){
       }
       $out['question']=$qq;
       $lb=qff_game_leaderboard($s); $top=array(); foreach(array_slice($lb,0,8) as $p) $top[]=qff_game_pub_player($p); $out['leaderboard']=$top;
+      $resp=array(); foreach((isset($s['players'])?$s['players']:array()) as $p){ if(isset($p['answers'][$qi]) && isset($p['answers'][$qi]['ts'])){ $a=$p['answers'][$qi]; $resp[]=array('name'=>(string)$p['name'],'avatar'=>(int)(isset($p['avatar'])?$p['avatar']:0),'ts'=>(int)$a['ts'],'correct'=>!empty($a['correct']),'points'=>(int)(isset($a['points'])?$a['points']:0)); } }
+      usort($resp,function($a,$b){ return $a['ts']-$b['ts']; });
+      $fast=array(); foreach(array_slice($resp,0,5) as $r){ $fast[]=array('name'=>$r['name'],'avatar'=>$r['avatar'],'ms'=>max(0,$r['ts']-$qStart),'correct'=>$r['correct'],'points'=>$r['points']); }
+      $out['fastest']=$fast;
       if($me){ $rank=1; foreach($lb as $i=>$p){ if($p['id']===$me['id']){ $rank=$i+1; break; } } $my=isset($me['answers'][$qi])?$me['answers'][$qi]:null;
         $out['myResult']=array('answered'=>($my!==null),'correct'=>($my!==null && !empty($my['correct'])),'points'=>($my!==null?(int)$my['points']:0),'score'=>(int)$me['score'],'rank'=>$rank,'streak'=>(int)$me['streak']); }
     }
@@ -489,12 +505,12 @@ if($action !== null){
 
   if($action==='live_create'){
     $b=qff_body(); qff_check_csrf($b); qff_require_admin();
-    $type=isset($b['type'])?$b['type']:''; if(!in_array($type,array('cloud','poll','qa','game','assign','rating','rank','scale','points','deck'),true)) qff_err('bad type');
+    $type=isset($b['type'])?$b['type']:''; if(!in_array($type,array('cloud','poll','qa','game','assign','rating','rank','scale','points','deck','survey'),true)) qff_err('bad type');
     if($type==='game'){
       $quiz=qff_norm_quiz(isset($b['quiz'])?$b['quiz']:null);
       $s=array('code'=>qff_gen_code(),'type'=>'game','prompt'=>$quiz['title'],'quiz'=>$quiz,'open'=>true,'phase'=>'lobby','qIndex'=>-1,'qStart'=>0,'qStarts'=>array(),'created'=>(int)round(microtime(true)*1000),'players'=>array());
       $tms=(isset($b['teams'])&&is_array($b['teams']))?$b['teams']:array(); $teams=array();
-      foreach($tms as $tm){ if(!is_array($tm)) continue; $teams[]=array('name'=>qff_clip(isset($tm['name'])?$tm['name']:'Echipă',20),'emoji'=>qff_clip(isset($tm['emoji'])?$tm['emoji']:'⚑',8),'color'=>qff_clip(isset($tm['color'])?$tm['color']:'#888888',9)); if(count($teams)>=4) break; }
+      foreach($tms as $tm){ if(!is_array($tm)) continue; $tcol=(isset($tm['color'])&&is_string($tm['color'])&&preg_match('/^#[0-9a-fA-F]{3,8}$/',$tm['color']))?$tm['color']:'#888888'; $temo=str_replace(array('<','>','&','"',"'"),'',qff_clip(isset($tm['emoji'])?$tm['emoji']:'⚑',8)); if($temo==='')$temo='⚑'; $teams[]=array('name'=>qff_clip(isset($tm['name'])?$tm['name']:'Echipă',20),'emoji'=>$temo,'color'=>$tcol); if(count($teams)>=4) break; }
       if(count($teams)>=2) $s['teams']=$teams;
       if(!qff_live_write($s)) qff_err('write failed',500);
       qff_json(array('ok'=>true,'session'=>qff_game_state($s,'',true)));
@@ -523,6 +539,15 @@ if($action !== null){
       if(!qff_live_write($s)) qff_err('write failed',500);
       qff_json(array('ok'=>true,'session'=>qff_deck_public($s,true)));
     }
+    if($type==='survey'){
+      $raw=(isset($b['questions'])&&is_array($b['questions']))?$b['questions']:array(); $qs=array();
+      foreach($raw as $q){ if(is_array($q)){ $qt=qff_clip(isset($q['q'])?$q['q']:'',200); $qm=(int)(isset($q['multi'])?$q['multi']:1); } else { $qt=qff_clip((string)$q,200); $qm=1; } if($qt==='') continue; if($qm<1)$qm=1; if($qm>5)$qm=5; $qs[]=array('q'=>$qt,'multi'=>$qm,'entries'=>array()); }
+      if(count($qs)<1) qff_err('need questions'); $qs=array_slice($qs,0,20);
+      $title=qff_clip(isset($b['prompt'])?$b['prompt']:'',200); if($title==='') $title='Chestionar';
+      $s=array('code'=>qff_gen_code(),'type'=>'survey','prompt'=>$title,'questions'=>$qs,'filter'=>!empty($b['filter']),'open'=>true,'created'=>(int)round(microtime(true)*1000),'done'=>array());
+      if(!qff_live_write($s)) qff_err('write failed',500);
+      qff_json(array('ok'=>true,'session'=>qff_survey_public($s,true)));
+    }
     $prompt=qff_clip(isset($b['prompt'])?$b['prompt']:'',200); if($prompt==='') qff_err('missing prompt');
     $opts=array();
     if($type==='poll'||$type==='rank'||$type==='points'){ $raw=(isset($b['options'])&&is_array($b['options']))?$b['options']:array(); foreach($raw as $o){ $o=qff_clip($o,80); if($o!=='') $opts[]=$o; } $opts=array_slice($opts,0,$type==='poll'?10:8); if(count($opts)<2) qff_err('need 2 options'); }
@@ -541,6 +566,7 @@ if($action !== null){
     if(($s['type']??'')==='assign') qff_json(array('session'=>qff_assign_state($s, qff_safe_pid(isset($_GET['pid'])?$_GET['pid']:''), qff_is_admin())));
     if(($s['type']??'')==='game') qff_json(array('session'=>qff_game_state($s, qff_safe_pid(isset($_GET['pid'])?$_GET['pid']:''), qff_is_admin())));
     if(($s['type']??'')==='deck') qff_json(array('session'=>qff_deck_public($s, qff_is_admin())));
+    if(($s['type']??'')==='survey') qff_json(array('session'=>qff_survey_public($s, qff_is_admin())));
     qff_json(array('session'=>qff_live_public($s,qff_is_admin())));
   }
   if($action==='live_submit'){
@@ -559,6 +585,21 @@ if($action !== null){
       list($s,$st)=qff_live_mutate($code,function($s) use($entry,$cur){ if(empty($s['open'])) return false; if(!isset($s['slides'][$cur])) return false; if(!isset($s['slides'][$cur]['entries'])) $s['slides'][$cur]['entries']=array(); if(count($s['slides'][$cur]['entries'])>=5000) return false; $s['slides'][$cur]['entries'][]=$entry; return $s; });
       if($st!=='ok') qff_err('could not save', $st==='reject'?423:500);
       $_SESSION['live_last'][$code]=$now; qff_json(array('ok'=>true,'session'=>qff_deck_public($s,qff_is_admin())));
+    }
+    if(($pre['type']??'')==='survey'){
+      $voter=qff_safe_voter(isset($b['voter'])?$b['voter']:''); $name=qff_clip(isset($b['name'])?$b['name']:'',40);
+      $ans=(isset($b['answers'])&&is_array($b['answers']))?$b['answers']:array(); $filter=!empty($pre['filter']); $tn=(int)round($now*1000);
+      $pdone=isset($pre['done'])?$pre['done']:array(); if($voter!=='' && in_array($voter,$pdone,true)) qff_err('already submitted',409);
+      list($s,$st)=qff_live_mutate($code,function($s) use($ans,$name,$voter,$filter,$tn){ if(empty($s['open'])) return false;
+        $done=isset($s['done'])?$s['done']:array(); if($voter!=='' && in_array($voter,$done,true)) return false;
+        $qs=isset($s['questions'])?$s['questions']:array();
+        foreach($qs as $qi=>$q){ $multi=(int)(isset($q['multi'])?$q['multi']:1); if($multi<1)$multi=1; if($multi>5)$multi=5; $raw=isset($ans[$qi])?$ans[$qi]:null; $words=array();
+          if(is_array($raw)){ foreach($raw as $w){ $w=qff_clip($w,40); if($w!=='') $words[]=$w; } } else if(is_string($raw)){ foreach(preg_split('/,/',$raw) as $w){ $w=qff_clip(trim($w),40); if($w!=='') $words[]=$w; } }
+          $words=array_slice($words,0,$multi); if(!isset($s['questions'][$qi]['entries'])) $s['questions'][$qi]['entries']=array();
+          foreach($words as $w){ if($filter) $w=qff_profanity_mask($w); if(count($s['questions'][$qi]['entries'])<5000) $s['questions'][$qi]['entries'][]=array('text'=>$w,'name'=>$name,'ts'=>$tn); } }
+        if($voter!==''){ $done[]=$voter; $s['done']=$done; } return $s; });
+      if($st!=='ok') qff_err('could not save', $st==='reject'?423:500);
+      $_SESSION['live_last'][$code]=$now; qff_json(array('ok'=>true,'session'=>qff_survey_public($s,qff_is_admin())));
     }
     $type=$pre['type'];
     if($type==='rating'){
@@ -637,6 +678,10 @@ if($action !== null){
         else return false;
         return $s;
       }
+      if(($s['type']??'')==='survey'){
+        if($act==='open'){ $s['open']=true; } else if($act==='close'){ $s['open']=false; } else if($act==='clear'){ if(isset($s['questions'])) foreach($s['questions'] as $i=>$q){ $s['questions'][$i]['entries']=array(); } $s['done']=array(); } else return false;
+        return $s;
+      }
       if($act==='open'){ $s['open']=true; }
       else if($act==='close'){ $s['open']=false; }
       else if($act==='clear'){ $s['entries']=array(); }
@@ -653,7 +698,7 @@ if($action !== null){
       return $s;
     });
     if($st!=='ok') qff_err($st==='missing'?'not found':'bad action', $st==='missing'?404:400);
-    $rt=($s['type']??''); $rsess = $rt==='game' ? qff_game_state($s,'',true) : ($rt==='assign' ? qff_assign_state($s,'',true) : ($rt==='deck' ? qff_deck_public($s,true) : qff_live_public($s,true)));
+    $rt=($s['type']??''); $rsess = $rt==='game' ? qff_game_state($s,'',true) : ($rt==='assign' ? qff_assign_state($s,'',true) : ($rt==='deck' ? qff_deck_public($s,true) : ($rt==='survey' ? qff_survey_public($s,true) : qff_live_public($s,true))));
     qff_json(array('ok'=>true,'session'=>$rsess));
   }
   if($action==='live_join'){
@@ -894,7 +939,7 @@ input,textarea,select{font-family:inherit}
 .hidden{display:none!important}
 
 /* ---------- top bar ---------- */
-.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
   padding:14px clamp(14px,4vw,28px);max-width:var(--maxw);margin:0 auto;width:100%}
 .brand{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;margin-right:auto}
 .brand .logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
@@ -910,6 +955,13 @@ input,textarea,select{font-family:inherit}
 .langtog{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .langtog button{padding:9px 11px;background:transparent;font-weight:800;font-size:13px;color:var(--muted);line-height:1}
 .langtog button.on{background:var(--accent);color:#2a1000}
+@media (max-width:640px){
+  .topbar{gap:10px;padding-top:12px}
+  .topbar .langtog{order:-1;flex-basis:100%;width:100%;flex-wrap:nowrap}
+  .topbar .langtog button{flex:1 1 0;min-width:0;text-align:center;padding:10px 2px}
+  .topbar .brand{order:1;margin-right:auto}
+  .topbar .tools{order:2}
+}
 
 /* ---------- layout ---------- */
 .wrap{max-width:var(--maxw);margin:0 auto;padding:8px clamp(14px,4vw,28px) 60px;width:100%}
@@ -1301,6 +1353,20 @@ input,textarea,select{font-family:inherit}
 .gr-q .answers{margin-top:14px}
 .gr-lb{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:var(--r);padding:16px}
 .gr-lb .sb-row{padding:10px 12px;margin-bottom:8px;animation:none}
+.gh-fast{margin-top:16px;background:rgba(0,0,0,.16);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.ghf-title{font-weight:800;font-size:13px;letter-spacing:.04em;color:var(--accent);margin-bottom:10px;text-transform:uppercase}
+.ghf-row{display:flex;flex-wrap:wrap;gap:10px}
+.ghf-card{flex:1 1 140px;min-width:130px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:var(--r-sm);padding:8px 10px}
+.ghf-card.ok{border-left-color:var(--good)}
+.ghf-card.no{border-left-color:var(--bad)}
+.ghf-rk{font-weight:900;font-size:15px;width:20px;text-align:center;color:var(--accent);flex:none}
+.ghf-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+.ghf-nm{font-weight:700;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ghf-ms{font-weight:800;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.ghf-pts{font-weight:800;font-size:12px;flex:none;white-space:nowrap}
+.ghf-card.ok .ghf-pts{color:var(--good)}
+.ghf-card.no .ghf-pts{color:var(--bad)}
+@media(max-width:820px){ .ghf-card{flex:1 1 100%} }
 .gr-lb .rk{font-weight:900;width:24px;color:var(--muted)}
 .gr-lb .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:18px;flex:none}
 .gr-lb .nm{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -9022,7 +9088,7 @@ window.QFF = window.QFF || <?php echo json_encode($QFF_CLIENT, JSON_UNESCAPED_UN
 
 /* ---------------- i18n ---------------- */
 const I18N = {
-  ro:{
+  ro:{fastest5:"Cei mai rapizi", live_mode_survey:"Chestionar", sv_title:"Titlul chestionarului", sv_title_ph:"Ex: Feedback eveniment ASFAN", sv_questions:"Întrebări (una pe linie)", sv_questions_ph:"De ce ai venit?\nUn cuvânt pentru seara asta\nCe ai schimba?", sv_questions_hint:"Fiecare linie devine o întrebare cu text liber. Răspunsurile se agregă într-un nor de cuvinte.", sv_need_q:"Scrie măcar o întrebare.", sv_thanks:"Mulțumim! Răspunsul tău a fost trimis.", sv_word_ph:"Un cuvânt sau o frază scurtă…", sv_need_ans:"Scrie măcar un răspuns.", sv_send:"Trimite", cat_survey:"Chestionar feedback", cat_quiz:"Chestionare & jocuri", cat_quiz_d:"Grile, adevărat/fals, răspuns liber, numeric · Solo, pe rând, live, temă sau echipe", cat_audience:"Activități de audiență", cat_audience_d:"Colectează răspunsuri live de la public, de pe telefoane. Alege un tip:", cat_deck:"Prezentări", cat_deck_d:"Înlănțuie mai multe activități într-o singură sesiune, navigate în ritmul tău.", cat_tools:"Instrumente", deck_build:"Construiește o prezentare", cat_vote:"Voturi & sondaje", cat_text:"Text & idei", cat_eval:"Evaluări & scale", 
     tagline:"Quiz fără frontiere",
     home_kicker:"Joc de quiz • offline • gratuit",
     home_title_1:"Învață, joacă,",
@@ -9178,7 +9244,7 @@ const I18N = {
     report_correct:"corecte", report_answered:"au răspuns", report_csv:"CSV", report_json:"JSON", report_print:"Printează",
     report_easy:"ușoară", report_med:"medie", report_hard:"grea", report_back:"Înapoi", report_no_data:"Încă nu sunt date.", report_player:"Jucător",
   },
-  en:{
+  en:{fastest5:"Fastest", live_mode_survey:"Survey", sv_title:"Survey title", sv_title_ph:"E.g. ASFAN event feedback", sv_questions:"Questions (one per line)", sv_questions_ph:"Why did you come?\nOne word for tonight\nWhat would you change?", sv_questions_hint:"Each line becomes a free-text question. Answers aggregate into a word cloud.", sv_need_q:"Write at least one question.", sv_thanks:"Thank you! Your response was sent.", sv_word_ph:"A word or a short phrase…", sv_need_ans:"Write at least one answer.", sv_send:"Send", cat_survey:"Feedback survey", cat_quiz:"Quizzes & games", cat_quiz_d:"Multiple choice, true/false, free answer, numeric · Solo, turns, live, homework or teams", cat_audience:"Audience activities", cat_audience_d:"Collect live responses from the audience, from their phones. Pick a type:", cat_deck:"Presentations", cat_deck_d:"Chain several activities into one session, navigated at your pace.", cat_tools:"Tools", deck_build:"Build a presentation", cat_vote:"Votes & polls", cat_text:"Text & ideas", cat_eval:"Ratings & scales", 
     tagline:"Quiz without borders",
     home_kicker:"Quiz game • offline • free",
     home_title_1:"Learn, play,",
@@ -9334,7 +9400,7 @@ const I18N = {
     report_correct:"correct", report_answered:"answered", report_csv:"CSV", report_json:"JSON", report_print:"Print",
     report_easy:"easy", report_med:"medium", report_hard:"hard", report_back:"Back", report_no_data:"No data yet.", report_player:"Player",
   },
-  fr:{
+  fr:{fastest5:"Les plus rapides", live_mode_survey:"Sondage", sv_title:"Titre du sondage", sv_title_ph:"Ex : Retour événement ASFAN", sv_questions:"Questions (une par ligne)", sv_questions_ph:"Pourquoi es-tu venu ?\nUn mot pour ce soir\nQue changerais-tu ?", sv_questions_hint:"Chaque ligne devient une question à texte libre. Les réponses s'agrègent en nuage de mots.", sv_need_q:"Écris au moins une question.", sv_thanks:"Merci ! Ta réponse a été envoyée.", sv_word_ph:"Un mot ou une courte phrase…", sv_need_ans:"Écris au moins une réponse.", sv_send:"Envoyer", cat_survey:"Sondage de retour", cat_quiz:"Quiz & jeux", cat_quiz_d:"Choix multiple, vrai/faux, réponse libre, numérique · Solo, à tour de rôle, live, devoir ou équipes", cat_audience:"Activités d'audience", cat_audience_d:"Collecte les réponses du public en direct, depuis les téléphones. Choisis un type :", cat_deck:"Présentations", cat_deck_d:"Enchaîne plusieurs activités en une seule session, à ton rythme.", cat_tools:"Outils", deck_build:"Créer une présentation", cat_vote:"Votes & sondages", cat_text:"Texte & idées", cat_eval:"Évaluations & échelles", 
     tagline:"Quiz sans frontières",
     home_kicker:"Jeu de quiz • hors ligne • gratuit",
     home_title_1:"Apprends, joue,",
@@ -9490,7 +9556,7 @@ const I18N = {
     report_correct:"correctes", report_answered:"répondu", report_csv:"CSV", report_json:"JSON", report_print:"Imprimer",
     report_easy:"facile", report_med:"moyen", report_hard:"difficile", report_back:"Retour", report_no_data:"Aucune donnée.", report_player:"Joueur",
   },
-  it:{
+  it:{fastest5:"I più veloci", live_mode_survey:"Sondaggio", sv_title:"Titolo del sondaggio", sv_title_ph:"Es: Feedback evento ASFAN", sv_questions:"Domande (una per riga)", sv_questions_ph:"Perché sei venuto?\nUna parola per stasera\nCosa cambieresti?", sv_questions_hint:"Ogni riga diventa una domanda a testo libero. Le risposte si aggregano in una nuvola di parole.", sv_need_q:"Scrivi almeno una domanda.", sv_thanks:"Grazie! La tua risposta è stata inviata.", sv_word_ph:"Una parola o una frase breve…", sv_need_ans:"Scrivi almeno una risposta.", sv_send:"Invia", cat_survey:"Sondaggio di feedback", cat_quiz:"Quiz & giochi", cat_quiz_d:"Scelta multipla, vero/falso, risposta libera, numerico · Solo, a turni, dal vivo, compito o squadre", cat_audience:"Attività per il pubblico", cat_audience_d:"Raccogli risposte dal vivo dal pubblico, dai telefoni. Scegli un tipo:", cat_deck:"Presentazioni", cat_deck_d:"Concatena più attività in un'unica sessione, al tuo ritmo.", cat_tools:"Strumenti", deck_build:"Crea una presentazione", cat_vote:"Voti & sondaggi", cat_text:"Testo & idee", cat_eval:"Valutazioni & scale", 
     tagline:"Quiz senza frontiere",
     home_kicker:"Gioco a quiz • offline • gratuito",
     home_title_1:"Impara, gioca,",
@@ -9646,7 +9712,7 @@ const I18N = {
     report_correct:"corrette", report_answered:"risposto", report_csv:"CSV", report_json:"JSON", report_print:"Stampa",
     report_easy:"facile", report_med:"media", report_hard:"difficile", report_back:"Indietro", report_no_data:"Ancora nessun dato.", report_player:"Giocatore",
   },
-  es:{
+  es:{fastest5:"Los más rápidos", live_mode_survey:"Cuestionario", sv_title:"Título del cuestionario", sv_title_ph:"Ej: Feedback evento ASFAN", sv_questions:"Preguntas (una por línea)", sv_questions_ph:"¿Por qué viniste?\nUna palabra para esta noche\n¿Qué cambiarías?", sv_questions_hint:"Cada línea se convierte en una pregunta de texto libre. Las respuestas se agregan en una nube de palabras.", sv_need_q:"Escribe al menos una pregunta.", sv_thanks:"¡Gracias! Tu respuesta se ha enviado.", sv_word_ph:"Una palabra o una frase corta…", sv_need_ans:"Escribe al menos una respuesta.", sv_send:"Enviar", cat_survey:"Cuestionario de feedback", cat_quiz:"Cuestionarios & juegos", cat_quiz_d:"Opción múltiple, verdadero/falso, respuesta libre, numérico · Solo, por turnos, en directo, tarea o equipos", cat_audience:"Actividades de audiencia", cat_audience_d:"Recoge respuestas en directo del público, desde sus teléfonos. Elige un tipo:", cat_deck:"Presentaciones", cat_deck_d:"Encadena varias actividades en una sola sesión, a tu ritmo.", cat_tools:"Herramientas", deck_build:"Crear una presentación", cat_vote:"Votos & encuestas", cat_text:"Texto & ideas", cat_eval:"Valoraciones & escalas", 
     tagline:"Quiz sin fronteras",
     home_kicker:"Juego de preguntas • sin conexión • gratis",
     home_title_1:"Aprende, juega,",
@@ -9802,7 +9868,7 @@ const I18N = {
     report_correct:"correctas", report_answered:"respondido", report_csv:"CSV", report_json:"JSON", report_print:"Imprimir",
     report_easy:"fácil", report_med:"media", report_hard:"difícil", report_back:"Atrás", report_no_data:"Aún no hay datos.", report_player:"Jugador",
   },
-  pt:{
+  pt:{fastest5:"Os mais rápidos", live_mode_survey:"Questionário", sv_title:"Título do questionário", sv_title_ph:"Ex: Feedback evento ASFAN", sv_questions:"Perguntas (uma por linha)", sv_questions_ph:"Porque vieste?\nUma palavra para esta noite\nO que mudarias?", sv_questions_hint:"Cada linha torna-se uma pergunta de texto livre. As respostas agregam-se numa nuvem de palavras.", sv_need_q:"Escreve pelo menos uma pergunta.", sv_thanks:"Obrigado! A tua resposta foi enviada.", sv_word_ph:"Uma palavra ou uma frase curta…", sv_need_ans:"Escreve pelo menos uma resposta.", sv_send:"Enviar", cat_survey:"Questionário de feedback", cat_quiz:"Questionários & jogos", cat_quiz_d:"Escolha múltipla, verdadeiro/falso, resposta livre, numérico · Solo, à vez, ao vivo, trabalho ou equipas", cat_audience:"Atividades de audiência", cat_audience_d:"Recolhe respostas ao vivo do público, dos telemóveis. Escolhe um tipo:", cat_deck:"Apresentações", cat_deck_d:"Encadeia várias atividades numa única sessão, ao teu ritmo.", cat_tools:"Ferramentas", deck_build:"Criar uma apresentação", cat_vote:"Votos & sondagens", cat_text:"Texto & ideias", cat_eval:"Avaliações & escalas", 
     tagline:"Quiz sem fronteiras",
     home_kicker:"Jogo de perguntas • offline • gratuito",
     home_title_1:"Aprende, joga,",
@@ -9958,7 +10024,7 @@ const I18N = {
     report_correct:"corretas", report_answered:"respondido", report_csv:"CSV", report_json:"JSON", report_print:"Imprimir",
     report_easy:"fácil", report_med:"média", report_hard:"difícil", report_back:"Voltar", report_no_data:"Ainda não há dados.", report_player:"Jogador",
   },
-  de:{
+  de:{fastest5:"Die Schnellsten", live_mode_survey:"Umfrage", sv_title:"Umfragetitel", sv_title_ph:"z. B. ASFAN-Event-Feedback", sv_questions:"Fragen (eine pro Zeile)", sv_questions_ph:"Warum bist du gekommen?\nEin Wort für heute Abend\nWas würdest du ändern?", sv_questions_hint:"Jede Zeile wird zu einer Freitextfrage. Antworten werden zu einer Wortwolke zusammengefasst.", sv_need_q:"Schreibe mindestens eine Frage.", sv_thanks:"Danke! Deine Antwort wurde gesendet.", sv_word_ph:"Ein Wort oder eine kurze Phrase…", sv_need_ans:"Schreibe mindestens eine Antwort.", sv_send:"Senden", cat_survey:"Feedback-Umfrage", cat_quiz:"Quiz & Spiele", cat_quiz_d:"Multiple Choice, wahr/falsch, freie Antwort, numerisch · Solo, reihum, live, Aufgabe oder Teams", cat_audience:"Publikumsaktivitäten", cat_audience_d:"Sammle Live-Antworten vom Publikum, von den Handys. Wähle einen Typ:", cat_deck:"Präsentationen", cat_deck_d:"Verkette mehrere Aktivitäten in einer Sitzung, in deinem Tempo.", cat_tools:"Werkzeuge", deck_build:"Präsentation erstellen", cat_vote:"Abstimmungen & Umfragen", cat_text:"Text & Ideen", cat_eval:"Bewertungen & Skalen", 
     tagline:"Quiz ohne Grenzen",
     home_kicker:"Quizspiel • offline • kostenlos",
     home_title_1:"Lernen, spielen,",
@@ -10326,16 +10392,16 @@ function renderTopBar(){
       <div class="logo"></div>
       <div><h1>Undava</h1><small>${esc(t("tagline"))}</small></div>
     </div>
+    <div class="langtog">
+      <button class="${state.lang==="ro"?"on":""}" data-action="lang" data-v="ro">RO</button>
+      <button class="${state.lang==="en"?"on":""}" data-action="lang" data-v="en">EN</button>
+      <button class="${state.lang==="fr"?"on":""}" data-action="lang" data-v="fr">FR</button>
+      <button class="${state.lang==="it"?"on":""}" data-action="lang" data-v="it">IT</button>
+      <button class="${state.lang==="es"?"on":""}" data-action="lang" data-v="es">ES</button>
+      <button class="${state.lang==="pt"?"on":""}" data-action="lang" data-v="pt">PT</button>
+      <button class="${state.lang==="de"?"on":""}" data-action="lang" data-v="de">DE</button>
+    </div>
     <div class="tools">
-      <div class="langtog">
-        <button class="${state.lang==="ro"?"on":""}" data-action="lang" data-v="ro">RO</button>
-        <button class="${state.lang==="en"?"on":""}" data-action="lang" data-v="en">EN</button>
-        <button class="${state.lang==="fr"?"on":""}" data-action="lang" data-v="fr">FR</button>
-        <button class="${state.lang==="it"?"on":""}" data-action="lang" data-v="it">IT</button>
-        <button class="${state.lang==="es"?"on":""}" data-action="lang" data-v="es">ES</button>
-        <button class="${state.lang==="pt"?"on":""}" data-action="lang" data-v="pt">PT</button>
-        <button class="${state.lang==="de"?"on":""}" data-action="lang" data-v="de">DE</button>
-      </div>
       <button class="iconbtn" data-action="sound" title="${esc(t("set_sound"))}">${state.sound?"🔊":"🔇"}</button>
       <button class="iconbtn" data-action="settings" title="${esc(t("settings"))}">⚙️</button>
     </div>`;
@@ -10439,27 +10505,31 @@ function viewHelp(){
   +'</div>';
 }
 function viewHome(){
-  return `<div class="wrap center-stage">
-    <section class="hero">
+  const A={cloud:["☁️",t("live_t_cloud"),t("live_t_cloud_d")],poll:["📊",t("live_t_poll"),t("live_t_poll_d")],qa:["💬",t("live_t_qa"),t("live_t_qa_d")],rating:["⭐",t("live_t_rating"),t("live_t_rating_d")],rank:["🔢",t("live_t_rank"),t("live_t_rank_d")],scale:["📈",t("live_t_scale"),t("live_t_scale_d")],points:["🎯",t("live_t_points"),t("live_t_points_d")]};
+  const tile=id=>`<button class="ltype" data-action="golive" data-v="${id}"><span class="lt-ic">${A[id][0]}</span><span class="lt-nm">${esc(A[id][1])}</span><span class="lt-d">${esc(A[id][2])}</span></button>`;
+  const cats=[["cat_vote",["poll","rank","points"]],["cat_text",["cloud","qa"]],["cat_eval",["rating","scale"]]];
+  const cs="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;opacity:.55;margin:14px 2px 8px";
+  const groups=cats.map(c=>`<div class="ltype-cat" style="${cs}">${esc(t(c[0]))}</div><div class="ltype-grid">${c[1].map(tile).join("")}</div>`).join("");
+  return `<div class="wrap">
+    <section class="hero" style="padding-bottom:2px">
       <span class="kicker">${esc(t("home_kicker"))}</span>
       <h2>${esc(t("home_title_1"))}<br><span class="pop">${esc(t("home_title_2"))}</span></h2>
       <p>${esc(t("home_sub"))}</p>
-      <div class="cta-row">
-        <button class="btn btn-primary btn-lg" data-action="library">▶ ${esc(t("play"))}</button>
-        <button class="btn btn-pink btn-lg" data-action="create">✎ ${esc(t("create"))}</button>
-        <button class="btn btn-ghost btn-lg" data-action="import">⇪ ${esc(t("import"))}</button>
-        <button class="btn btn-ghost btn-lg" data-action="guestbook">💬 ${esc(t("guestbook"))}</button>
-        <button class="btn btn-ghost btn-lg" data-action="live">📡 ${esc(t("live_nav"))}</button>
-        <button class="btn btn-ghost btn-lg" data-action="spinner">🎡 ${esc(t("spin_nav"))}</button>
-        <button class="btn btn-ghost btn-lg" data-action="help">❓ ${esc(t("help_nav"))}</button>
-      </div>
-      <div class="feat">
-        <span><b>●</b> ${esc(t("feat_offline"))}</span>
-        <span><b>●</b> ${esc(t("feat_free"))}</span>
-        <span><b>●</b> ${esc(t("feat_priv"))}</span>
-        <span><b>●</b> ${esc(t("feat_open"))}</span>
-      </div>
     </section>
+    <div class="ltype-head" style="margin-top:6px">🎓 ${esc(t("cat_quiz"))}</div>
+    <div class="panel"><div class="about" style="margin:0 0 12px">${esc(t("cat_quiz_d"))}</div><div class="cta-row" style="margin:0"><button class="btn btn-primary btn-lg" data-action="library">▶ ${esc(t("play"))}</button><button class="btn btn-pink btn-lg" data-action="create">✎ ${esc(t("create"))}</button><button class="btn btn-ghost btn-lg" data-action="import">⇪ ${esc(t("import"))}</button></div></div>
+    <div class="ltype-head" style="margin-top:18px">📡 ${esc(t("cat_audience"))}</div>
+    <div class="panel"><div class="about" style="margin:0 0 4px">${esc(t("cat_audience_d"))}</div>${groups}</div>
+    <div class="ltype-head" style="margin-top:18px">🎬 ${esc(t("cat_deck"))}</div>
+    <div class="panel"><div class="about" style="margin:0 0 12px">${esc(t("cat_deck_d"))}</div><div class="cta-row" style="margin:0"><button class="btn btn-primary btn-lg" data-action="golivedeck">🎬 ${esc(t("deck_build"))}</button><button class="btn btn-ghost btn-lg" data-action="golivesurvey">📝 ${esc(t("cat_survey"))}</button></div></div>
+    <div class="ltype-head" style="margin-top:18px">🧰 ${esc(t("cat_tools"))}</div>
+    <div class="panel"><div class="cta-row" style="margin:0"><button class="btn btn-ghost btn-lg" data-action="live">📡 ${esc(t("live_nav"))}</button><button class="btn btn-ghost btn-lg" data-action="spinner">🎡 ${esc(t("spin_nav"))}</button><button class="btn btn-ghost btn-lg" data-action="guestbook">💬 ${esc(t("guestbook"))}</button><button class="btn btn-ghost btn-lg" data-action="help">❓ ${esc(t("help_nav"))}</button></div></div>
+    <div class="feat" style="justify-content:center;margin-top:18px">
+      <span><b>●</b> ${esc(t("feat_offline"))}</span>
+      <span><b>●</b> ${esc(t("feat_free"))}</span>
+      <span><b>●</b> ${esc(t("feat_priv"))}</span>
+      <span><b>●</b> ${esc(t("feat_open"))}</span>
+    </div>
   </div>`;
 }
 
@@ -10865,7 +10935,7 @@ function doReveal(){
     } else { newStreak=0; }
     pt.streak=newStreak; pt.score+=pts;
     pt.history.push({correct:a.correct, pts});
-    return {name:pt.name, idx:pt.idx, answerIndex:a.answerIndex, text:a.text, correct:a.correct, pts, streak:newStreak, answered:(a.answerIndex!=null)||(a.text!=null&&a.text!=="")};
+    return {name:pt.name, idx:pt.idx, answerIndex:a.answerIndex, text:a.text, correct:a.correct, pts, streak:newStreak, elapsed:a.elapsed, answered:(a.answerIndex!=null)||(a.text!=null&&a.text!=="")};
   });
   // post ranks
   const postSorted=[...p.participants].sort((a,b)=>b.score-a.score);
@@ -10984,10 +11054,13 @@ function revealView(){
       <div class="nm">${esc(r.name)}</div>
       <div class="pt">${r.correct?"+"+r.pts:(r.answered?"✗":"—")}</div>
     </div>`).join("");
+  const fastList=p.roundResults.filter(r=>r.answered).sort((a,b)=>a.elapsed-b.elapsed).slice(0,5);
+  const fastHTML=fastList.length?`<div class="gh-fast"><div class="ghf-title">⚡ ${esc(t("fastest5"))}</div><div class="ghf-row">${fastList.map((r,i)=>`<div class="ghf-card ${r.correct?"ok":"no"}"><div class="ghf-rk">${i+1}</div><div class="ghf-av" style="background:${avColor(r.idx)}">${esc(initials(r.name))}</div><div class="ghf-nm">${esc(r.name)}</div><div class="ghf-ms">${(r.elapsed/1000).toFixed(1)}s</div><div class="ghf-pts">${r.correct?"✓ +"+r.pts:"✗"}</div></div>`).join("")}</div></div>`:"";
   return `<div class="reveal">
     <div class="verdict ok" style="font-size:clamp(22px,5vw,34px);color:#fff">${esc(t("correct_was"))}</div>
     <div class="points" style="font-size:clamp(22px,5vw,34px)">${esc(correctTxt)}</div>
     <div class="reveal-results">${rows}</div>
+    ${fastHTML}
     <button class="btn btn-primary btn-lg" style="margin-top:12px" data-action="continue">${esc(t("continue"))} ▶</button>
   </div>`;
 }
@@ -11383,7 +11456,7 @@ function qrInto(el,text,scale){ el.innerHTML=""; try{ const c=qrCanvas(text,scal
    LIVE AUDIENCE MODE — multi-device word cloud / poll / Q&A (server-backed)
    ========================================================================== */
 Object.assign(state, { live:null, liveRole:null, join:null,
-  liveBuilder:{ type:"cloud", prompt:"", options:["",""], statements:["",""], multi:1, scale:5, budget:100, mod:false, filter:false }, liveMode:"single", deck:{ title:"", slides:[] }, _poll:null });
+  liveBuilder:{ type:"cloud", prompt:"", options:["",""], statements:["",""], multi:1, scale:5, budget:100, mod:false, filter:false }, liveMode:"single", deck:{ title:"", slides:[] }, survey:{ title:"", text:"", multi:1, filter:false }, _poll:null });
 
 const CLOUD_COLORS=["#ffd23f","#ff5a5f","#34d3ff","#18bd6b","#b06bff","#ff8c42","#ff6ad5","#9fe84f","#62d0ff","#ffc14d"];
 const POLL_COLORS=["#2f6bff","#ff5a5f","#ffd23f","#18bd6b","#b06bff","#ff8c42","#34d3ff","#ff6ad5"];
@@ -11539,6 +11612,7 @@ function renderResultsInto(viz, s, host, voted){
 /* ---------- host (presenter) ---------- */
 function updateLiveViz(){
   const s=state.live; if(!s) return;
+  if(s.type==="survey"){ surveyRenderClouds(); return; }
   const cnt=document.getElementById("live-count"); if(cnt) cnt.textContent=s.count;
   const st=document.getElementById("live-status"); if(st){ st.textContent=s.open?t("live_open"):t("live_closed_b"); st.className="lh-status "+(s.open?"open":"closed"); }
   const viz=document.getElementById("live-viz"); if(viz) renderResultsInto(viz, s, true, null);
@@ -11554,6 +11628,11 @@ function liveStart(){
     .then(d=>{ state.live=d.session; state.liveRole="host"; state.screen="livehost"; render(); startPoll(refreshLive); })
     .catch(e=>toast(apiErr(e)));
 }
+function createSurvey(){ if(!requireAdmin()) return; syncBuilder(); const sv=state.survey;
+  const qs=(sv.text||"").split("\n").map(function(x){return x.trim();}).filter(Boolean).slice(0,20).map(function(q){return {q:q, multi:sv.multi||1};});
+  if(qs.length<1){ toast(t("sv_need_q")); return; }
+  api("live_create",{body:{ type:"survey", prompt:(sv.title||"").trim(), questions:qs, filter:!!sv.filter }})
+    .then(d=>{ state.live=d.session; state.liveRole="host"; state.screen="livehost"; render(); startPoll(refreshLive); }).catch(e=>toast(apiErr(e))); }
 function liveControl(action,id){
   const s=state.live; if(!s) return;
   api("live_control",{body:{code:s.code, action:action, id:id}}).then(d=>{
@@ -11570,10 +11649,23 @@ function shareJoin(){ const s=state.live; if(!s||!navigator.share) return; navig
 function exportLiveJSON(){ const s=state.live; if(!s) return; liveDL(new Blob([JSON.stringify(s,null,2)],{type:"application/json"}), t("live_json_name")+"-"+s.code+".json"); }
 function exportCloudPNG(){ const s=state.live; const viz=document.getElementById("live-viz"); if(!s||!viz) return; const lay=viz._lastLay; if(!lay||!lay.placements.length){ toast(t("live_waiting")); return; } cloudPNG(lay).toBlob(b=>{ if(b) liveDL(b, t("live_png_name")+"-"+s.code+".png"); }); }
 
+function surveyRenderClouds(){ const s=state.live; if(!s||s.type!=="survey") return;
+  const cnt=document.getElementById("live-count"); if(cnt) cnt.textContent=s.count;
+  const st=document.getElementById("live-status"); if(st){ st.textContent=s.open?t("live_open"):t("live_closed_b"); st.className="lh-status "+(s.open?"open":"closed"); }
+  (s.questions||[]).forEach(function(q,qi){ const el=document.getElementById("sv-hviz-"+qi); if(el) renderResultsInto(el, {type:"cloud", results:q.results, count:q.count, code:s.code, open:s.open}, true, null); }); }
+function viewSurveyHost(){ const s=state.live;
+  return '<div class="live-host"><div class="lh-bar"><a class="backlink" data-action="livestop">← '+esc(t("live_back"))+'</a>'
+    +'<div class="lh-meta"><span class="lh-type">📝 '+esc(t("live_mode_survey"))+'</span><span id="live-status" class="lh-status '+(s.open?"open":"closed")+'">'+esc(s.open?t("live_open"):t("live_closed_b"))+'</span></div>'
+    +'<div class="lh-ctrls"><button class="btn btn-ghost sm" data-action="'+(s.open?"liveclosea":"liveopena")+'">'+(s.open?"⏸ "+esc(t("live_pause")):"▶ "+esc(t("live_resume")))+'</button><button class="btn btn-ghost sm" data-action="liveclear">🧹 '+esc(t("live_clear"))+'</button><button class="btn btn-ghost sm" data-action="livejson">⬇ JSON</button><button class="btn btn-ghost sm danger" data-action="liveenda">⏹ '+esc(t("live_end"))+'</button></div></div>'
+    +'<div class="lh-main"><div class="lh-stage" style="flex:1"><h2 class="lh-prompt">'+esc(s.prompt)+'</h2><div class="lh-foot"><span class="lh-count"><b id="live-count">'+s.count+'</b> '+esc(t("live_responses"))+'</span></div>'
+    +(s.questions||[]).map(function(q,qi){ return '<div style="margin-top:18px"><h3 style="margin:0 0 8px">'+(qi+1)+'. '+esc(q.q)+'</h3><div id="sv-hviz-'+qi+'" class="live-viz cloud"></div></div>'; }).join("")
+    +'</div><aside class="lh-join"><div class="join-card"><div class="jc-label">'+esc(t("live_join_at"))+'</div><div class="jc-host">'+esc(location.host+location.pathname)+'</div><div class="jc-code">'+esc(s.code)+'</div><div id="live-qr" class="jc-qr"></div><div class="jc-actions"><button class="btn btn-ghost sm" data-action="livecopy">⧉ '+esc(t("live_copy"))+'</button></div></div></aside></div></div>';
+}
 function viewLiveHost(){
   const s=state.live; if(!s) return '<div class="wrap"><a class="backlink" data-action="livestop">←</a></div>';
   if(s.type==="game") return viewGameHost();
   if(s.type==="assign") return viewAssignHost();
+  if(s.type==="survey") return viewSurveyHost();
   const tl={cloud:t("live_t_cloud"),poll:t("live_t_poll"),qa:t("live_t_qa"),rating:t("live_t_rating"),rank:t("live_t_rank"),scale:t("live_t_scale"),points:t("live_t_points")}[s.type];
   return '<div class="live-host">'
     +'<div class="lh-bar">'
@@ -11604,7 +11696,7 @@ function viewLiveHost(){
     +'</div>'
   +'</div>';
 }
-function afterLiveHost(){ const s=state.live; if(!s) return; if(s.type==="game"){ afterGameHost(); return; } if(s.type==="assign"){ afterAssignHost(); return; } const q=document.getElementById("live-qr"); if(q) qrInto(q, joinURLFor(s.code), 6); updateLiveViz(); }
+function afterLiveHost(){ const s=state.live; if(!s) return; if(s.type==="game"){ afterGameHost(); return; } if(s.type==="assign"){ afterAssignHost(); return; } if(s.type==="survey"){ const q=document.getElementById("live-qr"); if(q) qrInto(q, joinURLFor(s.code), 6); surveyRenderClouds(); return; } const q=document.getElementById("live-qr"); if(q) qrInto(q, joinURLFor(s.code), 6); updateLiveViz(); }
 
 /* ---------- participant ---------- */
 function getVoter(){ let v=null; try{ v=localStorage.getItem(STORE_KEY+"_voter"); }catch(e){} if(!v){ v=Math.random().toString(36).slice(2)+Date.now().toString(36); try{ localStorage.setItem(STORE_KEY+"_voter",v); }catch(e){} } return v; }
@@ -11616,7 +11708,8 @@ function openJoin(code){
   if(!code){ toast(t("live_need_code")); state.screen="livehub"; render(); return; }
   let pname="",savedPid=null; try{ pname=localStorage.getItem(STORE_KEY+"_pname")||""; savedPid=localStorage.getItem(STORE_KEY+"_pid_"+code)||null; }catch(e){}
   state.liveRole="participant";
-  state.join={ code:code, session:null, error:null, name:pname, busy:false, submittedCount:0, voted_poll:false, voted:loadVoted(code), voter:getVoter(), pid:savedPid, avatar:0 };
+  let svdone=false; try{ svdone=localStorage.getItem(STORE_KEY+"_svdone_"+code)==="1"; }catch(e){}
+  state.join={ code:code, session:null, error:null, name:pname, busy:false, submittedCount:0, voted_poll:false, voted:loadVoted(code), voter:getVoter(), pid:savedPid, avatar:0, surveyDone:svdone };
   state.screen="livejoin"; render();
   fetchJoin(true);
 }
@@ -11683,10 +11776,24 @@ function joinVote(id){
   j.voted.add(id); saveVoted(s.code,j.voted); updateJoinViz();
   api("live_vote",{body:{code:s.code, id:id, voter:j.voter}}).then(()=>fetchJoin(false)).catch(()=>{});
 }
+function surveySubmit(){ const j=state.join; const s=j&&j.session; if(!s) return; if(!s.open){ toast(t("live_closed")); return; }
+  const nm=document.getElementById("sv-name"); if(nm){ j.name=(nm.value||"").trim(); try{ localStorage.setItem(STORE_KEY+"_pname",j.name); }catch(e){} }
+  const answers=(s.questions||[]).map(function(q,qi){ var el=document.getElementById("sv-a-"+qi); return el?el.value:""; });
+  if(answers.every(function(a){return !(a||"").trim();})){ toast(t("sv_need_ans")); return; }
+  const hp=document.getElementById("join-hp"); const body={ code:s.code, voter:j.voter, name:j.name||"", answers:answers }; if(hp&&hp.value) body.website=hp.value;
+  j.busy=true; render();
+  api("live_submit",{body:body}).then(d=>{ j.session=d.session; j.busy=false; j.surveyDone=true; try{ localStorage.setItem(STORE_KEY+"_svdone_"+s.code,"1"); }catch(e){} render(); toast(t("sv_thanks")); })
+    .catch(e=>{ j.busy=false; if(e.status===409){ j.surveyDone=true; try{ localStorage.setItem(STORE_KEY+"_svdone_"+s.code,"1"); }catch(e2){} render(); } else { toast(e.status===423?t("live_closed"):apiErr(e)); render(); } }); }
+function viewSurveyForm(){ const j=state.join; const s=j.session; const closed=!s.open;
+  if(j.surveyDone){ return '<div class="join-view"><div class="jv-head"><a class="backlink" data-action="joinleave">← '+esc(t("live_leave"))+'</a><span class="jv-code">'+esc(s.code)+'</span></div><h2 class="jv-prompt">'+esc(s.prompt)+'</h2><div class="join-done">✓ '+esc(t("sv_thanks"))+'</div></div>'; }
+  const form=(s.questions||[]).map(function(q,qi){ return '<div class="field"><label>'+esc(q.q)+(q.multi>1?' <span style="opacity:.5;font-weight:400">(max '+q.multi+')</span>':'')+'</label><input id="sv-a-'+qi+'" class="input" maxlength="'+(q.multi>1?200:40)+'" placeholder="'+esc(t("sv_word_ph"))+'"></div>'; }).join("");
+  return '<div class="join-view"><div class="jv-head"><a class="backlink" data-action="joinleave">← '+esc(t("live_leave"))+'</a><span class="jv-code">'+esc(s.code)+'</span></div>'+'<h2 class="jv-prompt">'+esc(s.prompt)+'</h2>'+(closed?'<div class="jv-closed">⏸ '+esc(t("live_closed_note"))+'</div>':'')+'<div class="jv-input"><input id="sv-name" class="input" maxlength="40" placeholder="'+esc(t("fb_name"))+'" value="'+esc(j.name||"")+'" style="margin-bottom:10px">'+form+'<input id="join-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0"><button class="btn btn-primary btn-block" style="margin-top:6px" data-action="svsubmit"'+((j.busy||closed)?' disabled':'')+'>'+(j.busy?"…":"✓ "+esc(t("sv_send")))+'</button></div></div>';
+}
 function viewLiveJoin(){
   const j=state.join;
   if(j.session && j.session.type==="game") return viewGameJoin();
   if(j.session && j.session.type==="assign") return viewAssignPlay();
+  if(j.session && j.session.type==="survey") return viewSurveyForm();
   if(j.error){ return '<div class="join-view"><div class="jv-head"><a class="backlink" data-action="joinleave">←</a></div><div class="join-err">⚠ '+esc(j.error)+'<div style="margin-top:16px"><button class="btn btn-primary" data-action="joinleave">'+esc(t("back_home"))+'</button></div></div></div>'; }
   if(!j.session){ return '<div class="join-view"><div class="join-loading">'+esc(t("live_loading"))+'</div></div>'; }
   const s=j.session; const closed=!s.open;
@@ -11747,11 +11854,14 @@ function syncBuilder(){ const lb=state.liveBuilder; const p=document.getElementB
   const m=document.getElementById("lb-multi"); if(m) lb.multi=Math.max(1,Math.min(10,parseInt(m.value,10)||1));
   if(lb.type==="poll"||lb.type==="rank"||lb.type==="points"){ const opts=[]; document.querySelectorAll("[id^=lb-opt-]").forEach(el=>opts.push(el.value)); if(opts.length) lb.options=opts; }
   if(lb.type==="scale"){ const sts=[]; document.querySelectorAll("[id^=lb-stmt-]").forEach(el=>sts.push(el.value)); if(sts.length) lb.statements=sts; }
-  const dt=document.getElementById("deck-title"); if(dt&&state.deck) state.deck.title=dt.value; }
+  const dt=document.getElementById("deck-title"); if(dt&&state.deck) state.deck.title=dt.value;
+  if(state.survey){ const svt=document.getElementById("sv-title"); if(svt) state.survey.title=svt.value; const svx=document.getElementById("sv-text"); if(svx) state.survey.text=svx.value; const svm=document.getElementById("sv-multi"); if(svm) state.survey.multi=Math.max(1,Math.min(5,parseInt(svm.value,10)||1)); } }
 function viewLiveHub(){
   const lb=state.liveBuilder; const admin=(!state.server)||state.admin;
   const types=[["cloud","☁️",t("live_t_cloud"),t("live_t_cloud_d")],["poll","📊",t("live_t_poll"),t("live_t_poll_d")],["rating","⭐",t("live_t_rating"),t("live_t_rating_d")],["rank","🔢",t("live_t_rank"),t("live_t_rank_d")],["scale","📈",t("live_t_scale"),t("live_t_scale_d")],["points","🎯",t("live_t_points"),t("live_t_points_d")],["qa","💬",t("live_t_qa"),t("live_t_qa_d")]];
-  const cards=types.map(a=>'<button class="ltype'+(lb.type===a[0]?' on':'')+'" data-action="livetype" data-v="'+a[0]+'"><span class="lt-ic">'+a[1]+'</span><span class="lt-nm">'+esc(a[2])+'</span><span class="lt-d">'+esc(a[3])+'</span></button>').join("");
+  const _byId={}; types.forEach(function(a){ _byId[a[0]]=a; });
+  const _cats=[["cat_vote",["poll","rank","points"]],["cat_text",["cloud","qa"]],["cat_eval",["rating","scale"]]];
+  const cards=_cats.map(function(c){ return '<div class="ltype-cat" style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;opacity:.55;margin:16px 2px 8px">'+esc(t(c[0]))+'</div><div class="ltype-grid">'+c[1].map(function(id){ var a=_byId[id]; return '<button class="ltype'+(lb.type===a[0]?' on':'')+'" data-action="livetype" data-v="'+a[0]+'"><span class="lt-ic">'+a[1]+'</span><span class="lt-nm">'+esc(a[2])+'</span><span class="lt-d">'+esc(a[3])+'</span></button>'; }).join("")+'</div>'; }).join("");
   let extra="";
   if(lb.type==="poll"){ const opts=(lb.options&&lb.options.length?lb.options:["",""]);
     extra='<div class="field"><label>'+esc(t("live_options"))+'</label>'+opts.map((o,i)=>'<div class="opt-row"><input id="lb-opt-'+i+'" class="input" maxlength="80" placeholder="'+esc(t("live_option"))+' '+(i+1)+'" value="'+esc(o)+'">'+(opts.length>2?'<button class="iconbtn sm" data-action="livermopt" data-i="'+i+'" title="✕">✕</button>':'')+'</div>').join("")+(opts.length<10?'<button class="btn btn-ghost sm" data-action="liveaddopt">+ '+esc(t("live_add_option"))+'</button>':'')+'</div>';
@@ -11770,8 +11880,8 @@ function viewLiveHub(){
   } else if(lb.type==="cloud"){
     extra='<div class="field"><label>'+esc(t("live_max_words"))+'</label><input id="lb-multi" class="input" type="number" min="1" max="10" value="'+(lb.multi||1)+'" style="max-width:130px"></div>'+'<div class="field"><label>'+esc(t("live_filter"))+'</label><div class="seg"><button class="seg-btn'+(!lb.filter?" on":"")+'" data-action="livefilterset" data-v="0">'+esc(t("live_filter_off"))+'</button><button class="seg-btn'+(lb.filter?" on":"")+'" data-action="livefilterset" data-v="1">'+esc(t("live_filter_on"))+'</button></div><div class="join-hint">'+esc(t("live_filter_hint"))+'</div></div>';
   }
-  const deckMode=(state.liveMode==="deck");
-  const modeToggle = admin ? '<div class="live-mode-seg"><div class="seg"><button class="seg-btn'+(deckMode?"":" on")+'" data-action="livemode" data-v="single">'+esc(t("live_mode_single"))+'</button><button class="seg-btn'+(deckMode?" on":"")+'" data-action="livemode" data-v="deck">🎬 '+esc(t("live_mode_deck"))+'</button></div></div>' : '';
+  const deckMode=(state.liveMode==="deck"); const surveyMode=(state.liveMode==="survey");
+  const modeToggle = admin ? '<div class="live-mode-seg"><div class="seg"><button class="seg-btn'+((!deckMode&&!surveyMode)?" on":"")+'" data-action="livemode" data-v="single">'+esc(t("live_mode_single"))+'</button><button class="seg-btn'+(deckMode?" on":"")+'" data-action="livemode" data-v="deck">🎬 '+esc(t("live_mode_deck"))+'</button><button class="seg-btn'+(surveyMode?" on":"")+'" data-action="livemode" data-v="survey">📝 '+esc(t("live_mode_survey"))+'</button></div></div>' : '';
   let hostCard;
   if(!admin){ hostCard='<div class="panel"><div class="about">'+esc(t("live_host_login"))+'</div><button class="btn btn-primary btn-block" style="margin-top:14px" data-action="openlogin">'+esc(t("login"))+'</button></div>'; }
   else if(deckMode){ const dsl=state.deck.slides;
@@ -11786,14 +11896,22 @@ function viewLiveHub(){
       +'<div class="deck-io"><button class="btn btn-ghost sm" data-action="deckexport"'+(dsl.length<1?' disabled':'')+'>⬇ '+esc(t("deck_export"))+'</button><button class="btn btn-ghost sm" data-action="deckimport">⬆ '+esc(t("deck_import"))+'</button><input type="file" id="deck-file" accept="application/json,.json" style="display:none"></div>'
       +'<button class="btn btn-primary btn-block" style="margin-top:14px" data-action="decklaunch"'+(dsl.length<1?' disabled':'')+'>🚀 '+esc(t("deck_launch"))+'</button>'
     +'</div>';
-  } else { hostCard='<div class="panel"><div class="field"><label>'+esc(t("live_prompt"))+'</label><input id="lb-prompt" class="input" maxlength="200" placeholder="'+esc(t("live_prompt_ph"))+'" value="'+esc(lb.prompt||"")+'"></div>'+extra+'<button class="btn btn-primary btn-block" data-action="livestart">🚀 '+esc(t("live_launch"))+'</button></div>'; }
+  } else if(surveyMode){ const sv=state.survey;
+    hostCard='<div class="panel">'
+      +'<div class="field"><label>'+esc(t("sv_title"))+'</label><input id="sv-title" class="input" maxlength="200" placeholder="'+esc(t("sv_title_ph"))+'" value="'+esc(sv.title||"")+'"></div>'
+      +'<div class="field"><label>'+esc(t("sv_questions"))+'</label><textarea id="sv-text" class="textarea" rows="6" placeholder="'+esc(t("sv_questions_ph"))+'">'+esc(sv.text||"")+'</textarea><div class="join-hint">'+esc(t("sv_questions_hint"))+'</div></div>'
+      +'<div class="field"><label>'+esc(t("live_max_words"))+'</label><input id="sv-multi" class="input" type="number" min="1" max="5" value="'+(sv.multi||1)+'" style="max-width:130px"></div>'
+      +'<div class="field"><label>'+esc(t("live_filter"))+'</label><div class="seg"><button class="seg-btn'+(!sv.filter?" on":"")+'" data-action="svfilter" data-v="0">'+esc(t("live_filter_off"))+'</button><button class="seg-btn'+(sv.filter?" on":"")+'" data-action="svfilter" data-v="1">'+esc(t("live_filter_on"))+'</button></div></div>'
+      +'<button class="btn btn-primary btn-block" data-action="svlaunch">🚀 '+esc(t("live_launch"))+'</button>'
+    +'</div>'; }
+  else { hostCard='<div class="panel"><div class="field"><label>'+esc(t("live_prompt"))+'</label><input id="lb-prompt" class="input" maxlength="200" placeholder="'+esc(t("live_prompt_ph"))+'" value="'+esc(lb.prompt||"")+'"></div>'+extra+'<button class="btn btn-primary btn-block" data-action="livestart">🚀 '+esc(t("live_launch"))+'</button></div>'; }
   return '<div class="wrap">'
     +'<a class="backlink" data-action="home">← '+esc(t("back_home"))+'</a>'
     +'<div class="page-head"><div><h2>📡 '+esc(t("live_title"))+'</h2><div class="sub">'+esc(t("live_sub"))+'</div></div></div>'
     +'<div class="panel"><div class="field" style="margin-bottom:0"><label>'+esc(t("live_join_code"))+'</label><div class="opt-row"><input id="lb-join" class="input big-input" maxlength="12" placeholder="'+esc(t("live_code_ph"))+'" style="text-transform:uppercase;letter-spacing:4px;font-weight:800"><button class="btn btn-primary" data-action="joincode" style="white-space:nowrap">'+esc(t("live_join"))+'</button></div></div></div>'
     +'<div class="ltype-head">'+esc(t("live_host_new"))+'</div>'
     +modeToggle
-    +'<div class="ltype-grid">'+cards+'</div>'
+    +'<div class="ltype-cats">'+cards+'</div>'
     +hostCard
   +'</div>';
 }
@@ -11895,7 +12013,7 @@ function gameHostLobby(s){
     +'<div class="lh-bar"><a class="backlink" data-action="livestop">← '+esc(t("live_back"))+'</a><div class="lh-meta"><span class="lh-type">🎮 '+esc(s.prompt)+'</span></div></div>'
     +'<div class="gl-main">'
       +'<div class="join-card gl-join"><div class="jc-label">'+esc(t("live_join_at"))+'</div><div class="jc-host">'+esc(location.host+location.pathname)+'</div><div class="jc-code">'+esc(s.code)+'</div><div id="g-qr" class="jc-qr"></div></div>'
-      +'<div class="gl-players"><div class="gl-ptitle"><b id="g-count">'+s.count+'</b> '+esc(t("game_players"))+'</div>'+(s.teams?'<div class="gl-teams">'+s.teams.map(function(tt){return '<span class="gl-team" style="--tc:'+tt.color+'">'+tt.emoji+' '+esc(tt.name)+' · '+tt.members+'</span>';}).join("")+'</div>':'')+'<div id="g-lobby-players" class="g-chips">'+lobbyPlayersHTML(s)+'</div></div>'
+      +'<div class="gl-players"><div class="gl-ptitle"><b id="g-count">'+s.count+'</b> '+esc(t("game_players"))+'</div>'+(s.teams?'<div class="gl-teams">'+s.teams.map(function(tt){return '<span class="gl-team" style="--tc:'+esc(tt.color)+'">'+esc(tt.emoji)+' '+esc(tt.name)+' · '+tt.members+'</span>';}).join("")+'</div>':'')+'<div id="g-lobby-players" class="g-chips">'+lobbyPlayersHTML(s)+'</div></div>'
     +'</div>'
     +'<div class="gl-foot"><button id="g-start" class="btn btn-primary btn-lg" data-action="gstart"'+(s.count<1?' disabled':'')+'>▶ '+esc(t("game_start"))+'</button></div>'
   +'</div>';
@@ -11922,10 +12040,12 @@ function gameHostReveal(s){ const q=s.question;
     body='<div class="answers showonly'+(q.type==="tf"?" two":"")+'">'+(q.answers||[]).map((a,i)=>'<div class="ans '+ANSCLASS[i]+(a.correct?" correct":" dim")+'"><span class="ico">'+SHAPES[i]+'</span><span>'+esc(a.text)+'</span><span class="g-bar"><i style="width:'+Math.round((a.count||0)/maxc*100)+'%"></i><b>'+(a.count||0)+'</b></span>'+(a.correct?'<span class="g-check">✓</span>':'')+'</div>').join("")+'</div>';
   }
   const lb=(s.leaderboard||[]).slice(0,8).map((p,i)=>'<div class="sb-row"><div class="rk">'+(i+1)+'</div><div class="av" style="background:'+avColor(i)+'">'+avEmoji(p.avatar)+'</div><div class="nm">'+esc(p.name)+'</div><div class="sc">'+p.score+'</div></div>').join("");
+  const fast=(s.fastest||[]);
+  const fastHTML=fast.length?('<div class="gh-fast"><div class="ghf-title">⚡ '+esc(t("fastest5"))+'</div><div class="ghf-row">'+fast.map((p,i)=>'<div class="ghf-card'+(p.correct?" ok":" no")+'"><div class="ghf-rk">'+(i+1)+'</div><div class="ghf-av" style="background:'+avColor(i)+'">'+avEmoji(p.avatar)+'</div><div class="ghf-nm">'+esc(p.name)+'</div><div class="ghf-ms">'+(p.ms/1000).toFixed(1)+'s</div><div class="ghf-pts">'+(p.correct?"✓ +"+p.points:"✗")+'</div></div>').join("")+'</div></div>'):'';
   const last=(q.index+1>=s.total);
   return '<div class="game-host">'
     +'<div class="lh-bar"><div class="pill">📋 '+(q.index+1)+'/'+s.total+'</div><div class="lh-ctrls"><button class="btn btn-primary sm" data-action="gnext">'+(last?'🏆 '+esc(t("game_results")):esc(t("game_next"))+' ▶')+'</button></div></div>'
-    +'<div class="gr-main"><div class="gr-q"><h2 class="gq-text">'+esc(q.text)+'</h2>'+body+'</div>'
+    +'<div class="gr-main"><div class="gr-q"><h2 class="gq-text">'+esc(q.text)+'</h2>'+body+fastHTML+'</div>'
       +'<div class="gr-lb"><div class="gl-ptitle">'+esc(t("scoreboard"))+'</div>'+(lb||'<div class="g-lobby-empty">—</div>')+'</div></div>'
   +'</div>';
 }
@@ -11933,7 +12053,7 @@ function gameHostFinal(s){ const lb=s.leaderboard||[]; const top=lb.slice(0,3);
   const pod=top.map((p,i)=>{ const place=i+1; return '<div class="pod p'+place+'" style="animation-delay:'+(0.2*(3-place))+'s"><div class="av" style="background:'+avColor(i)+'">'+avEmoji(p.avatar)+'</div><div class="nm">'+esc(p.name)+'</div><div class="sc">'+p.score+'</div><div class="bar">'+(place===1?'🥇':place===2?'🥈':'🥉')+'</div></div>'; }).join("");
   const rest=lb.slice(3).map((p,i)=>'<div class="sb-row"><div class="rk">'+(i+4)+'</div><div class="av" style="background:'+avColor(i+3)+'">'+avEmoji(p.avatar)+'</div><div class="nm">'+esc(p.name)+'</div><div class="sc">'+p.score+'</div></div>').join("");
   return '<div class="podium-screen">'
-    +'<h2>🏆 '+esc(t("podium_title"))+'</h2>'+(top[0]?'<div style="text-align:center;color:var(--accent);font-weight:800;font-size:18px">'+esc(t("winner_is"))+': '+esc(top[0].name)+'</div>':'')+(s.teams?'<div class="team-standings"><div class="ts-title">👥 '+esc(t("team_standings"))+'</div>'+s.teams.map(function(tt,i){return '<div class="ts-row'+(i===0?" win":"")+'" style="--tc:'+tt.color+'"><div class="ts-rk">'+(i+1)+'</div><div class="ts-emoji">'+tt.emoji+'</div><div class="ts-name">'+esc(tt.name)+'</div><div class="ts-sc">'+tt.score+'</div></div>';}).join("")+'</div>':'')
+    +'<h2>🏆 '+esc(t("podium_title"))+'</h2>'+(top[0]?'<div style="text-align:center;color:var(--accent);font-weight:800;font-size:18px">'+esc(t("winner_is"))+': '+esc(top[0].name)+'</div>':'')+(s.teams?'<div class="team-standings"><div class="ts-title">👥 '+esc(t("team_standings"))+'</div>'+s.teams.map(function(tt,i){return '<div class="ts-row'+(i===0?" win":"")+'" style="--tc:'+esc(tt.color)+'"><div class="ts-rk">'+(i+1)+'</div><div class="ts-emoji">'+esc(tt.emoji)+'</div><div class="ts-name">'+esc(tt.name)+'</div><div class="ts-sc">'+tt.score+'</div></div>';}).join("")+'</div>':'')
     +'<div class="podium">'+pod+'</div>'+(rest?'<div class="rest-list">'+rest+'</div>':'')
     +'<div class="cta-row"><button class="btn btn-primary btn-lg" data-action="grestart">↻ '+esc(t("game_replay"))+'</button><button class="btn btn-ghost btn-lg" data-action="greport">📊 '+esc(t("game_report"))+'</button><button class="btn btn-ghost btn-lg" data-action="livestop">'+esc(t("live_back"))+'</button></div>'
   +'</div>';
@@ -11983,9 +12103,9 @@ function gamePlayerJoinForm(j,s){ const avs=AVATARS.map((e,i)=>'<button class="g
     +'<div class="gj-card"><div class="gj-title">🎮 '+esc(s.prompt)+'</div><div class="gj-sub">'+esc(t("game_pick_name"))+'</div>'
     +'<div class="nick-row"><input id="gj-name" class="input big-input" maxlength="20" placeholder="'+esc(t("game_nickname"))+'" value="'+esc(j.name||"")+'"><button class="nick-btn" data-action="nickgen" data-t="gj-name" title="'+esc(t("nick_gen"))+'">🎲</button></div>'
     +'<div class="gj-avs">'+avs+'</div>'
-    +((s.teamList&&s.teamList.length)?'<div class="gj-tlabel">'+esc(t("team_pick"))+'</div><div class="gj-teams">'+s.teamList.map(function(tm){return '<button class="gj-team'+(((j.team||0)===tm.idx)?" on":"")+'" data-action="gteam" data-i="'+tm.idx+'" style="--tc:'+tm.color+'">'+tm.emoji+' '+esc(tm.name)+'</button>';}).join("")+'</div>':'')
+    +((s.teamList&&s.teamList.length)?'<div class="gj-tlabel">'+esc(t("team_pick"))+'</div><div class="gj-teams">'+s.teamList.map(function(tm){return '<button class="gj-team'+(((j.team||0)===tm.idx)?" on":"")+'" data-action="gteam" data-i="'+tm.idx+'" style="--tc:'+esc(tm.color)+'">'+esc(tm.emoji)+' '+esc(tm.name)+'</button>';}).join("")+'</div>':'')
     +'<button class="btn btn-primary btn-block" data-action="gjoin"'+(j.busy?' disabled':'')+'>'+(j.busy?"…":"🚀 "+esc(t("game_enter")))+'</button></div></div>'; }
-function gamePlayerLobby(s,j){ return '<div class="join-view game-wait"><div class="gw-card"><div class="gw-av">'+avEmoji(j.avatar)+'</div><div class="gw-name">'+esc(j.name)+'</div>'+(s.myTeam?'<div class="gw-team" style="--tc:'+s.myTeam.color+'">'+s.myTeam.emoji+' '+esc(s.myTeam.name)+'</div>':'')+'<div class="gw-msg">'+esc(t("game_youre_in"))+'</div><div class="gw-sub">'+esc(t("game_look_screen"))+'</div><div class="gw-count"><b id="gp-count">'+s.count+'</b> '+esc(t("game_players"))+'</div></div>'+reactBar()+'</div>'; }
+function gamePlayerLobby(s,j){ return '<div class="join-view game-wait"><div class="gw-card"><div class="gw-av">'+avEmoji(j.avatar)+'</div><div class="gw-name">'+esc(j.name)+'</div>'+(s.myTeam?'<div class="gw-team" style="--tc:'+esc(s.myTeam.color)+'">'+esc(s.myTeam.emoji)+' '+esc(s.myTeam.name)+'</div>':'')+'<div class="gw-msg">'+esc(t("game_youre_in"))+'</div><div class="gw-sub">'+esc(t("game_look_screen"))+'</div><div class="gw-count"><b id="gp-count">'+s.count+'</b> '+esc(t("game_players"))+'</div></div>'+reactBar()+'</div>'; }
 function gamePlayerQuestion(s,j){ const q=s.question;
   if(q.answered){ const ic=q.isText?'✍️':SHAPES[q.myChoice!=null?q.myChoice:0]; const yourTxt=(q.isText&&q.myText)?'<div class="gp-lock-your">“'+esc(q.myText)+'”</div>':''; return '<div class="join-view game-play"><div class="gp-head"><span class="pill">📋 '+(q.index+1)+'/'+s.total+'</span><span class="pill">✓ <b id="gp-answered">'+q.answeredCount+'</b>/'+s.count+'</span></div><div class="gp-locked"><div class="gp-lock-ic">'+ic+'</div>'+yourTxt+'<div class="gp-lock-msg">'+esc(t("game_locked"))+'</div><div class="gp-lock-sub">'+esc(t("game_wait_others"))+'</div></div>'+reactBar()+'</div>'; }
   const head='<div class="join-view game-play"><div class="gp-head"><span class="pill">📋 '+(q.index+1)+'/'+s.total+'</span><span class="ring sm" id="gp-ring" style="--deg:360deg"><span id="gp-ring-num">'+Math.ceil((q.remaining||0)/1000)+'</span></span></div><h2 class="gp-q">'+esc(q.text)+'</h2>';
@@ -11999,7 +12119,7 @@ function gamePlayerReveal(s,j){ const r=s.myResult||{}; const ok=r.correct; cons
     +'<div class="gres-rank">'+esc(t("game_your_rank"))+' <b>#'+(r.rank||"–")+'</b> · '+(r.score||0)+' '+esc(t("stat_pts"))+'</div></div>'+reactBar()+'</div>'; }
 function gamePlayerFinal(s,j){ const rank=s.myRank||"–"; const me=s.me||{}; const lb=s.leaderboard||[]; const top=lb.slice(0,3); const tRank=(s.teams&&s.myTeam)?(s.teams.findIndex(function(t){return t.idx===s.myTeam.idx;})+1):0;
   const pod=top.map((p,i)=>{ const place=i+1; return '<div class="pod p'+place+'"><div class="av" style="background:'+avColor(i)+'">'+avEmoji(p.avatar)+'</div><div class="nm">'+esc(p.name)+'</div><div class="sc">'+p.score+'</div><div class="bar">'+(place===1?'🥇':place===2?'🥈':'🥉')+'</div></div>'; }).join("");
-  return '<div class="join-view game-result"><div class="gres '+(rank===1?'ok':'')+'"><div class="gres-ic">🏁</div><div class="gres-msg">'+esc(t("game_finished"))+'</div><div class="gres-rank">'+esc(t("game_your_rank"))+' <b>#'+rank+'</b> / '+(s.totalPlayers||lb.length)+' · '+(me.score||0)+' '+esc(t("stat_pts"))+'</div>'+(tRank>0?'<div class="gres-team" style="--tc:'+s.myTeam.color+'">'+s.myTeam.emoji+' '+esc(s.myTeam.name)+' · #'+tRank+'/'+s.teams.length+'</div>':'')+'</div>'
+  return '<div class="join-view game-result"><div class="gres '+(rank===1?'ok':'')+'"><div class="gres-ic">🏁</div><div class="gres-msg">'+esc(t("game_finished"))+'</div><div class="gres-rank">'+esc(t("game_your_rank"))+' <b>#'+rank+'</b> / '+(s.totalPlayers||lb.length)+' · '+(me.score||0)+' '+esc(t("stat_pts"))+'</div>'+(tRank>0?'<div class="gres-team" style="--tc:'+esc(s.myTeam.color)+'">'+esc(s.myTeam.emoji)+' '+esc(s.myTeam.name)+' · #'+tRank+'/'+s.teams.length+'</div>':'')+'</div>'
     +(pod?'<div class="podium" style="margin-top:18px">'+pod+'</div>':'')+'<div class="cta-row"><button class="btn btn-ghost btn-lg" data-action="joinleave">'+esc(t("back_home"))+'</button></div></div>'; }
 
 /* ============================ POST-GAME REPORT ============================ */
@@ -12207,6 +12327,8 @@ document.addEventListener("click",(e)=>{
     case "livefilterset": syncBuilder(); state.liveBuilder.filter=(v==="1"); render(); break;
     case "home": stopAll(); state.screen="home"; render(); break;
     case "library": state.screen="library"; render(); break;
+    case "golive": if(el.dataset.v && state.liveBuilder){ state.liveBuilder.type=el.dataset.v; } state.liveMode="single"; state.screen="livehub"; render(); break;
+    case "golivedeck": state.liveMode="deck"; state.screen="livehub"; render(); break;
     case "lang": state.lang=v; saveStore(); render(); break;
     case "sound": state.sound=!state.sound; saveStore(); render(); break;
     case "settings": state.modal="settings"; renderModal(); break;
@@ -12282,13 +12404,17 @@ document.addEventListener("click",(e)=>{
     // live audience mode
     case "live": if(!onlineOnly()) break; state.screen="livehub"; render(); break;
     case "joincode": { const v=(document.getElementById("lb-join")||{}).value||""; if(v.trim()) openJoin(v.trim()); else toast(t("live_need_code")); break; }
-    case "livemode": syncBuilder(); state.liveMode=(v==="deck"?"deck":"single"); render(); break;
+    case "livemode": syncBuilder(); state.liveMode=(v==="deck"?"deck":(v==="survey"?"survey":"single")); render(); break;
+    case "svsubmit": surveySubmit(); break;
     case "deckadd": deckAdd(); break;
     case "decktpl": loadDeckTemplate(el.dataset.id); break;
     case "deckrm": { syncBuilder(); const i=parseInt(el.dataset.i,10); state.deck.slides.splice(i,1); render(); break; }
     case "deckup": { syncBuilder(); const i=parseInt(el.dataset.i,10); if(i>0){ const a=state.deck.slides; const tm=a[i]; a[i]=a[i-1]; a[i-1]=tm; } render(); break; }
     case "deckdown": { syncBuilder(); const i=parseInt(el.dataset.i,10); const a=state.deck.slides; if(i<a.length-1){ const tm=a[i]; a[i]=a[i+1]; a[i+1]=tm; } render(); break; }
     case "decklaunch": syncBuilder(); createDeck(); break;
+    case "svlaunch": createSurvey(); break;
+    case "svfilter": if(state.survey) state.survey.filter=(v==="1"); render(); break;
+    case "golivesurvey": state.liveMode="survey"; state.screen="livehub"; render(); break;
     case "livemodset": syncBuilder(); state.liveBuilder.mod=(v==="1"); render(); break;
     case "liveapprove": liveControl("approve", el.dataset.id); break;
     case "deckexport": deckExport(); break;

@@ -56,7 +56,7 @@ input,textarea,select{font-family:inherit}
 .hidden{display:none!important}
 
 /* ---------- top bar ---------- */
-.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
   padding:14px clamp(14px,4vw,28px);max-width:var(--maxw);margin:0 auto;width:100%}
 .brand{display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none;margin-right:auto}
 .brand .logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
@@ -72,6 +72,13 @@ input,textarea,select{font-family:inherit}
 .langtog{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .langtog button{padding:9px 11px;background:transparent;font-weight:800;font-size:13px;color:var(--muted);line-height:1}
 .langtog button.on{background:var(--accent);color:#2a1000}
+@media (max-width:640px){
+  .topbar{gap:10px;padding-top:12px}
+  .topbar .langtog{order:-1;flex-basis:100%;width:100%;flex-wrap:nowrap}
+  .topbar .langtog button{flex:1 1 0;min-width:0;text-align:center;padding:10px 2px}
+  .topbar .brand{order:1;margin-right:auto}
+  .topbar .tools{order:2}
+}
 
 /* ---------- layout ---------- */
 .wrap{max-width:var(--maxw);margin:0 auto;padding:8px clamp(14px,4vw,28px) 60px;width:100%}
@@ -238,6 +245,19 @@ input,textarea,select{font-family:inherit}
 .reveal .streak{display:inline-flex;align-items:center;gap:7px;background:rgba(255,78,138,.16);color:#ff9cc0;
   padding:8px 16px;border-radius:999px;font-weight:800;font-size:14px;border:1px solid rgba(255,78,138,.3)}
 .reveal-results{display:grid;gap:8px;width:100%;max-width:440px;margin-top:6px}
+.gh-fast{margin-top:14px;width:100%;max-width:520px;background:rgba(0,0,0,.16);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.ghf-title{font-weight:800;font-size:13px;letter-spacing:.04em;color:var(--accent);margin-bottom:10px;text-transform:uppercase;text-align:center}
+.ghf-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.ghf-card{flex:1 1 150px;min-width:140px;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-left:4px solid var(--muted);border-radius:var(--r-sm);padding:7px 10px}
+.ghf-card.ok{border-left-color:var(--good)}
+.ghf-card.no{border-left-color:var(--bad)}
+.ghf-rk{font-weight:900;font-size:15px;width:18px;text-align:center;color:var(--accent);flex:none}
+.ghf-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#16092e;flex:none}
+.ghf-nm{font-weight:700;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ghf-ms{font-weight:800;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.ghf-pts{font-weight:800;font-size:12px;flex:none;white-space:nowrap}
+.ghf-card.ok .ghf-pts{color:var(--good)}
+.ghf-card.no .ghf-pts{color:var(--bad)}
 .rr{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:12px;padding:10px 14px}
 .rr .av{width:32px;height:32px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:900;font-size:13px;color:#16092e}
 .rr .nm{flex:1;text-align:left;font-weight:800}
@@ -4468,7 +4488,7 @@ Pentru instalare, configurare și întreținere, vezi **Manualul administratorul
 
 /* ---------------- i18n ---------------- */
 const I18N = {
-  ro:{server_edition:"Ediția server (live)", php_guide_title:"🖥️ Ediția server necesită PHP", php_guide_intro:"Ediția server (index.php) are nevoie de PHP ca să ruleze — nu se deschide cu dublu-clic. Pune index.php în același folder cu acest fișier, apoi pornește un server:", php_guide_quick:"Test rapid (local) — deschide un terminal în folder și rulează:", php_guide_open:"apoi deschide în browser:", php_guide_real:"Server real (Apache / Nginx + PHP 8.0+): vezi Manualul de administrator din ediția server pentru pașii detaliați.", php_guide_req:"Necesită PHP 8.0 sau mai nou.", 
+  ro:{fastest5:"Cei mai rapizi", server_edition:"Ediția server (live)", php_guide_title:"🖥️ Ediția server necesită PHP", php_guide_intro:"Ediția server (index.php) are nevoie de PHP ca să ruleze — nu se deschide cu dublu-clic. Pune index.php în același folder cu acest fișier, apoi pornește un server:", php_guide_quick:"Test rapid (local) — deschide un terminal în folder și rulează:", php_guide_open:"apoi deschide în browser:", php_guide_real:"Server real (Apache / Nginx + PHP 8.0+): vezi Manualul de administrator din ediția server pentru pașii detaliați.", php_guide_req:"Necesită PHP 8.0 sau mai nou.", 
     tagline:"Quiz fără frontiere",
     home_kicker:"Joc de quiz • offline • gratuit",
     home_title_1:"Învață, joacă,",
@@ -4535,7 +4555,7 @@ const I18N = {
     import_paste_ph:'{"title":"…","questions":[…]}',
     quit_q:"Părăsești jocul? Progresul se pierde.", quit:"Ieși din joc",
   },
-  en:{server_edition:"Server edition (live)", php_guide_title:"🖥️ The server edition needs PHP", php_guide_intro:"The server edition (index.php) needs PHP to run — it doesn't open with a double-click. Put index.php in the same folder as this file, then start a server:", php_guide_quick:"Quick test (local) — open a terminal in the folder and run:", php_guide_open:"then open in the browser:", php_guide_real:"Real server (Apache / Nginx + PHP 8.0+): see the Administrator manual in the server edition for detailed steps.", php_guide_req:"Requires PHP 8.0 or newer.", 
+  en:{fastest5:"Fastest", server_edition:"Server edition (live)", php_guide_title:"🖥️ The server edition needs PHP", php_guide_intro:"The server edition (index.php) needs PHP to run — it doesn't open with a double-click. Put index.php in the same folder as this file, then start a server:", php_guide_quick:"Quick test (local) — open a terminal in the folder and run:", php_guide_open:"then open in the browser:", php_guide_real:"Real server (Apache / Nginx + PHP 8.0+): see the Administrator manual in the server edition for detailed steps.", php_guide_req:"Requires PHP 8.0 or newer.", 
     tagline:"Quiz without borders",
     home_kicker:"Quiz game • offline • free",
     home_title_1:"Learn, play,",
@@ -4602,7 +4622,7 @@ const I18N = {
     import_paste_ph:'{"title":"…","questions":[…]}',
     quit_q:"Leave the game? Progress will be lost.", quit:"Quit game",
   },
-  fr:{server_edition:"Édition serveur (live)", php_guide_title:"🖥️ L'édition serveur nécessite PHP", php_guide_intro:"L'édition serveur (index.php) a besoin de PHP pour fonctionner — elle ne s'ouvre pas d'un double-clic. Place index.php dans le même dossier que ce fichier, puis démarre un serveur :", php_guide_quick:"Test rapide (local) — ouvre un terminal dans le dossier et exécute :", php_guide_open:"puis ouvre dans le navigateur :", php_guide_real:"Serveur réel (Apache / Nginx + PHP 8.0+) : voir le Manuel de l'administrateur dans l'édition serveur pour les étapes détaillées.", php_guide_req:"Nécessite PHP 8.0 ou plus récent.", 
+  fr:{fastest5:"Les plus rapides", server_edition:"Édition serveur (live)", php_guide_title:"🖥️ L'édition serveur nécessite PHP", php_guide_intro:"L'édition serveur (index.php) a besoin de PHP pour fonctionner — elle ne s'ouvre pas d'un double-clic. Place index.php dans le même dossier que ce fichier, puis démarre un serveur :", php_guide_quick:"Test rapide (local) — ouvre un terminal dans le dossier et exécute :", php_guide_open:"puis ouvre dans le navigateur :", php_guide_real:"Serveur réel (Apache / Nginx + PHP 8.0+) : voir le Manuel de l'administrateur dans l'édition serveur pour les étapes détaillées.", php_guide_req:"Nécessite PHP 8.0 ou plus récent.", 
     tagline:"Quiz sans frontières",
     home_kicker:"Jeu de quiz • hors ligne • gratuit",
     home_title_1:"Apprends, joue,",
@@ -4758,7 +4778,7 @@ const I18N = {
     report_correct:"correctes", report_answered:"répondu", report_csv:"CSV", report_json:"JSON", report_print:"Imprimer",
     report_easy:"facile", report_med:"moyen", report_hard:"difficile", report_back:"Retour", report_no_data:"Aucune donnée.", report_player:"Joueur",
   },
-  it:{server_edition:"Edizione server (dal vivo)", php_guide_title:"🖥️ L'edizione server richiede PHP", php_guide_intro:"L'edizione server (index.php) ha bisogno di PHP per funzionare — non si apre con un doppio clic. Metti index.php nella stessa cartella di questo file, poi avvia un server:", php_guide_quick:"Test rapido (locale) — apri un terminale nella cartella ed esegui:", php_guide_open:"poi apri nel browser:", php_guide_real:"Server reale (Apache / Nginx + PHP 8.0+): vedi il Manuale dell'amministratore nell'edizione server per i passaggi dettagliati.", php_guide_req:"Richiede PHP 8.0 o più recente.", 
+  it:{fastest5:"I più veloci", server_edition:"Edizione server (dal vivo)", php_guide_title:"🖥️ L'edizione server richiede PHP", php_guide_intro:"L'edizione server (index.php) ha bisogno di PHP per funzionare — non si apre con un doppio clic. Metti index.php nella stessa cartella di questo file, poi avvia un server:", php_guide_quick:"Test rapido (locale) — apri un terminale nella cartella ed esegui:", php_guide_open:"poi apri nel browser:", php_guide_real:"Server reale (Apache / Nginx + PHP 8.0+): vedi il Manuale dell'amministratore nell'edizione server per i passaggi dettagliati.", php_guide_req:"Richiede PHP 8.0 o più recente.", 
     tagline:"Quiz senza frontiere",
     home_kicker:"Gioco a quiz • offline • gratuito",
     home_title_1:"Impara, gioca,",
@@ -4914,7 +4934,7 @@ const I18N = {
     report_correct:"corrette", report_answered:"risposto", report_csv:"CSV", report_json:"JSON", report_print:"Stampa",
     report_easy:"facile", report_med:"media", report_hard:"difficile", report_back:"Indietro", report_no_data:"Ancora nessun dato.", report_player:"Giocatore",
   },
-  es:{server_edition:"Edición servidor (en directo)", php_guide_title:"🖥️ La edición servidor necesita PHP", php_guide_intro:"La edición servidor (index.php) necesita PHP para funcionar — no se abre con doble clic. Pon index.php en la misma carpeta que este archivo, luego inicia un servidor:", php_guide_quick:"Prueba rápida (local) — abre un terminal en la carpeta y ejecuta:", php_guide_open:"luego abre en el navegador:", php_guide_real:"Servidor real (Apache / Nginx + PHP 8.0+): consulta el Manual del administrador en la edición servidor para los pasos detallados.", php_guide_req:"Requiere PHP 8.0 o más reciente.", 
+  es:{fastest5:"Los más rápidos", server_edition:"Edición servidor (en directo)", php_guide_title:"🖥️ La edición servidor necesita PHP", php_guide_intro:"La edición servidor (index.php) necesita PHP para funcionar — no se abre con doble clic. Pon index.php en la misma carpeta que este archivo, luego inicia un servidor:", php_guide_quick:"Prueba rápida (local) — abre un terminal en la carpeta y ejecuta:", php_guide_open:"luego abre en el navegador:", php_guide_real:"Servidor real (Apache / Nginx + PHP 8.0+): consulta el Manual del administrador en la edición servidor para los pasos detallados.", php_guide_req:"Requiere PHP 8.0 o más reciente.", 
     tagline:"Quiz sin fronteras",
     home_kicker:"Juego de preguntas • sin conexión • gratis",
     home_title_1:"Aprende, juega,",
@@ -5070,7 +5090,7 @@ const I18N = {
     report_correct:"correctas", report_answered:"respondido", report_csv:"CSV", report_json:"JSON", report_print:"Imprimir",
     report_easy:"fácil", report_med:"media", report_hard:"difícil", report_back:"Atrás", report_no_data:"Aún no hay datos.", report_player:"Jugador",
   },
-  pt:{server_edition:"Edição servidor (ao vivo)", php_guide_title:"🖥️ A edição servidor precisa de PHP", php_guide_intro:"A edição servidor (index.php) precisa de PHP para funcionar — não se abre com um duplo clique. Coloca index.php na mesma pasta que este ficheiro, depois inicia um servidor:", php_guide_quick:"Teste rápido (local) — abre um terminal na pasta e executa:", php_guide_open:"depois abre no navegador:", php_guide_real:"Servidor real (Apache / Nginx + PHP 8.0+): vê o Manual do administrador na edição servidor para os passos detalhados.", php_guide_req:"Requer PHP 8.0 ou mais recente.", 
+  pt:{fastest5:"Os mais rápidos", server_edition:"Edição servidor (ao vivo)", php_guide_title:"🖥️ A edição servidor precisa de PHP", php_guide_intro:"A edição servidor (index.php) precisa de PHP para funcionar — não se abre com um duplo clique. Coloca index.php na mesma pasta que este ficheiro, depois inicia um servidor:", php_guide_quick:"Teste rápido (local) — abre um terminal na pasta e executa:", php_guide_open:"depois abre no navegador:", php_guide_real:"Servidor real (Apache / Nginx + PHP 8.0+): vê o Manual do administrador na edição servidor para os passos detalhados.", php_guide_req:"Requer PHP 8.0 ou mais recente.", 
     tagline:"Quiz sem fronteiras",
     home_kicker:"Jogo de perguntas • offline • gratuito",
     home_title_1:"Aprende, joga,",
@@ -5226,7 +5246,7 @@ const I18N = {
     report_correct:"corretas", report_answered:"respondido", report_csv:"CSV", report_json:"JSON", report_print:"Imprimir",
     report_easy:"fácil", report_med:"média", report_hard:"difícil", report_back:"Voltar", report_no_data:"Ainda não há dados.", report_player:"Jogador",
   },
-  de:{server_edition:"Server-Edition (live)", php_guide_title:"🖥️ Die Server-Edition benötigt PHP", php_guide_intro:"Die Server-Edition (index.php) benötigt PHP zum Ausführen — sie öffnet sich nicht per Doppelklick. Lege index.php in denselben Ordner wie diese Datei, dann starte einen Server:", php_guide_quick:"Schnelltest (lokal) — öffne ein Terminal im Ordner und führe aus:", php_guide_open:"dann öffne im Browser:", php_guide_real:"Echter Server (Apache / Nginx + PHP 8.0+): siehe das Administratorhandbuch in der Server-Edition für detaillierte Schritte.", php_guide_req:"Erfordert PHP 8.0 oder neuer.", 
+  de:{fastest5:"Die Schnellsten", server_edition:"Server-Edition (live)", php_guide_title:"🖥️ Die Server-Edition benötigt PHP", php_guide_intro:"Die Server-Edition (index.php) benötigt PHP zum Ausführen — sie öffnet sich nicht per Doppelklick. Lege index.php in denselben Ordner wie diese Datei, dann starte einen Server:", php_guide_quick:"Schnelltest (lokal) — öffne ein Terminal im Ordner und führe aus:", php_guide_open:"dann öffne im Browser:", php_guide_real:"Echter Server (Apache / Nginx + PHP 8.0+): siehe das Administratorhandbuch in der Server-Edition für detaillierte Schritte.", php_guide_req:"Erfordert PHP 8.0 oder neuer.", 
     tagline:"Quiz ohne Grenzen",
     home_kicker:"Quizspiel • offline • kostenlos",
     home_title_1:"Lernen, spielen,",
@@ -5533,16 +5553,16 @@ function renderTopBar(){
       <div class="logo"></div>
       <div><h1>Undava</h1><small>${esc(t("tagline"))}</small></div>
     </div>
+    <div class="langtog">
+      <button class="${state.lang==="ro"?"on":""}" data-action="lang" data-v="ro">RO</button>
+      <button class="${state.lang==="en"?"on":""}" data-action="lang" data-v="en">EN</button>
+      <button class="${state.lang==="fr"?"on":""}" data-action="lang" data-v="fr">FR</button>
+      <button class="${state.lang==="it"?"on":""}" data-action="lang" data-v="it">IT</button>
+      <button class="${state.lang==="es"?"on":""}" data-action="lang" data-v="es">ES</button>
+      <button class="${state.lang==="pt"?"on":""}" data-action="lang" data-v="pt">PT</button>
+      <button class="${state.lang==="de"?"on":""}" data-action="lang" data-v="de">DE</button>
+    </div>
     <div class="tools">
-      <div class="langtog">
-        <button class="${state.lang==="ro"?"on":""}" data-action="lang" data-v="ro">RO</button>
-        <button class="${state.lang==="en"?"on":""}" data-action="lang" data-v="en">EN</button>
-        <button class="${state.lang==="fr"?"on":""}" data-action="lang" data-v="fr">FR</button>
-        <button class="${state.lang==="it"?"on":""}" data-action="lang" data-v="it">IT</button>
-        <button class="${state.lang==="es"?"on":""}" data-action="lang" data-v="es">ES</button>
-        <button class="${state.lang==="pt"?"on":""}" data-action="lang" data-v="pt">PT</button>
-        <button class="${state.lang==="de"?"on":""}" data-action="lang" data-v="de">DE</button>
-      </div>
       <button class="iconbtn" data-action="sound" title="${esc(t("set_sound"))}">${state.sound?"🔊":"🔇"}</button>
       <button class="iconbtn" data-action="settings" title="${esc(t("settings"))}">⚙️</button>
     </div>`;
@@ -6059,7 +6079,7 @@ function doReveal(){
     } else { newStreak=0; }
     pt.streak=newStreak; pt.score+=pts;
     pt.history.push({correct:a.correct, pts});
-    return {name:pt.name, idx:pt.idx, answerIndex:a.answerIndex, text:a.text, correct:a.correct, pts, streak:newStreak, answered:(a.answerIndex!=null)||(a.text!=null&&a.text!=="")};
+    return {name:pt.name, idx:pt.idx, answerIndex:a.answerIndex, text:a.text, correct:a.correct, pts, streak:newStreak, elapsed:a.elapsed, answered:(a.answerIndex!=null)||(a.text!=null&&a.text!=="")};
   });
   // post ranks
   const postSorted=[...p.participants].sort((a,b)=>b.score-a.score);
@@ -6178,10 +6198,13 @@ function revealView(){
       <div class="nm">${esc(r.name)}</div>
       <div class="pt">${r.correct?"+"+r.pts:(r.answered?"✗":"—")}</div>
     </div>`).join("");
+  const fastList=p.roundResults.filter(r=>r.answered).sort((a,b)=>a.elapsed-b.elapsed).slice(0,5);
+  const fastHTML=fastList.length?`<div class="gh-fast"><div class="ghf-title">⚡ ${esc(t("fastest5"))}</div><div class="ghf-row">${fastList.map((r,i)=>`<div class="ghf-card ${r.correct?"ok":"no"}"><div class="ghf-rk">${i+1}</div><div class="ghf-av" style="background:${avColor(r.idx)}">${esc(initials(r.name))}</div><div class="ghf-nm">${esc(r.name)}</div><div class="ghf-ms">${(r.elapsed/1000).toFixed(1)}s</div><div class="ghf-pts">${r.correct?"✓ +"+r.pts:"✗"}</div></div>`).join("")}</div></div>`:"";
   return `<div class="reveal">
     <div class="verdict ok" style="font-size:clamp(22px,5vw,34px);color:#fff">${esc(t("correct_was"))}</div>
     <div class="points" style="font-size:clamp(22px,5vw,34px)">${esc(correctTxt)}</div>
     <div class="reveal-results">${rows}</div>
+    ${fastHTML}
     <button class="btn btn-primary btn-lg" style="margin-top:12px" data-action="continue">${esc(t("continue"))} ▶</button>
   </div>`;
 }
