@@ -881,6 +881,30 @@ $QFF_CLIENT=array(
 <meta name="color-scheme" content="dark">
 <meta name="description" content="Quiz fara frontiere — joc de tip Kahoot, single-file, offline, fara conturi, fara reclame, fara telemetrie.">
 <title>Undava</title>
+<?php
+  $__ol='ro'; if(!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])){ foreach(array('ro','en','fr','it','es','pt','de') as $__l){ if(stripos($_SERVER['HTTP_ACCEPT_LANGUAGE'],$__l)!==false){ $__ol=$__l; break; } } }
+  $__ot=array('ro'=>'Undava — Quiz fără frontiere','en'=>'Undava — Quiz Without Borders','fr'=>'Undava — Quiz sans frontières','it'=>'Undava — Quiz senza frontiere','es'=>'Undava — Quiz sin fronteras','pt'=>'Undava — Quiz sem fronteiras','de'=>'Undava — Quiz ohne Grenzen');
+  $__od=array('ro'=>'Joc de quiz în spiritul Kahoot — creează întrebări și joacă cu prietenii. Offline, gratuit, fără conturi, fără reclame. Disponibil în 7 limbi.','en'=>'A Kahoot-style quiz game — create questions and play with friends. Offline, free, no accounts, no ads. Available in 7 languages.','fr'=>'Un jeu de quiz façon Kahoot — crée des questions et joue avec tes amis. Hors ligne, gratuit, sans compte, sans pub. Disponible en 7 langues.','it'=>'Un gioco di quiz in stile Kahoot — crea domande e gioca con gli amici. Offline, gratis, senza account, senza pubblicità. Disponibile in 7 lingue.','es'=>'Un juego de preguntas al estilo Kahoot — crea preguntas y juega con amigos. Sin conexión, gratis, sin cuentas, sin anuncios. Disponible en 7 idiomas.','pt'=>'Um jogo de quiz ao estilo Kahoot — cria perguntas e joga com amigos. Offline, grátis, sem contas, sem anúncios. Disponível em 7 idiomas.','de'=>'Ein Quizspiel im Kahoot-Stil — erstelle Fragen und spiele mit Freunden. Offline, kostenlos, ohne Konto, ohne Werbung. In 7 Sprachen verfügbar.');
+  $__lc=array('ro'=>'ro_RO','en'=>'en_US','fr'=>'fr_FR','it'=>'it_IT','es'=>'es_ES','pt'=>'pt_PT','de'=>'de_DE');
+  $__sc=(!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off')?'https':'http'; $__ho=isset($_SERVER['HTTP_HOST'])?$_SERVER['HTTP_HOST']:'localhost';
+  $__pa=strtok((string)(isset($_SERVER['REQUEST_URI'])?$_SERVER['REQUEST_URI']:'/'),'?'); $__di=rtrim(str_replace('\\','/',dirname($__pa)),'/');
+  $__im=$__sc.'://'.$__ho.$__di.'/undava-og-'.$__ol.'.jpg'; $__ur=$__sc.'://'.$__ho.$__pa;
+  $__e=function($s){ return htmlspecialchars($s,ENT_QUOTES,'UTF-8'); };
+  echo '<meta property="og:type" content="website">'."\n";
+  echo '<meta property="og:site_name" content="Undava">'."\n";
+  echo '<meta property="og:title" content="'.$__e($__ot[$__ol]).'">'."\n";
+  echo '<meta property="og:description" content="'.$__e($__od[$__ol]).'">'."\n";
+  echo '<meta property="og:url" content="'.$__e($__ur).'">'."\n";
+  echo '<meta property="og:image" content="'.$__e($__im).'">'."\n";
+  echo '<meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">'."\n";
+  echo '<meta property="og:image:alt" content="'.$__e($__ot[$__ol]).'">'."\n";
+  echo '<meta property="og:locale" content="'.$__lc[$__ol].'">'."\n";
+  foreach($__lc as $__k=>$__v){ if($__k!==$__ol) echo '<meta property="og:locale:alternate" content="'.$__v.'">'; }
+  echo "\n".'<meta name="twitter:card" content="summary_large_image">'."\n";
+  echo '<meta name="twitter:title" content="'.$__e($__ot[$__ol]).'">'."\n";
+  echo '<meta name="twitter:description" content="'.$__e($__od[$__ol]).'">'."\n";
+  echo '<meta name="twitter:image" content="'.$__e($__im).'">'."\n";
+?>
 <meta name="theme-color" content="#16092e">
 <link rel="manifest" href="?asset=manifest">
 <link rel="icon" type="image/svg+xml" href="?asset=icon">
@@ -991,6 +1015,14 @@ input,textarea,select{font-family:inherit}
 .btn-danger{background:rgba(232,56,90,.16);color:#ff90a8;border:1px solid rgba(232,56,90,.4);box-shadow:none}
 .btn[disabled]{opacity:.45;pointer-events:none}
 .feat{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:42px;color:var(--muted2);font-size:13px;font-weight:600}
+.tf-foot{max-width:640px;margin:38px auto 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:22px;border-top:1px solid var(--line)}
+.tf-badge{display:inline-block;font-weight:800;font-size:13px;letter-spacing:.03em;color:#18bd6b;background:rgba(24,189,107,.12);border:1px solid rgba(24,189,107,.32);border-radius:999px;padding:6px 16px;text-decoration:none}
+.tf-badge:hover{background:rgba(24,189,107,.2)}
+.tf-desc{color:var(--muted);font-size:13px;line-height:1.5;max-width:520px}
+.tf-links{display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:center;align-items:center;font-size:14px;font-weight:700}
+.tf-links a{color:var(--accent);text-decoration:none}
+.tf-links a:hover{text-decoration:underline}
+.tf-dot{opacity:.4}
 .feat span{display:inline-flex;align-items:center;gap:6px}
 .feat b{color:var(--teal)}
 
@@ -1710,12 +1742,13 @@ input,textarea,select{font-family:inherit}
 /* ---------- in-app help / manual ---------- */
 .help-wrap{max-width:940px}
 .help-books{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.help-book{padding:10px 18px;border:1px solid var(--line,#2a2350);background:rgba(255,255,255,.04);border-radius:10px;font-weight:800;cursor:pointer;color:var(--ink,#f4f2ff)}
-.help-book.on{background:var(--accent,#7c5cff);color:#fff;border-color:var(--accent,#7c5cff)}
+.help-book{padding:10px 18px;border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:10px;font-weight:800;cursor:pointer;color:#ece7ff;transition:background .15s,color .15s}
+.help-book:hover{background:rgba(255,255,255,.12)}
+.help-book.on{background:var(--accent);color:#2a1000;border-color:var(--accent);box-shadow:0 2px 10px rgba(255,210,63,.25)}
 .help-layout{display:grid;grid-template-columns:230px 1fr;gap:26px;align-items:start}
 .help-toc{position:sticky;top:16px;display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 40px);overflow:auto;border-right:1px solid var(--line,#2a2350);padding-right:12px}
 .help-toc-item{font-size:13px;font-weight:700;color:var(--muted,#9a93c0);padding:6px 8px;border-radius:7px;cursor:pointer;text-decoration:none;line-height:1.3;transition:background .12s}
-.help-toc-item:hover{background:rgba(255,255,255,.06);color:var(--ink,#f4f2ff)}
+.help-toc-item:hover{background:rgba(255,255,255,.08);color:#fff}
 .md-body{min-width:0;line-height:1.65;font-size:15px}
 .md-body .md-h1{font-size:26px;font-weight:900;margin:0 0 6px;line-height:1.2}
 .md-body .md-h2{font-size:21px;font-weight:800;margin:30px 0 10px;padding-top:12px;border-top:1px solid var(--line,#2a2350);scroll-margin-top:14px}
@@ -1734,7 +1767,12 @@ input,textarea,select{font-family:inherit}
 .md-body .md-tbl th{background:rgba(255,255,255,.05);font-weight:800}
 .md-body .md-cb{color:var(--accent,#7c5cff);font-weight:900}
 .md-body a{color:var(--accent,#7c5cff)}
-@media(max-width:760px){ .help-layout{grid-template-columns:1fr} .help-toc{position:static;max-height:200px;border-right:none;border-bottom:1px solid var(--line,#2a2350);padding-right:0;padding-bottom:10px;margin-bottom:14px} }
+@media(max-width:760px){
+  .help-layout{grid-template-columns:1fr;gap:16px}
+  .help-toc{position:static;max-height:none;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:8px;border-right:none;border-bottom:1px solid var(--line);padding:0 0 12px;-webkit-overflow-scrolling:touch}
+  .help-toc-item{flex:0 0 auto;white-space:nowrap;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+  .md-body .md-h2{margin-top:22px}
+}
 </style>
 </head>
 <body>
@@ -1746,6 +1784,279 @@ input,textarea,select{font-family:inherit}
 
 <canvas id="confetti" class="hidden"></canvas>
 
+<script type="text/markdown" id="manual-eli5">
+# Undava — ghid rapid 🎮
+
+Undava e un joc de întrebări, ca un mic concurs pe telefon. Apare o întrebare, tu alegi răspunsul corect — cât mai repede — și strângi puncte. Poți juca singur sau cu prietenii, pe același telefon.
+
+## Ce este? 🤔
+
+E un joc de tip quiz. Vezi o întrebare cu mai multe variante colorate și apeși varianta pe care o crezi corectă. Cu cât răspunzi mai repede, cu atât iei mai multe puncte. La final apare un clasament.
+
+## Cum joci ▶️
+
+Apasă butonul mare **Joacă** și alege un quiz din listă. Apoi alege felul jocului:
+
+- **Solo** — joci doar tu.
+- **Pe rând** — mai mulți jucători, pe același telefon; îl dați din mână în mână, fiecare la rândul lui.
+
+Răspunzi la fiecare întrebare înainte să se termine timpul. La sfârșit vezi cine a câștigat.
+
+
+După fiecare întrebare vezi și **cine a răspuns cel mai repede** (primii 5).
+## Cum îți faci propriul quiz ✏️
+
+Apasă **Creează quiz**. Scrie o întrebare, adaugă răspunsurile și bifează care e cel corect. Poți alege și câte secunde au jucătorii la fiecare întrebare. Adaugi câte întrebări vrei, apoi salvezi. Gata — quiz-ul tău e pregătit de joc!
+
+## Roata norocului 🎡
+
+Apasă **Roata**. Scrii câteva nume sau opțiuni, învârți roata și ea alege una la întâmplare. Perfectă pentru „cine începe?" sau „ce mâncăm azi?".
+
+## Salvează și trimite 💾
+
+Quiz-urile tale stau doar pe telefonul tău. Vrei să le păstrezi sau să le trimiți unui prieten? Apasă **Exportă** și le salvezi într-un fișier. Prietenul apasă **Importă** ca să le încarce la el.
+
+## Bine de știut 🌟
+
+- Merge **fără internet**.
+- E **gratuit** și **fără reclame**.
+- Nu cere cont și nu-ți urmărește datele.
+- Poți schimba limba din colțul de sus — sunt **7 limbi**.
+</script>
+<script type="text/markdown" id="manual-eli5-en">
+# Undava — quick guide 🎮
+
+Undava is a question game, like a little quiz show on your phone. A question pops up, you pick the right answer — as fast as you can — and you collect points. You can play alone or with friends on the same phone.
+
+## What is it? 🤔
+
+It's a quiz game. You see a question with a few colorful choices and you tap the one you think is correct. The faster you answer, the more points you get. At the end you see a scoreboard.
+
+## How to play ▶️
+
+Tap the big **Play** button and pick a quiz from the list. Then choose the game mode:
+
+- **Solo** — just you.
+- **Hotseat** — several players on the same phone; you pass it around and each takes a turn.
+
+Answer each question before the time runs out. At the end you see who won.
+
+
+After each question you also see **who answered fastest** (the top 5).
+## Make your own quiz ✏️
+
+Tap **Create quiz**. Write a question, add the answers, and tick the correct one. You can also choose how many seconds players get per question. Add as many questions as you like, then save. Done — your quiz is ready to play!
+
+## The lucky wheel 🎡
+
+Tap **Wheel**. Type a few names or options, spin it, and it picks one at random. Great for "who goes first?" or "what shall we eat today?".
+
+## Save & share 💾
+
+Your quizzes stay only on your phone. Want to keep them or send them to a friend? Tap **Export** to save them to a file. Your friend taps **Import** to load them.
+
+## Good to know 🌟
+
+- Works **without internet**.
+- It's **free** and has **no ads**.
+- No account needed, and it doesn't track your data.
+- You can change the language in the top corner — there are **7 languages**.
+</script>
+<script type="text/markdown" id="manual-eli5-fr">
+# Undava — guide express 🎮
+
+Undava est un jeu de questions, comme un petit quiz sur ton téléphone. Une question apparaît, tu choisis la bonne réponse — le plus vite possible — et tu gagnes des points. Tu peux jouer seul ou avec des amis sur le même téléphone.
+
+## C'est quoi ? 🤔
+
+C'est un jeu de quiz. Tu vois une question avec plusieurs choix colorés et tu appuies sur celui que tu penses correct. Plus tu réponds vite, plus tu gagnes de points. À la fin, un classement s'affiche.
+
+## Comment jouer ▶️
+
+Appuie sur le grand bouton **Jouer** et choisis un quiz dans la liste. Choisis ensuite le mode :
+
+- **Solo** — juste toi.
+- **Chacun son tour** — plusieurs joueurs sur le même téléphone ; on se le passe, chacun à son tour.
+
+Réponds à chaque question avant la fin du temps. À la fin, tu vois qui a gagné.
+
+
+Après chaque question, tu vois aussi **qui a répondu le plus vite** (le top 5).
+## Créer ton propre quiz ✏️
+
+Appuie sur **Créer un quiz**. Écris une question, ajoute les réponses et coche la bonne. Tu peux aussi choisir combien de secondes les joueurs ont par question. Ajoute autant de questions que tu veux, puis enregistre. Voilà — ton quiz est prêt !
+
+## La roue de la chance 🎡
+
+Appuie sur **Roue**. Écris quelques noms ou options, fais tourner, et elle en choisit un au hasard. Parfait pour « qui commence ? » ou « on mange quoi aujourd'hui ? ».
+
+## Enregistrer et partager 💾
+
+Tes quiz restent uniquement sur ton téléphone. Tu veux les garder ou les envoyer à un ami ? Appuie sur **Exporter** pour les enregistrer dans un fichier. Ton ami appuie sur **Importer** pour les charger.
+
+## Bon à savoir 🌟
+
+- Fonctionne **sans internet**.
+- C'est **gratuit** et **sans publicité**.
+- Pas de compte, et aucune donnée n'est suivie.
+- Tu peux changer de langue en haut — il y a **7 langues**.
+</script>
+<script type="text/markdown" id="manual-eli5-it">
+# Undava — guida rapida 🎮
+
+Undava è un gioco di domande, come un piccolo quiz sul telefono. Appare una domanda, tu scegli la risposta giusta — il più in fretta possibile — e guadagni punti. Puoi giocare da solo o con gli amici sullo stesso telefono.
+
+## Cos'è? 🤔
+
+È un gioco a quiz. Vedi una domanda con alcune scelte colorate e tocchi quella che pensi sia giusta. Più rispondi in fretta, più punti prendi. Alla fine appare una classifica.
+
+## Come si gioca ▶️
+
+Tocca il grande pulsante **Gioca** e scegli un quiz dalla lista. Poi scegli la modalità:
+
+- **Solo** — solo tu.
+- **A turni** — più giocatori sullo stesso telefono; ve lo passate, ognuno al proprio turno.
+
+Rispondi a ogni domanda prima che scada il tempo. Alla fine vedi chi ha vinto.
+
+
+Dopo ogni domanda vedi anche **chi ha risposto più in fretta** (i primi 5).
+## Crea il tuo quiz ✏️
+
+Tocca **Crea quiz**. Scrivi una domanda, aggiungi le risposte e spunta quella giusta. Puoi anche scegliere quanti secondi hanno i giocatori per ogni domanda. Aggiungi tutte le domande che vuoi, poi salva. Fatto — il tuo quiz è pronto!
+
+## La ruota della fortuna 🎡
+
+Tocca **Ruota**. Scrivi alcuni nomi o opzioni, falla girare e ne sceglie uno a caso. Perfetta per "chi inizia?" o "cosa mangiamo oggi?".
+
+## Salva e condividi 💾
+
+I tuoi quiz restano solo sul tuo telefono. Vuoi conservarli o inviarli a un amico? Tocca **Esporta** per salvarli in un file. L'amico tocca **Importa** per caricarli.
+
+## Buono a sapersi 🌟
+
+- Funziona **senza internet**.
+- È **gratis** e **senza pubblicità**.
+- Nessun account, e non traccia i tuoi dati.
+- Puoi cambiare lingua in alto — ci sono **7 lingue**.
+</script>
+<script type="text/markdown" id="manual-eli5-es">
+# Undava — guía rápida 🎮
+
+Undava es un juego de preguntas, como un pequeño concurso en tu teléfono. Aparece una pregunta, eliges la respuesta correcta — lo más rápido posible — y ganas puntos. Puedes jugar solo o con amigos en el mismo teléfono.
+
+## ¿Qué es? 🤔
+
+Es un juego de preguntas. Ves una pregunta con varias opciones de colores y tocas la que crees correcta. Cuanto más rápido respondas, más puntos ganas. Al final aparece una clasificación.
+
+## Cómo se juega ▶️
+
+Toca el botón grande **Jugar** y elige un cuestionario de la lista. Luego elige el modo:
+
+- **Solo** — solo tú.
+- **Por turnos** — varios jugadores en el mismo teléfono; os lo pasáis, cada uno en su turno.
+
+Responde cada pregunta antes de que se acabe el tiempo. Al final ves quién ganó.
+
+
+Después de cada pregunta también ves **quién respondió más rápido** (el top 5).
+## Crea tu propio cuestionario ✏️
+
+Toca **Crear cuestionario**. Escribe una pregunta, añade las respuestas y marca la correcta. También puedes elegir cuántos segundos tienen los jugadores por pregunta. Añade tantas preguntas como quieras y guarda. ¡Listo — tu cuestionario está preparado!
+
+## La ruleta de la suerte 🎡
+
+Toca **Ruleta**. Escribe algunos nombres u opciones, gírala y elige uno al azar. Perfecta para "¿quién empieza?" o "¿qué comemos hoy?".
+
+## Guarda y comparte 💾
+
+Tus cuestionarios se quedan solo en tu teléfono. ¿Quieres guardarlos o enviarlos a un amigo? Toca **Exportar** para guardarlos en un archivo. Tu amigo toca **Importar** para cargarlos.
+
+## Bueno saber 🌟
+
+- Funciona **sin internet**.
+- Es **gratis** y **sin anuncios**.
+- No pide cuenta y no rastrea tus datos.
+- Puedes cambiar el idioma arriba — hay **7 idiomas**.
+</script>
+<script type="text/markdown" id="manual-eli5-pt">
+# Undava — guia rápido 🎮
+
+Undava é um jogo de perguntas, como um pequeno concurso no telemóvel. Aparece uma pergunta, escolhes a resposta certa — o mais depressa possível — e ganhas pontos. Podes jogar sozinho ou com amigos no mesmo telemóvel.
+
+## O que é? 🤔
+
+É um jogo de quiz. Vês uma pergunta com várias opções coloridas e tocas na que achas certa. Quanto mais depressa responderes, mais pontos ganhas. No fim aparece uma classificação.
+
+## Como se joga ▶️
+
+Toca no botão grande **Jogar** e escolhe um quiz da lista. Depois escolhe o modo:
+
+- **Solo** — só tu.
+- **À vez** — vários jogadores no mesmo telemóvel; vão passando, cada um na sua vez.
+
+Responde a cada pergunta antes de o tempo acabar. No fim vês quem ganhou.
+
+
+Depois de cada pergunta vês também **quem respondeu mais depressa** (os 5 primeiros).
+## Cria o teu próprio quiz ✏️
+
+Toca em **Criar quiz**. Escreve uma pergunta, adiciona as respostas e marca a correta. Também podes escolher quantos segundos os jogadores têm por pergunta. Adiciona as perguntas que quiseres e guarda. Pronto — o teu quiz está a postos!
+
+## A roda da sorte 🎡
+
+Toca em **Roda**. Escreve alguns nomes ou opções, roda-a e ela escolhe um ao acaso. Ótima para "quem começa?" ou "o que comemos hoje?".
+
+## Guarda e partilha 💾
+
+Os teus quizzes ficam só no teu telemóvel. Queres guardá-los ou enviá-los a um amigo? Toca em **Exportar** para os guardar num ficheiro. O teu amigo toca em **Importar** para os carregar.
+
+## Bom saber 🌟
+
+- Funciona **sem internet**.
+- É **grátis** e **sem anúncios**.
+- Não pede conta e não segue os teus dados.
+- Podes mudar de idioma no canto de cima — são **7 idiomas**.
+</script>
+<script type="text/markdown" id="manual-eli5-de">
+# Undava — Schnellanleitung 🎮
+
+Undava ist ein Fragenspiel, wie ein kleines Quiz auf dem Handy. Eine Frage erscheint, du wählst die richtige Antwort — so schnell wie möglich — und sammelst Punkte. Du kannst allein oder mit Freunden am selben Handy spielen.
+
+## Was ist das? 🤔
+
+Es ist ein Quizspiel. Du siehst eine Frage mit mehreren bunten Antworten und tippst auf die, die du für richtig hältst. Je schneller du antwortest, desto mehr Punkte bekommst du. Am Ende erscheint eine Rangliste.
+
+## So wird gespielt ▶️
+
+Tippe auf den großen **Spielen**-Knopf und wähle ein Quiz aus der Liste. Dann wähle den Modus:
+
+- **Solo** — nur du.
+- **Reihum** — mehrere Spieler am selben Handy; ihr gebt es weiter, jeder ist der Reihe nach dran.
+
+Beantworte jede Frage, bevor die Zeit abläuft. Am Ende siehst du, wer gewonnen hat.
+
+
+Nach jeder Frage siehst du auch, **wer am schnellsten geantwortet hat** (die Top 5).
+## Eigenes Quiz erstellen ✏️
+
+Tippe auf **Quiz erstellen**. Schreibe eine Frage, füge die Antworten hinzu und markiere die richtige. Du kannst auch festlegen, wie viele Sekunden die Spieler pro Frage haben. Füge so viele Fragen hinzu, wie du willst, und speichere. Fertig — dein Quiz ist spielbereit!
+
+## Das Glücksrad 🎡
+
+Tippe auf **Rad**. Schreibe ein paar Namen oder Optionen, dreh es, und es wählt zufällig einen aus. Ideal für „Wer fängt an?" oder „Was essen wir heute?".
+
+## Speichern & teilen 💾
+
+Deine Quizze bleiben nur auf deinem Handy. Willst du sie behalten oder einem Freund schicken? Tippe auf **Exportieren**, um sie in einer Datei zu speichern. Dein Freund tippt auf **Importieren**, um sie zu laden.
+
+## Gut zu wissen 🌟
+
+- Funktioniert **ohne Internet**.
+- Es ist **kostenlos** und **werbefrei**.
+- Kein Konto nötig, und es verfolgt deine Daten nicht.
+- Du kannst die Sprache oben in der Ecke ändern — es gibt **7 Sprachen**.
+</script>
 <script type="text/markdown" id="manual-user-en">
 # Undava — User manual
 
@@ -2039,6 +2350,10 @@ Perfect for a table of friends with a single laptop/phone.
 
 > Actually pass the device from one player to another when the app asks you to.
 
+
+### Fastest players
+
+After each question, a **"Fastest players"** strip shows the first 5 players who answered, ordered by reaction speed. Each appears with their avatar, name, **reaction time** (e.g. `0.8s`) and result: `✓ +points` if correct or `✗` if wrong. You see at a glance who was quickest — and whoever answers correctly **faster** earns more points.
 ---
 
 ## 12. Live game — host
@@ -2089,6 +2404,10 @@ During the game, participants can send **emoji reactions** that float across the
 
 At the last question, the host displays the **podium** (top 3) and, if you played in teams, the **team standings** with the winning team highlighted. From here you can open the **reports** (section 19).
 
+
+### Fastest players
+
+After each question, a **"Fastest players"** strip shows the first 5 players who answered, ordered by reaction speed. Each appears with their avatar, name, **reaction time** (e.g. `0.8s`) and result: `✓ +points` if correct or `✗` if wrong. You see at a glance who was quickest — and whoever answers correctly **faster** earns more points.
 ---
 
 ## 13. Live game — participant
@@ -2605,6 +2924,10 @@ Parfait pour une tablée d'amis avec un seul ordinateur/téléphone.
 
 > Passe effectivement l'appareil d'un joueur à l'autre quand l'application te le demande.
 
+
+### Les plus rapides
+
+Après chaque question, un bandeau **« Les plus rapides »** affiche les 5 premiers joueurs à avoir répondu, classés par vitesse de réaction. Chacun apparaît avec son avatar, son nom, son **temps de réaction** (par ex. `0,8s`) et son résultat : `✓ +points` si correct ou `✗` si faux. On voit d'un coup d'œil qui a été le plus rapide — et celui qui répond correctement **plus vite** gagne plus de points.
 ---
 
 ## 12. Jeu en direct — l'animateur
@@ -2655,6 +2978,10 @@ Pendant le jeu, les participants peuvent envoyer des **réactions emoji** qui fl
 
 À la dernière question, l'animateur affiche le **podium** (top 3) et, si tu as joué en équipes, le **classement des équipes** avec l'équipe gagnante mise en avant. De là tu peux ouvrir les **rapports** (section 19).
 
+
+### Les plus rapides
+
+Après chaque question, un bandeau **« Les plus rapides »** affiche les 5 premiers joueurs à avoir répondu, classés par vitesse de réaction. Chacun apparaît avec son avatar, son nom, son **temps de réaction** (par ex. `0,8s`) et son résultat : `✓ +points` si correct ou `✗` si faux. On voit d'un coup d'œil qui a été le plus rapide — et celui qui répond correctement **plus vite** gagne plus de points.
 ---
 
 ## 13. Jeu en direct — le participant
@@ -3171,6 +3498,10 @@ Perfetto per un tavolo di amici con un solo portatile/telefono.
 
 > Passa effettivamente il dispositivo da un giocatore all'altro quando l'applicazione te lo chiede.
 
+
+### I più veloci
+
+Dopo ogni domanda, una striscia **«I più veloci»** mostra i primi 5 giocatori che hanno risposto, in ordine di velocità di reazione. Ognuno appare con il proprio avatar, il nome, il **tempo di reazione** (es. `0,8s`) e il risultato: `✓ +punti` se corretto o `✗` se sbagliato. Si vede subito chi è stato il più rapido — e chi risponde correttamente **più in fretta** guadagna più punti.
 ---
 
 ## 12. Gioco dal vivo — il conduttore
@@ -3221,6 +3552,10 @@ Durante il gioco, i partecipanti possono inviare **reazioni emoji** che fluttuan
 
 All'ultima domanda, il conduttore mostra il **podio** (top 3) e, se hai giocato a squadre, la **classifica a squadre** con la squadra vincitrice evidenziata. Da qui puoi aprire i **rapporti** (sezione 19).
 
+
+### I più veloci
+
+Dopo ogni domanda, una striscia **«I più veloci»** mostra i primi 5 giocatori che hanno risposto, in ordine di velocità di reazione. Ognuno appare con il proprio avatar, il nome, il **tempo di reazione** (es. `0,8s`) e il risultato: `✓ +punti` se corretto o `✗` se sbagliato. Si vede subito chi è stato il più rapido — e chi risponde correttamente **più in fretta** guadagna più punti.
 ---
 
 ## 13. Gioco dal vivo — il partecipante
@@ -3737,6 +4072,10 @@ Perfecto para una mesa de amigos con un solo portátil/teléfono.
 
 > Pasa efectivamente el dispositivo de un jugador a otro cuando la aplicación te lo pida.
 
+
+### Los más rápidos
+
+Después de cada pregunta, una franja **«Los más rápidos»** muestra los 5 primeros jugadores que respondieron, ordenados por velocidad de reacción. Cada uno aparece con su avatar, su nombre, su **tiempo de reacción** (p. ej. `0,8s`) y el resultado: `✓ +puntos` si acertó o `✗` si falló. Se ve de un vistazo quién fue el más rápido — y quien responde correctamente **más rápido** gana más puntos.
 ---
 
 ## 12. Juego en directo — el anfitrión
@@ -3787,6 +4126,10 @@ Durante el juego, los participantes pueden enviar **reacciones emoji** que flota
 
 En la última pregunta, el anfitrión muestra el **podio** (top 3) y, si has jugado por equipos, la **clasificación por equipos** con el equipo ganador resaltado. Desde aquí puedes abrir los **informes** (sección 19).
 
+
+### Los más rápidos
+
+Después de cada pregunta, una franja **«Los más rápidos»** muestra los 5 primeros jugadores que respondieron, ordenados por velocidad de reacción. Cada uno aparece con su avatar, su nombre, su **tiempo de reacción** (p. ej. `0,8s`) y el resultado: `✓ +puntos` si acertó o `✗` si falló. Se ve de un vistazo quién fue el más rápido — y quien responde correctamente **más rápido** gana más puntos.
 ---
 
 ## 13. Juego en directo — el participante
@@ -4303,6 +4646,10 @@ Perfeito para uma mesa de amigos com um só portátil/telemóvel.
 
 > Passa efetivamente o dispositivo de um jogador para outro quando a aplicação te pedir.
 
+
+### Os mais rápidos
+
+Depois de cada pergunta, uma faixa **«Os mais rápidos»** mostra os primeiros 5 jogadores que responderam, por ordem de velocidade de reação. Cada um aparece com o seu avatar, o nome, o **tempo de reação** (ex. `0,8s`) e o resultado: `✓ +pontos` se acertou ou `✗` se errou. Vê-se num relance quem foi o mais rápido — e quem responde corretamente **mais depressa** ganha mais pontos.
 ---
 
 ## 12. Jogo ao vivo — o anfitrião
@@ -4353,6 +4700,10 @@ Durante o jogo, os participantes podem enviar **reações emoji** que flutuam no
 
 Na última pergunta, o anfitrião mostra o **pódio** (top 3) e, se jogaste por equipas, a **classificação por equipas** com a equipa vencedora destacada. A partir daqui podes abrir os **relatórios** (secção 19).
 
+
+### Os mais rápidos
+
+Depois de cada pergunta, uma faixa **«Os mais rápidos»** mostra os primeiros 5 jogadores que responderam, por ordem de velocidade de reação. Cada um aparece com o seu avatar, o nome, o **tempo de reação** (ex. `0,8s`) e o resultado: `✓ +pontos` se acertou ou `✗` se errou. Vê-se num relance quem foi o mais rápido — e quem responde corretamente **mais depressa** ganha mais pontos.
 ---
 
 ## 13. Jogo ao vivo — o participante
@@ -4869,6 +5220,10 @@ Perfekt für einen Tisch voller Freunde mit einem einzigen Laptop/Handy.
 
 > Reiche das Gerät tatsächlich von einem Spieler zum anderen weiter, wenn die Anwendung dich dazu auffordert.
 
+
+### Die Schnellsten
+
+Nach jeder Frage zeigt eine Leiste **„Die Schnellsten"** die ersten 5 Spieler, die geantwortet haben, sortiert nach Reaktionsgeschwindigkeit. Jeder erscheint mit Avatar, Name, **Reaktionszeit** (z. B. `0,8s`) und Ergebnis: `✓ +Punkte` bei richtiger oder `✗` bei falscher Antwort. Man sieht auf einen Blick, wer am schnellsten war — und wer **schneller** richtig antwortet, bekommt mehr Punkte.
 ---
 
 ## 12. Live-Spiel — der Gastgeber
@@ -4919,6 +5274,10 @@ Während des Spiels können die Teilnehmer **Emoji-Reaktionen** senden, die übe
 
 Bei der letzten Frage zeigt der Gastgeber das **Podium** (Top 3) und, wenn du in Teams gespielt hast, die **Team-Rangliste** mit dem hervorgehobenen Siegerteam. Von hier aus kannst du die **Berichte** öffnen (Abschnitt 19).
 
+
+### Die Schnellsten
+
+Nach jeder Frage zeigt eine Leiste **„Die Schnellsten"** die ersten 5 Spieler, die geantwortet haben, sortiert nach Reaktionsgeschwindigkeit. Jeder erscheint mit Avatar, Name, **Reaktionszeit** (z. B. `0,8s`) und Ergebnis: `✓ +Punkte` bei richtiger oder `✗` bei falscher Antwort. Man sieht auf einen Blick, wer am schnellsten war — und wer **schneller** richtig antwortet, bekommt mehr Punkte.
 ---
 
 ## 13. Live-Spiel — der Teilnehmer
@@ -5479,6 +5838,10 @@ Perfect pentru o masă de prieteni cu un singur laptop/telefon.
 
 > Predă efectiv dispozitivul de la un jucător la altul când aplicația îți cere.
 
+
+### Cei mai rapizi
+
+După fiecare întrebare, o bandă **„Cei mai rapizi"** arată primii 5 jucători care au răspuns, în ordinea vitezei de reacție. Fiecare apare cu avatarul, numele, **timpul de reacție** (de ex. `0,8s`) și rezultatul: `✓ +puncte` dacă a răspuns corect sau `✗` dacă a greșit. Se vede pe loc cine a fost cel mai iute — iar cine răspunde corect **mai repede** primește mai multe puncte.
 ---
 
 ## 12. Joc live sincron — gazda
@@ -5535,6 +5898,10 @@ La ultima întrebare, gazda afișează **podiumul** (top 3) și, dacă ai jucat 
 **clasamentul pe echipe** cu echipa câștigătoare evidențiată. De aici poți deschide
 **rapoartele** (secțiunea 19).
 
+
+### Cei mai rapizi
+
+După fiecare întrebare, o bandă **„Cei mai rapizi"** arată primii 5 jucători care au răspuns, în ordinea vitezei de reacție. Fiecare apare cu avatarul, numele, **timpul de reacție** (de ex. `0,8s`) și rezultatul: `✓ +puncte` dacă a răspuns corect sau `✗` dacă a greșit. Se vede pe loc cine a fost cel mai iute — iar cine răspunde corect **mai repede** primește mai multe puncte.
 ---
 
 ## 13. Joc live sincron — participantul
@@ -6038,6 +6405,15 @@ Important points:
 - **Writes are atomic** (temporary file + rename) and **serialized** (locking with `flock`), so they don't get corrupted under simultaneous access.
 - Session codes are short (4 characters from `A–Z0–9`, without ambiguous characters) and strictly validated — they can't contain file paths.
 
+
+### Share preview (Open Graph)
+
+When someone shares the app's address on WhatsApp, Facebook, Telegram, etc., a card with the logo, title and a description appears. For the image to show, **upload the files `undava-og-ro.jpg` … `undava-og-de.jpg` and `undava-og.jpg` into the same folder** as the app.
+
+- The **server edition** automatically picks the card in the viewer's language (from the `Accept-Language` header); the title, description and absolute URLs are generated dynamically.
+- The **offline (HTML) edition** uses the Romanian card by default; if your address differs from the one in `<head>` (`og:url` / `og:image`), update it.
+
+Platforms cache the preview; to refresh it after a change, use the *Facebook Sharing Debugger*.
 ---
 
 ## 10. Security
@@ -6493,6 +6869,15 @@ Points importants :
 - **Les écritures sont atomiques** (fichier temporaire + renommage) et **sérialisées** (verrouillage avec `flock`), donc elles ne se corrompent pas lors d'accès simultanés.
 - Les codes de session sont courts (4 caractères de `A–Z0–9`, sans caractères ambigus) et strictement validés — ils ne peuvent pas contenir de chemins de fichiers.
 
+
+### Aperçu de partage (Open Graph)
+
+Quand on partage l'adresse de l'application sur WhatsApp, Facebook, Telegram, etc., une carte avec le logo, le titre et une description s'affiche. Pour que l'image apparaisse, **téléverse les fichiers `undava-og-ro.jpg` … `undava-og-de.jpg` et `undava-og.jpg` dans le même dossier** que l'application.
+
+- L'**édition serveur** choisit automatiquement la carte dans la langue du visiteur (d'après l'en-tête `Accept-Language`) ; le titre, la description et les URL absolues sont générés dynamiquement.
+- L'**édition hors ligne (HTML)** utilise la carte roumaine par défaut ; si ton adresse diffère de celle du `<head>` (`og:url` / `og:image`), mets-la à jour.
+
+Les plateformes mettent l'aperçu en cache ; pour le rafraîchir après un changement, utilise le *Facebook Sharing Debugger*.
 ---
 
 ## 10. Sécurité
@@ -6948,6 +7333,15 @@ Punti importanti:
 - **Le scritture sono atomiche** (file temporaneo + rinomina) e **serializzate** (blocco con `flock`), quindi non si corrompono con accessi simultanei.
 - I codici di sessione sono brevi (4 caratteri da `A–Z0–9`, senza caratteri ambigui) e rigorosamente convalidati — non possono contenere percorsi di file.
 
+
+### Anteprima di condivisione (Open Graph)
+
+Quando qualcuno condivide l'indirizzo dell'app su WhatsApp, Facebook, Telegram, ecc., appare una scheda con logo, titolo e descrizione. Perché l'immagine appaia, **carica i file `undava-og-ro.jpg` … `undava-og-de.jpg` e `undava-og.jpg` nella stessa cartella** dell'app.
+
+- L'**edizione server** sceglie automaticamente la scheda nella lingua di chi guarda (dall'header `Accept-Language`); titolo, descrizione e URL assoluti sono generati dinamicamente.
+- L'**edizione offline (HTML)** usa la scheda rumena come predefinita; se il tuo indirizzo è diverso da quello nel `<head>` (`og:url` / `og:image`), agggiornalo.
+
+Le piattaforme mettono in cache l'anteprima; per aggiornarla dopo una modifica, usa il *Facebook Sharing Debugger*.
 ---
 
 ## 10. Sicurezza
@@ -7403,6 +7797,15 @@ Puntos importantes:
 - **Las escrituras son atómicas** (archivo temporal + renombrado) y **serializadas** (bloqueo con `flock`), así que no se corrompen con accesos simultáneos.
 - Los códigos de sesión son cortos (4 caracteres de `A–Z0–9`, sin caracteres ambiguos) y estrictamente validados — no pueden contener rutas de archivo.
 
+
+### Vista previa al compartir (Open Graph)
+
+Cuando alguien comparte la dirección de la app en WhatsApp, Facebook, Telegram, etc., aparece una tarjeta con el logotipo, el título y una descripción. Para que la imagen aparezca, **sube los archivos `undava-og-ro.jpg` … `undava-og-de.jpg` y `undava-og.jpg` a la misma carpeta** que la app.
+
+- La **edición servidor** elige automáticamente la tarjeta en el idioma de quien la ve (según la cabecera `Accept-Language`); el título, la descripción y las URL absolutas se generan dinámicamente.
+- La **edición offline (HTML)** usa la tarjeta rumana por defecto; si tu dirección difiere de la del `<head>` (`og:url` / `og:image`), actualízala.
+
+Las plataformas guardan la vista previa en caché; para refrescarla tras un cambio, usa el *Facebook Sharing Debugger*.
 ---
 
 ## 10. Seguridad
@@ -7858,6 +8261,15 @@ Pontos importantes:
 - **As escritas são atómicas** (ficheiro temporário + renomeação) e **serializadas** (bloqueio com `flock`), por isso não se corrompem com acessos simultâneos.
 - Os códigos de sessão são curtos (4 caracteres de `A–Z0–9`, sem caracteres ambíguos) e rigorosamente validados — não podem conter caminhos de ficheiro.
 
+
+### Pré-visualização ao partilhar (Open Graph)
+
+Quando alguém partilha o endereço da aplicação no WhatsApp, Facebook, Telegram, etc., aparece um cartão com o logótipo, o título e uma descrição. Para que a imagem apareça, **carrega os ficheiros `undava-og-ro.jpg` … `undava-og-de.jpg` e `undava-og.jpg` para a mesma pasta** da aplicação.
+
+- A **edição servidor** escolhe automaticamente o cartão no idioma de quem vê (a partir do cabeçalho `Accept-Language`); o título, a descrição e os URLs absolutos são gerados dinamicamente.
+- A **edição offline (HTML)** usa o cartão romeno por predefinição; se o teu endereço for diferente do que está no `<head>` (`og:url` / `og:image`), atualiza-o.
+
+As plataformas mantêm a pré-visualização em cache; para a atualizar após uma alteração, usa o *Facebook Sharing Debugger*.
 ---
 
 ## 10. Segurança
@@ -8313,6 +8725,15 @@ Wichtige Punkte:
 - **Die Schreibvorgänge sind atomar** (temporäre Datei + Umbenennung) und **serialisiert** (Sperrung mit `flock`), sodass sie bei gleichzeitigem Zugriff nicht beschädigt werden.
 - Die Sitzungscodes sind kurz (4 Zeichen aus `A–Z0–9`, ohne mehrdeutige Zeichen) und streng validiert — sie können keine Dateipfade enthalten.
 
+
+### Freigabe-Vorschau (Open Graph)
+
+Wenn jemand die Adresse der App auf WhatsApp, Facebook, Telegram usw. teilt, erscheint eine Karte mit Logo, Titel und Beschreibung. Damit das Bild angezeigt wird, **lade die Dateien `undava-og-ro.jpg` … `undava-og-de.jpg` und `undava-og.jpg` in denselben Ordner** wie die App.
+
+- Die **Server-Edition** wählt automatisch die Karte in der Sprache des Betrachters (anhand des `Accept-Language`-Headers); Titel, Beschreibung und absolute URLs werden dynamisch erzeugt.
+- Die **Offline-Edition (HTML)** verwendet standardmäßig die rumänische Karte; falls deine Adresse von der im `<head>` (`og:url` / `og:image`) abweicht, aktualisiere sie.
+
+Plattformen speichern die Vorschau im Cache; um sie nach einer Änderung zu aktualisieren, nutze den *Facebook Sharing Debugger*.
 ---
 
 ## 10. Sicherheit
@@ -8806,6 +9227,15 @@ Puncte importante:
 - Codurile de sesiune sunt scurte (4 caractere din `A–Z0–9`, fără caractere ambigue) și
   strict validate — nu pot conține căi de fișier.
 
+
+### Previzualizare la partajare (Open Graph)
+
+Când cineva partajează adresa aplicației pe WhatsApp, Facebook, Telegram etc., apare un card cu sigla, titlul și o descriere. Ca imaginea să apară, **urcă fișierele `undava-og-ro.jpg` … `undava-og-de.jpg` și `undava-og.jpg` în același folder** cu aplicația.
+
+- **Ediția server** alege automat cardul în limba celui care vede link-ul (după antetul `Accept-Language`); titlul, descrierea și URL-urile absolute se generează dinamic.
+- **Ediția offline (HTML)** folosește cardul românesc implicit; dacă adresa ta diferă de cea din `<head>` (`og:url` / `og:image`), actualizeaz-o.
+
+Platformele țin previzualizarea în cache; pentru a o reîmprospăta după o modificare, folosește *Facebook Sharing Debugger*.
 ---
 
 ## 10. Securitate
@@ -9088,7 +9518,7 @@ window.QFF = window.QFF || <?php echo json_encode($QFF_CLIENT, JSON_UNESCAPED_UN
 
 /* ---------------- i18n ---------------- */
 const I18N = {
-  ro:{fastest5:"Cei mai rapizi", live_mode_survey:"Chestionar", sv_title:"Titlul chestionarului", sv_title_ph:"Ex: Feedback eveniment ASFAN", sv_questions:"Întrebări (una pe linie)", sv_questions_ph:"De ce ai venit?\nUn cuvânt pentru seara asta\nCe ai schimba?", sv_questions_hint:"Fiecare linie devine o întrebare cu text liber. Răspunsurile se agregă într-un nor de cuvinte.", sv_need_q:"Scrie măcar o întrebare.", sv_thanks:"Mulțumim! Răspunsul tău a fost trimis.", sv_word_ph:"Un cuvânt sau o frază scurtă…", sv_need_ans:"Scrie măcar un răspuns.", sv_send:"Trimite", cat_survey:"Chestionar feedback", cat_quiz:"Chestionare & jocuri", cat_quiz_d:"Grile, adevărat/fals, răspuns liber, numeric · Solo, pe rând, live, temă sau echipe", cat_audience:"Activități de audiență", cat_audience_d:"Colectează răspunsuri live de la public, de pe telefoane. Alege un tip:", cat_deck:"Prezentări", cat_deck_d:"Înlănțuie mai multe activități într-o singură sesiune, navigate în ritmul tău.", cat_tools:"Instrumente", deck_build:"Construiește o prezentare", cat_vote:"Voturi & sondaje", cat_text:"Text & idei", cat_eval:"Evaluări & scale", 
+  ro:{tf_desc:"fără reclame, fără colectare de date, fără cont necesar, fără funcții blocate după plată", tf_tools:"alte unelte", import_fmt_title:"Format JSON — creează manual", import_fmt_intro:"Poți scrie un fișier .json cu structura de mai jos și îl imporți aici. Iată un exemplu cu toate tipurile de întrebări:", import_copy:"Copiază exemplul", import_template:"Descarcă șablon", import_copied:"Copiat!", import_fields:"STRUCTURA FIȘIERULUI\n• title — numele quiz-ului\n• desc — descriere scurtă (opțional)\n• color — culoare hex, ex. #2f6bff (opțional)\n• questions — lista de întrebări\n\nFIECARE ÎNTREBARE\n• type — quiz (variante) / tf (adevărat-fals) / type (răspuns scris) / num (numeric)\n• text — enunțul întrebării\n• time — secunde: 5, 10, 20, 30, 60 sau 120\n• points — 1000 (standard) sau 2000 (dublu)\n• answers — răspunsurile (vezi mai jos)\n• tol — doar la num: toleranța acceptată (±)\n\nRĂSPUNSURI, DUPĂ TIP\n• quiz: 2–4 variante; marchează corectul cu \"correct\": true\n• tf: 2 variante (Adevărat / Fals); marchează corectul\n• type: 1–6 texte acceptate (toate corecte; adaugă variante de scriere)\n• num: un singur număr; opțional tol pentru toleranță", help_book_eli5:"Ghid simplu", fastest5:"Cei mai rapizi", live_mode_survey:"Chestionar", sv_title:"Titlul chestionarului", sv_title_ph:"Ex: Feedback eveniment ASFAN", sv_questions:"Întrebări (una pe linie)", sv_questions_ph:"De ce ai venit?\nUn cuvânt pentru seara asta\nCe ai schimba?", sv_questions_hint:"Fiecare linie devine o întrebare cu text liber. Răspunsurile se agregă într-un nor de cuvinte.", sv_need_q:"Scrie măcar o întrebare.", sv_thanks:"Mulțumim! Răspunsul tău a fost trimis.", sv_word_ph:"Un cuvânt sau o frază scurtă…", sv_need_ans:"Scrie măcar un răspuns.", sv_send:"Trimite", cat_survey:"Chestionar feedback", cat_quiz:"Chestionare & jocuri", cat_quiz_d:"Grile, adevărat/fals, răspuns liber, numeric · Solo, pe rând, live, temă sau echipe", cat_audience:"Activități de audiență", cat_audience_d:"Colectează răspunsuri live de la public, de pe telefoane. Alege un tip:", cat_deck:"Prezentări", cat_deck_d:"Înlănțuie mai multe activități într-o singură sesiune, navigate în ritmul tău.", cat_tools:"Instrumente", deck_build:"Construiește o prezentare", cat_vote:"Voturi & sondaje", cat_text:"Text & idei", cat_eval:"Evaluări & scale", 
     tagline:"Quiz fără frontiere",
     home_kicker:"Joc de quiz • offline • gratuit",
     home_title_1:"Învață, joacă,",
@@ -9244,7 +9674,7 @@ const I18N = {
     report_correct:"corecte", report_answered:"au răspuns", report_csv:"CSV", report_json:"JSON", report_print:"Printează",
     report_easy:"ușoară", report_med:"medie", report_hard:"grea", report_back:"Înapoi", report_no_data:"Încă nu sunt date.", report_player:"Jucător",
   },
-  en:{fastest5:"Fastest", live_mode_survey:"Survey", sv_title:"Survey title", sv_title_ph:"E.g. ASFAN event feedback", sv_questions:"Questions (one per line)", sv_questions_ph:"Why did you come?\nOne word for tonight\nWhat would you change?", sv_questions_hint:"Each line becomes a free-text question. Answers aggregate into a word cloud.", sv_need_q:"Write at least one question.", sv_thanks:"Thank you! Your response was sent.", sv_word_ph:"A word or a short phrase…", sv_need_ans:"Write at least one answer.", sv_send:"Send", cat_survey:"Feedback survey", cat_quiz:"Quizzes & games", cat_quiz_d:"Multiple choice, true/false, free answer, numeric · Solo, turns, live, homework or teams", cat_audience:"Audience activities", cat_audience_d:"Collect live responses from the audience, from their phones. Pick a type:", cat_deck:"Presentations", cat_deck_d:"Chain several activities into one session, navigated at your pace.", cat_tools:"Tools", deck_build:"Build a presentation", cat_vote:"Votes & polls", cat_text:"Text & ideas", cat_eval:"Ratings & scales", 
+  en:{tf_desc:"no ads, no data collection, no account needed, no features locked behind payment", tf_tools:"other tools", import_fmt_title:"JSON format — create manually", import_fmt_intro:"You can write a .json file with the structure below and import it here. Here is an example with all question types:", import_copy:"Copy example", import_template:"Download template", import_copied:"Copied!", import_fields:"FILE STRUCTURE\n• title — the quiz name\n• desc — short description (optional)\n• color — hex color, e.g. #2f6bff (optional)\n• questions — the list of questions\n\nEACH QUESTION\n• type — quiz (choices) / tf (true-false) / type (typed answer) / num (numeric)\n• text — the question\n• time — seconds: 5, 10, 20, 30, 60 or 120\n• points — 1000 (standard) or 2000 (double)\n• answers — the answers (see below)\n• tol — num only: accepted tolerance (±)\n\nANSWERS, BY TYPE\n• quiz: 2–4 choices; mark the correct one with \"correct\": true\n• tf: 2 choices (True / False); mark the correct one\n• type: 1–6 accepted texts (all correct; add spelling variants)\n• num: a single number; optional tol for tolerance", help_book_eli5:"Quick guide", fastest5:"Fastest", live_mode_survey:"Survey", sv_title:"Survey title", sv_title_ph:"E.g. ASFAN event feedback", sv_questions:"Questions (one per line)", sv_questions_ph:"Why did you come?\nOne word for tonight\nWhat would you change?", sv_questions_hint:"Each line becomes a free-text question. Answers aggregate into a word cloud.", sv_need_q:"Write at least one question.", sv_thanks:"Thank you! Your response was sent.", sv_word_ph:"A word or a short phrase…", sv_need_ans:"Write at least one answer.", sv_send:"Send", cat_survey:"Feedback survey", cat_quiz:"Quizzes & games", cat_quiz_d:"Multiple choice, true/false, free answer, numeric · Solo, turns, live, homework or teams", cat_audience:"Audience activities", cat_audience_d:"Collect live responses from the audience, from their phones. Pick a type:", cat_deck:"Presentations", cat_deck_d:"Chain several activities into one session, navigated at your pace.", cat_tools:"Tools", deck_build:"Build a presentation", cat_vote:"Votes & polls", cat_text:"Text & ideas", cat_eval:"Ratings & scales", 
     tagline:"Quiz without borders",
     home_kicker:"Quiz game • offline • free",
     home_title_1:"Learn, play,",
@@ -9400,7 +9830,7 @@ const I18N = {
     report_correct:"correct", report_answered:"answered", report_csv:"CSV", report_json:"JSON", report_print:"Print",
     report_easy:"easy", report_med:"medium", report_hard:"hard", report_back:"Back", report_no_data:"No data yet.", report_player:"Player",
   },
-  fr:{fastest5:"Les plus rapides", live_mode_survey:"Sondage", sv_title:"Titre du sondage", sv_title_ph:"Ex : Retour événement ASFAN", sv_questions:"Questions (une par ligne)", sv_questions_ph:"Pourquoi es-tu venu ?\nUn mot pour ce soir\nQue changerais-tu ?", sv_questions_hint:"Chaque ligne devient une question à texte libre. Les réponses s'agrègent en nuage de mots.", sv_need_q:"Écris au moins une question.", sv_thanks:"Merci ! Ta réponse a été envoyée.", sv_word_ph:"Un mot ou une courte phrase…", sv_need_ans:"Écris au moins une réponse.", sv_send:"Envoyer", cat_survey:"Sondage de retour", cat_quiz:"Quiz & jeux", cat_quiz_d:"Choix multiple, vrai/faux, réponse libre, numérique · Solo, à tour de rôle, live, devoir ou équipes", cat_audience:"Activités d'audience", cat_audience_d:"Collecte les réponses du public en direct, depuis les téléphones. Choisis un type :", cat_deck:"Présentations", cat_deck_d:"Enchaîne plusieurs activités en une seule session, à ton rythme.", cat_tools:"Outils", deck_build:"Créer une présentation", cat_vote:"Votes & sondages", cat_text:"Texte & idées", cat_eval:"Évaluations & échelles", 
+  fr:{tf_desc:"sans publicité, sans collecte de données, sans compte requis, sans fonctions bloquées derrière un paiement", tf_tools:"autres outils", import_fmt_title:"Format JSON — créer à la main", import_fmt_intro:"Tu peux écrire un fichier .json avec la structure ci-dessous et l'importer ici. Voici un exemple avec tous les types de questions :", import_copy:"Copier l'exemple", import_template:"Télécharger le modèle", import_copied:"Copié !", import_fields:"STRUCTURE DU FICHIER\n• title — le nom du quiz\n• desc — brève description (facultatif)\n• color — couleur hex, par ex. #2f6bff (facultatif)\n• questions — la liste des questions\n\nCHAQUE QUESTION\n• type — quiz (choix) / tf (vrai-faux) / type (réponse écrite) / num (numérique)\n• text — l'énoncé\n• time — secondes : 5, 10, 20, 30, 60 ou 120\n• points — 1000 (standard) ou 2000 (double)\n• answers — les réponses (voir ci-dessous)\n• tol — num uniquement : tolérance acceptée (±)\n\nRÉPONSES, PAR TYPE\n• quiz : 2–4 choix ; marque le bon avec \"correct\": true\n• tf : 2 choix (Vrai / Faux) ; marque le bon\n• type : 1–6 textes acceptés (tous corrects ; ajoute des variantes)\n• num : un seul nombre ; tol facultatif pour la tolérance", help_book_eli5:"Guide express", fastest5:"Les plus rapides", live_mode_survey:"Sondage", sv_title:"Titre du sondage", sv_title_ph:"Ex : Retour événement ASFAN", sv_questions:"Questions (une par ligne)", sv_questions_ph:"Pourquoi es-tu venu ?\nUn mot pour ce soir\nQue changerais-tu ?", sv_questions_hint:"Chaque ligne devient une question à texte libre. Les réponses s'agrègent en nuage de mots.", sv_need_q:"Écris au moins une question.", sv_thanks:"Merci ! Ta réponse a été envoyée.", sv_word_ph:"Un mot ou une courte phrase…", sv_need_ans:"Écris au moins une réponse.", sv_send:"Envoyer", cat_survey:"Sondage de retour", cat_quiz:"Quiz & jeux", cat_quiz_d:"Choix multiple, vrai/faux, réponse libre, numérique · Solo, à tour de rôle, live, devoir ou équipes", cat_audience:"Activités d'audience", cat_audience_d:"Collecte les réponses du public en direct, depuis les téléphones. Choisis un type :", cat_deck:"Présentations", cat_deck_d:"Enchaîne plusieurs activités en une seule session, à ton rythme.", cat_tools:"Outils", deck_build:"Créer une présentation", cat_vote:"Votes & sondages", cat_text:"Texte & idées", cat_eval:"Évaluations & échelles", 
     tagline:"Quiz sans frontières",
     home_kicker:"Jeu de quiz • hors ligne • gratuit",
     home_title_1:"Apprends, joue,",
@@ -9556,7 +9986,7 @@ const I18N = {
     report_correct:"correctes", report_answered:"répondu", report_csv:"CSV", report_json:"JSON", report_print:"Imprimer",
     report_easy:"facile", report_med:"moyen", report_hard:"difficile", report_back:"Retour", report_no_data:"Aucune donnée.", report_player:"Joueur",
   },
-  it:{fastest5:"I più veloci", live_mode_survey:"Sondaggio", sv_title:"Titolo del sondaggio", sv_title_ph:"Es: Feedback evento ASFAN", sv_questions:"Domande (una per riga)", sv_questions_ph:"Perché sei venuto?\nUna parola per stasera\nCosa cambieresti?", sv_questions_hint:"Ogni riga diventa una domanda a testo libero. Le risposte si aggregano in una nuvola di parole.", sv_need_q:"Scrivi almeno una domanda.", sv_thanks:"Grazie! La tua risposta è stata inviata.", sv_word_ph:"Una parola o una frase breve…", sv_need_ans:"Scrivi almeno una risposta.", sv_send:"Invia", cat_survey:"Sondaggio di feedback", cat_quiz:"Quiz & giochi", cat_quiz_d:"Scelta multipla, vero/falso, risposta libera, numerico · Solo, a turni, dal vivo, compito o squadre", cat_audience:"Attività per il pubblico", cat_audience_d:"Raccogli risposte dal vivo dal pubblico, dai telefoni. Scegli un tipo:", cat_deck:"Presentazioni", cat_deck_d:"Concatena più attività in un'unica sessione, al tuo ritmo.", cat_tools:"Strumenti", deck_build:"Crea una presentazione", cat_vote:"Voti & sondaggi", cat_text:"Testo & idee", cat_eval:"Valutazioni & scale", 
+  it:{tf_desc:"senza pubblicità, senza raccolta dati, senza account, senza funzioni bloccate a pagamento", tf_tools:"altri strumenti", import_fmt_title:"Formato JSON — crea a mano", import_fmt_intro:"Puoi scrivere un file .json con la struttura qui sotto e importarlo qui. Ecco un esempio con tutti i tipi di domanda:", import_copy:"Copia l'esempio", import_template:"Scarica modello", import_copied:"Copiato!", import_fields:"STRUTTURA DEL FILE\n• title — il nome del quiz\n• desc — breve descrizione (facoltativo)\n• color — colore hex, es. #2f6bff (facoltativo)\n• questions — l'elenco delle domande\n\nOGNI DOMANDA\n• type — quiz (scelte) / tf (vero-falso) / type (risposta scritta) / num (numerico)\n• text — il testo della domanda\n• time — secondi: 5, 10, 20, 30, 60 o 120\n• points — 1000 (standard) o 2000 (doppio)\n• answers — le risposte (vedi sotto)\n• tol — solo num: tolleranza accettata (±)\n\nRISPOSTE, PER TIPO\n• quiz: 2–4 scelte; segna quella giusta con \"correct\": true\n• tf: 2 scelte (Vero / Falso); segna quella giusta\n• type: 1–6 testi accettati (tutti corretti; aggiungi varianti)\n• num: un solo numero; tol facoltativo per la tolleranza", help_book_eli5:"Guida rapida", fastest5:"I più veloci", live_mode_survey:"Sondaggio", sv_title:"Titolo del sondaggio", sv_title_ph:"Es: Feedback evento ASFAN", sv_questions:"Domande (una per riga)", sv_questions_ph:"Perché sei venuto?\nUna parola per stasera\nCosa cambieresti?", sv_questions_hint:"Ogni riga diventa una domanda a testo libero. Le risposte si aggregano in una nuvola di parole.", sv_need_q:"Scrivi almeno una domanda.", sv_thanks:"Grazie! La tua risposta è stata inviata.", sv_word_ph:"Una parola o una frase breve…", sv_need_ans:"Scrivi almeno una risposta.", sv_send:"Invia", cat_survey:"Sondaggio di feedback", cat_quiz:"Quiz & giochi", cat_quiz_d:"Scelta multipla, vero/falso, risposta libera, numerico · Solo, a turni, dal vivo, compito o squadre", cat_audience:"Attività per il pubblico", cat_audience_d:"Raccogli risposte dal vivo dal pubblico, dai telefoni. Scegli un tipo:", cat_deck:"Presentazioni", cat_deck_d:"Concatena più attività in un'unica sessione, al tuo ritmo.", cat_tools:"Strumenti", deck_build:"Crea una presentazione", cat_vote:"Voti & sondaggi", cat_text:"Testo & idee", cat_eval:"Valutazioni & scale", 
     tagline:"Quiz senza frontiere",
     home_kicker:"Gioco a quiz • offline • gratuito",
     home_title_1:"Impara, gioca,",
@@ -9712,7 +10142,7 @@ const I18N = {
     report_correct:"corrette", report_answered:"risposto", report_csv:"CSV", report_json:"JSON", report_print:"Stampa",
     report_easy:"facile", report_med:"media", report_hard:"difficile", report_back:"Indietro", report_no_data:"Ancora nessun dato.", report_player:"Giocatore",
   },
-  es:{fastest5:"Los más rápidos", live_mode_survey:"Cuestionario", sv_title:"Título del cuestionario", sv_title_ph:"Ej: Feedback evento ASFAN", sv_questions:"Preguntas (una por línea)", sv_questions_ph:"¿Por qué viniste?\nUna palabra para esta noche\n¿Qué cambiarías?", sv_questions_hint:"Cada línea se convierte en una pregunta de texto libre. Las respuestas se agregan en una nube de palabras.", sv_need_q:"Escribe al menos una pregunta.", sv_thanks:"¡Gracias! Tu respuesta se ha enviado.", sv_word_ph:"Una palabra o una frase corta…", sv_need_ans:"Escribe al menos una respuesta.", sv_send:"Enviar", cat_survey:"Cuestionario de feedback", cat_quiz:"Cuestionarios & juegos", cat_quiz_d:"Opción múltiple, verdadero/falso, respuesta libre, numérico · Solo, por turnos, en directo, tarea o equipos", cat_audience:"Actividades de audiencia", cat_audience_d:"Recoge respuestas en directo del público, desde sus teléfonos. Elige un tipo:", cat_deck:"Presentaciones", cat_deck_d:"Encadena varias actividades en una sola sesión, a tu ritmo.", cat_tools:"Herramientas", deck_build:"Crear una presentación", cat_vote:"Votos & encuestas", cat_text:"Texto & ideas", cat_eval:"Valoraciones & escalas", 
+  es:{tf_desc:"sin anuncios, sin recopilación de datos, sin cuenta necesaria, sin funciones bloqueadas tras pago", tf_tools:"otras herramientas", import_fmt_title:"Formato JSON — crear a mano", import_fmt_intro:"Puedes escribir un archivo .json con la estructura de abajo e importarlo aquí. Aquí tienes un ejemplo con todos los tipos de pregunta:", import_copy:"Copiar ejemplo", import_template:"Descargar plantilla", import_copied:"¡Copiado!", import_fields:"ESTRUCTURA DEL ARCHIVO\n• title — el nombre del cuestionario\n• desc — descripción breve (opcional)\n• color — color hex, p. ej. #2f6bff (opcional)\n• questions — la lista de preguntas\n\nCADA PREGUNTA\n• type — quiz (opciones) / tf (verdadero-falso) / type (respuesta escrita) / num (numérico)\n• text — el enunciado\n• time — segundos: 5, 10, 20, 30, 60 o 120\n• points — 1000 (estándar) o 2000 (doble)\n• answers — las respuestas (ver abajo)\n• tol — solo num: tolerancia aceptada (±)\n\nRESPUESTAS, POR TIPO\n• quiz: 2–4 opciones; marca la correcta con \"correct\": true\n• tf: 2 opciones (Verdadero / Falso); marca la correcta\n• type: 1–6 textos aceptados (todos correctos; añade variantes)\n• num: un solo número; tol opcional para la tolerancia", help_book_eli5:"Guía rápida", fastest5:"Los más rápidos", live_mode_survey:"Cuestionario", sv_title:"Título del cuestionario", sv_title_ph:"Ej: Feedback evento ASFAN", sv_questions:"Preguntas (una por línea)", sv_questions_ph:"¿Por qué viniste?\nUna palabra para esta noche\n¿Qué cambiarías?", sv_questions_hint:"Cada línea se convierte en una pregunta de texto libre. Las respuestas se agregan en una nube de palabras.", sv_need_q:"Escribe al menos una pregunta.", sv_thanks:"¡Gracias! Tu respuesta se ha enviado.", sv_word_ph:"Una palabra o una frase corta…", sv_need_ans:"Escribe al menos una respuesta.", sv_send:"Enviar", cat_survey:"Cuestionario de feedback", cat_quiz:"Cuestionarios & juegos", cat_quiz_d:"Opción múltiple, verdadero/falso, respuesta libre, numérico · Solo, por turnos, en directo, tarea o equipos", cat_audience:"Actividades de audiencia", cat_audience_d:"Recoge respuestas en directo del público, desde sus teléfonos. Elige un tipo:", cat_deck:"Presentaciones", cat_deck_d:"Encadena varias actividades en una sola sesión, a tu ritmo.", cat_tools:"Herramientas", deck_build:"Crear una presentación", cat_vote:"Votos & encuestas", cat_text:"Texto & ideas", cat_eval:"Valoraciones & escalas", 
     tagline:"Quiz sin fronteras",
     home_kicker:"Juego de preguntas • sin conexión • gratis",
     home_title_1:"Aprende, juega,",
@@ -9868,7 +10298,7 @@ const I18N = {
     report_correct:"correctas", report_answered:"respondido", report_csv:"CSV", report_json:"JSON", report_print:"Imprimir",
     report_easy:"fácil", report_med:"media", report_hard:"difícil", report_back:"Atrás", report_no_data:"Aún no hay datos.", report_player:"Jugador",
   },
-  pt:{fastest5:"Os mais rápidos", live_mode_survey:"Questionário", sv_title:"Título do questionário", sv_title_ph:"Ex: Feedback evento ASFAN", sv_questions:"Perguntas (uma por linha)", sv_questions_ph:"Porque vieste?\nUma palavra para esta noite\nO que mudarias?", sv_questions_hint:"Cada linha torna-se uma pergunta de texto livre. As respostas agregam-se numa nuvem de palavras.", sv_need_q:"Escreve pelo menos uma pergunta.", sv_thanks:"Obrigado! A tua resposta foi enviada.", sv_word_ph:"Uma palavra ou uma frase curta…", sv_need_ans:"Escreve pelo menos uma resposta.", sv_send:"Enviar", cat_survey:"Questionário de feedback", cat_quiz:"Questionários & jogos", cat_quiz_d:"Escolha múltipla, verdadeiro/falso, resposta livre, numérico · Solo, à vez, ao vivo, trabalho ou equipas", cat_audience:"Atividades de audiência", cat_audience_d:"Recolhe respostas ao vivo do público, dos telemóveis. Escolhe um tipo:", cat_deck:"Apresentações", cat_deck_d:"Encadeia várias atividades numa única sessão, ao teu ritmo.", cat_tools:"Ferramentas", deck_build:"Criar uma apresentação", cat_vote:"Votos & sondagens", cat_text:"Texto & ideias", cat_eval:"Avaliações & escalas", 
+  pt:{tf_desc:"sem anúncios, sem recolha de dados, sem conta necessária, sem funções bloqueadas por pagamento", tf_tools:"outras ferramentas", import_fmt_title:"Formato JSON — criar à mão", import_fmt_intro:"Podes escrever um ficheiro .json com a estrutura abaixo e importá-lo aqui. Eis um exemplo com todos os tipos de pergunta:", import_copy:"Copiar exemplo", import_template:"Transferir modelo", import_copied:"Copiado!", import_fields:"ESTRUTURA DO FICHEIRO\n• title — o nome do quiz\n• desc — descrição breve (opcional)\n• color — cor hex, ex. #2f6bff (opcional)\n• questions — a lista de perguntas\n\nCADA PERGUNTA\n• type — quiz (opções) / tf (verdadeiro-falso) / type (resposta escrita) / num (numérico)\n• text — o enunciado\n• time — segundos: 5, 10, 20, 30, 60 ou 120\n• points — 1000 (padrão) ou 2000 (duplo)\n• answers — as respostas (ver abaixo)\n• tol — só num: tolerância aceite (±)\n\nRESPOSTAS, POR TIPO\n• quiz: 2–4 opções; marca a correta com \"correct\": true\n• tf: 2 opções (Verdadeiro / Falso); marca a correta\n• type: 1–6 textos aceites (todos corretos; adiciona variantes)\n• num: um único número; tol opcional para a tolerância", help_book_eli5:"Guia rápido", fastest5:"Os mais rápidos", live_mode_survey:"Questionário", sv_title:"Título do questionário", sv_title_ph:"Ex: Feedback evento ASFAN", sv_questions:"Perguntas (uma por linha)", sv_questions_ph:"Porque vieste?\nUma palavra para esta noite\nO que mudarias?", sv_questions_hint:"Cada linha torna-se uma pergunta de texto livre. As respostas agregam-se numa nuvem de palavras.", sv_need_q:"Escreve pelo menos uma pergunta.", sv_thanks:"Obrigado! A tua resposta foi enviada.", sv_word_ph:"Uma palavra ou uma frase curta…", sv_need_ans:"Escreve pelo menos uma resposta.", sv_send:"Enviar", cat_survey:"Questionário de feedback", cat_quiz:"Questionários & jogos", cat_quiz_d:"Escolha múltipla, verdadeiro/falso, resposta livre, numérico · Solo, à vez, ao vivo, trabalho ou equipas", cat_audience:"Atividades de audiência", cat_audience_d:"Recolhe respostas ao vivo do público, dos telemóveis. Escolhe um tipo:", cat_deck:"Apresentações", cat_deck_d:"Encadeia várias atividades numa única sessão, ao teu ritmo.", cat_tools:"Ferramentas", deck_build:"Criar uma apresentação", cat_vote:"Votos & sondagens", cat_text:"Texto & ideias", cat_eval:"Avaliações & escalas", 
     tagline:"Quiz sem fronteiras",
     home_kicker:"Jogo de perguntas • offline • gratuito",
     home_title_1:"Aprende, joga,",
@@ -10024,7 +10454,7 @@ const I18N = {
     report_correct:"corretas", report_answered:"respondido", report_csv:"CSV", report_json:"JSON", report_print:"Imprimir",
     report_easy:"fácil", report_med:"média", report_hard:"difícil", report_back:"Voltar", report_no_data:"Ainda não há dados.", report_player:"Jogador",
   },
-  de:{fastest5:"Die Schnellsten", live_mode_survey:"Umfrage", sv_title:"Umfragetitel", sv_title_ph:"z. B. ASFAN-Event-Feedback", sv_questions:"Fragen (eine pro Zeile)", sv_questions_ph:"Warum bist du gekommen?\nEin Wort für heute Abend\nWas würdest du ändern?", sv_questions_hint:"Jede Zeile wird zu einer Freitextfrage. Antworten werden zu einer Wortwolke zusammengefasst.", sv_need_q:"Schreibe mindestens eine Frage.", sv_thanks:"Danke! Deine Antwort wurde gesendet.", sv_word_ph:"Ein Wort oder eine kurze Phrase…", sv_need_ans:"Schreibe mindestens eine Antwort.", sv_send:"Senden", cat_survey:"Feedback-Umfrage", cat_quiz:"Quiz & Spiele", cat_quiz_d:"Multiple Choice, wahr/falsch, freie Antwort, numerisch · Solo, reihum, live, Aufgabe oder Teams", cat_audience:"Publikumsaktivitäten", cat_audience_d:"Sammle Live-Antworten vom Publikum, von den Handys. Wähle einen Typ:", cat_deck:"Präsentationen", cat_deck_d:"Verkette mehrere Aktivitäten in einer Sitzung, in deinem Tempo.", cat_tools:"Werkzeuge", deck_build:"Präsentation erstellen", cat_vote:"Abstimmungen & Umfragen", cat_text:"Text & Ideen", cat_eval:"Bewertungen & Skalen", 
+  de:{tf_desc:"keine Werbung, keine Datensammlung, kein Konto nötig, keine hinter Bezahlung gesperrten Funktionen", tf_tools:"weitere Werkzeuge", import_fmt_title:"JSON-Format — manuell erstellen", import_fmt_intro:"Du kannst eine .json-Datei mit der Struktur unten schreiben und hier importieren. Hier ein Beispiel mit allen Fragetypen:", import_copy:"Beispiel kopieren", import_template:"Vorlage herunterladen", import_copied:"Kopiert!", import_fields:"DATEISTRUKTUR\n• title — der Quizname\n• desc — kurze Beschreibung (optional)\n• color — Hex-Farbe, z. B. #2f6bff (optional)\n• questions — die Liste der Fragen\n\nJEDE FRAGE\n• type — quiz (Auswahl) / tf (wahr-falsch) / type (Textantwort) / num (numerisch)\n• text — die Frage\n• time — Sekunden: 5, 10, 20, 30, 60 oder 120\n• points — 1000 (Standard) oder 2000 (doppelt)\n• answers — die Antworten (siehe unten)\n• tol — nur num: akzeptierte Toleranz (±)\n\nANTWORTEN, NACH TYP\n• quiz: 2–4 Optionen; markiere die richtige mit \"correct\": true\n• tf: 2 Optionen (Wahr / Falsch); markiere die richtige\n• type: 1–6 akzeptierte Texte (alle richtig; füge Schreibvarianten hinzu)\n• num: eine einzige Zahl; tol optional für Toleranz", help_book_eli5:"Schnellanleitung", fastest5:"Die Schnellsten", live_mode_survey:"Umfrage", sv_title:"Umfragetitel", sv_title_ph:"z. B. ASFAN-Event-Feedback", sv_questions:"Fragen (eine pro Zeile)", sv_questions_ph:"Warum bist du gekommen?\nEin Wort für heute Abend\nWas würdest du ändern?", sv_questions_hint:"Jede Zeile wird zu einer Freitextfrage. Antworten werden zu einer Wortwolke zusammengefasst.", sv_need_q:"Schreibe mindestens eine Frage.", sv_thanks:"Danke! Deine Antwort wurde gesendet.", sv_word_ph:"Ein Wort oder eine kurze Phrase…", sv_need_ans:"Schreibe mindestens eine Antwort.", sv_send:"Senden", cat_survey:"Feedback-Umfrage", cat_quiz:"Quiz & Spiele", cat_quiz_d:"Multiple Choice, wahr/falsch, freie Antwort, numerisch · Solo, reihum, live, Aufgabe oder Teams", cat_audience:"Publikumsaktivitäten", cat_audience_d:"Sammle Live-Antworten vom Publikum, von den Handys. Wähle einen Typ:", cat_deck:"Präsentationen", cat_deck_d:"Verkette mehrere Aktivitäten in einer Sitzung, in deinem Tempo.", cat_tools:"Werkzeuge", deck_build:"Präsentation erstellen", cat_vote:"Abstimmungen & Umfragen", cat_text:"Text & Ideen", cat_eval:"Bewertungen & Skalen", 
     tagline:"Quiz ohne Grenzen",
     home_kicker:"Quizspiel • offline • kostenlos",
     home_title_1:"Lernen, spielen,",
@@ -10492,11 +10922,12 @@ function mdRender(md){
 }
 function viewHelp(){
   var hasAdmin=!!document.getElementById("manual-admin");
-  var book=state.helpBook||"user"; if(book==="admin"&&!hasAdmin) book="user";
+  var book=state.helpBook||"user"; var hasEli5=!!document.getElementById("manual-eli5"); if(book==="admin"&&!hasAdmin) book="user"; if(book==="eli5"&&!hasEli5) book="user";
   var lang=state.lang||"ro"; var el=document.getElementById("manual-"+book+"-"+lang)||document.getElementById("manual-"+book); var md=el?el.textContent:"";
   var toc=[]; md.replace(/\r\n/g,"\n").split("\n").forEach(function(l){ var m=l.match(/^##\s+(.*)$/); if(m) toc.push(m[1]); });
   var tocHtml=toc.map(function(x){ return '<a class="help-toc-item" data-action="mdjump" data-t="mdh-'+mdSlug(x)+'">'+esc(x)+'</a>'; }).join("");
-  var switcher=hasAdmin?('<div class="help-books"><button class="help-book'+(book==="user"?" on":"")+'" data-action="helpbook" data-b="user">\ud83d\udcd8 '+esc(t("help_book_user"))+'</button><button class="help-book'+(book==="admin"?" on":"")+'" data-action="helpbook" data-b="admin">\ud83d\udd27 '+esc(t("help_book_admin"))+'</button></div>'):'';
+  var _books=[]; if(hasEli5)_books.push(["eli5","\ud83c\udfae",t("help_book_eli5")]); _books.push(["user","\ud83d\udcd8",t("help_book_user")]); if(hasAdmin)_books.push(["admin","\ud83d\udd27",t("help_book_admin")]);
+  var switcher=_books.length>1?('<div class="help-books">'+_books.map(function(x){return '<button class="help-book'+(book===x[0]?" on":"")+'" data-action="helpbook" data-b="'+x[0]+'">'+x[1]+' '+esc(x[2])+'</button>';}).join("")+'</div>'):'';
   return '<div class="wrap help-wrap">'
     +'<a class="backlink" data-action="gohome">\u2190 '+esc(t("back_home"))+'</a>'
     +'<div class="page-head"><div><h2>\u2753 '+esc(t("help_title"))+'</h2><div class="sub">'+esc(t("help_sub"))+'</div></div></div>'
@@ -10530,6 +10961,11 @@ function viewHome(){
       <span><b>●</b> ${esc(t("feat_priv"))}</span>
       <span><b>●</b> ${esc(t("feat_open"))}</span>
     </div>
+    <footer class="tf-foot">
+      <a class="tf-badge" href="https://trade-free.org/" target="_blank" rel="noopener noreferrer">💚 Trade-free</a>
+      <div class="tf-desc">${esc(t("tf_desc"))}</div>
+      <div class="tf-links"><a href="https://www.patreon.com/c/alexio_tf" target="_blank" rel="noopener noreferrer">💜 Patreon</a><span class="tf-dot">·</span><a href="https://buymeacoffee.com/echo.of.the.strings" target="_blank" rel="noopener noreferrer">☕ Buy me a coffee</a><span class="tf-dot">·</span><a href="https://chiuta.github.io/" target="_blank" rel="noopener noreferrer">${esc(t("tf_tools"))}</a></div>
+    </footer>
   </div>`;
 }
 
@@ -10743,6 +11179,24 @@ function bindSetup(){
 }
 
 /* ---------------- IMPORT ---------------- */
+const EXAMPLE_JSON = `{
+  "title": "Demo",
+  "desc": "",
+  "color": "#2f6bff",
+  "questions": [
+    { "type": "quiz", "text": "2 + 2 = ?", "time": 20, "points": 1000,
+      "answers": [ {"text":"4","correct":true}, {"text":"3"}, {"text":"5"}, {"text":"22"} ] },
+    { "type": "tf", "text": "Paris is the capital of France", "time": 10, "points": 1000,
+      "answers": [ {"text":"True","correct":true}, {"text":"False"} ] },
+    { "type": "type", "text": "Capital of Japan?", "time": 30, "points": 1000,
+      "answers": [ {"text":"Tokyo"}, {"text":"tokyo"} ] },
+    { "type": "num", "text": "2 x 21 = ?", "time": 20, "points": 1000, "tol": 0,
+      "answers": [ {"text":"42"} ] }
+  ]
+}`;
+function copyText(txt){ try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast(t("import_copied"));}).catch(function(){fallbackCopy(txt);}); return; } }catch(e){} fallbackCopy(txt); }
+function fallbackCopy(txt){ var ta=document.createElement("textarea"); ta.value=txt; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.focus(); ta.select(); try{ document.execCommand("copy"); toast(t("import_copied")); }catch(e){} ta.remove(); }
+function dlText(name,txt){ var blob=new Blob([txt],{type:"application/json"}); var url=URL.createObjectURL(blob); var a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(url);},1500); }
 function viewImport(){
   return `<div class="wrap">
     <a class="backlink" data-action="library">← ${esc(t("library"))}</a>
@@ -10754,6 +11208,16 @@ function viewImport(){
         <textarea class="textarea" id="pastein" style="min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px" placeholder='${esc(t("import_paste_ph"))}'></textarea></div>
       <button class="btn btn-primary" style="margin-top:14px" data-action="doimport">⇪ ${esc(t("import_btn"))}</button>
     </div>
+    <details class="json-doc">
+      <summary>📄 ${esc(t("import_fmt_title"))}</summary>
+      <p class="jd-intro">${esc(t("import_fmt_intro"))}</p>
+      <div class="jd-actions">
+        <button class="btn btn-ghost sm" data-action="copyexample">📋 ${esc(t("import_copy"))}</button>
+        <button class="btn btn-ghost sm" data-action="dltemplate">⬇ ${esc(t("import_template"))}</button>
+      </div>
+      <pre class="jd-code"><code>${esc(EXAMPLE_JSON)}</code></pre>
+      <div class="jd-ref">${esc(t("import_fields"))}</div>
+    </details>
   </div>`;
 }
 function bindImport(){
@@ -12317,7 +12781,7 @@ document.addEventListener("click",(e)=>{
 
   switch(a){
     case "spinner": stopPoll(); if(!state.spinner.items||!state.spinner.items.length) spinLoad(); state.spinner.result=null; state.spinAngle=0; state.screen="spinner"; render(); break;
-    case "help": state.helpBook="user"; state.screen="help"; render(); break;
+    case "help": state.helpBook="eli5"; state.screen="help"; render(); break;
     case "helpbook": state.helpBook=el.dataset.b; render(); break;
     case "mdjump": { var tgt=document.getElementById(el.dataset.t); if(tgt) tgt.scrollIntoView({behavior:"smooth",block:"start"}); break; }
     case "spinspin": spinWheel(); break;
@@ -12357,6 +12821,8 @@ document.addEventListener("click",(e)=>{
     }
     case "import": state.screen="import"; render(); break;
     case "doimport": { const v2=(document.getElementById("pastein")||{}).value||""; if(v2.trim()) tryImport(v2); else toast(t("import_err")); break; }
+    case "copyexample": copyText(EXAMPLE_JSON); break;
+    case "dltemplate": dlText("quiz-template.json", EXAMPLE_JSON); break;
 
     // editor
     case "addq": state.editing.questions.push(blankQuestion()); rerenderQList(); break;
