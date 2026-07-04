@@ -176,6 +176,33 @@ function qff_login_guard($ip,$success){
   flock($fh,LOCK_UN); fclose($fh);
   return $n;
 }
+/* General-purpose per-key fixed-window rate limiter, backed by one small self-pruning file
+   per bucket (mirrors qff_login_guard's pattern). Returns true if this call is still within
+   the allowance, false if the caller should be throttled/rejected. Fails OPEN (returns true)
+   on any filesystem hiccup — a rate limiter must never be the reason a legitimate request
+   fails outright. Used to close two gaps a purely session-cookie-based cooldown can't:
+   (1) an attacker who simply drops cookies between requests, and
+   (2) enumeration-style abuse (many different codes/ids from one IP) that a per-session
+       cooldown never even sees, because each attempt looks like a "new" session. */
+function qff_rate_guard($bucket,$key,$max,$windowSec){
+  global $DATA; $dir=$DATA.'/.rl'; if(!is_dir($dir)) @mkdir($dir,0775,true);
+  $safeBucket=preg_replace('/[^a-z0-9_-]/','',(string)$bucket); if($safeBucket==='') $safeBucket='b';
+  $f=$dir.'/'.$safeBucket.'.json';
+  $fh=@fopen($f,'c+'); if(!$fh) return true;
+  if(!flock($fh,LOCK_EX)){ fclose($fh); return true; }
+  $raw=stream_get_contents($fh); $all=json_decode((string)$raw,true); if(!is_array($all)) $all=array();
+  $now=time();
+  foreach($all as $k=>$v){ if(!is_array($v) || ($now-(int)(isset($v['t'])?$v['t']:0))>$windowSec) unset($all[$k]); }
+  $rkey=substr(preg_replace('/[^a-zA-Z0-9:._|-]/','',(string)$key),0,80); if($rkey==='') $rkey='unknown';
+  $n=(isset($all[$rkey]['n'])?(int)$all[$rkey]['n']:0);
+  $allowed=($n<$max);
+  if($allowed) $all[$rkey]=array('n'=>$n+1,'t'=>(isset($all[$rkey]['t'])?(int)$all[$rkey]['t']:$now));
+  if(count($all)>4000) $all=array_slice($all,-1000,null,true);
+  rewind($fh); ftruncate($fh,0); fwrite($fh, json_encode($all)); fflush($fh);
+  flock($fh,LOCK_UN); fclose($fh);
+  return $allowed;
+}
+function qff_client_ip(){ return isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0'; }
 function qff_safe_id($id){ $id=preg_replace('/[^A-Za-z0-9_-]/','',(string)$id); return substr($id,0,64); }
 function qff_gen_id(){ return 'q_'.base_convert((string)time(),10,36).'_'.bin2hex(random_bytes(3)); }
 function qff_clip($s,$n){ $s=is_string($s)?$s:''; $s=trim($s);
@@ -255,7 +282,7 @@ function qff_fb_write_all($rows){
 function qff_live_valid($s){ if(!is_array($s)||!isset($s['prompt'])) return false; $t=isset($s['type'])?$s['type']:''; if($t==='game'||$t==='assign') return isset($s['quiz']['questions'])&&is_array($s['quiz']['questions'])&&isset($s['players'])&&is_array($s['players']); if($t==='deck') return isset($s['slides'])&&is_array($s['slides']); if($t==='survey') return isset($s['questions'])&&is_array($s['questions']); if($t==='poll'||$t==='rank'||$t==='points') return isset($s['options'])&&is_array($s['options'])&&isset($s['entries'])&&is_array($s['entries']); if($t==='scale') return isset($s['statements'])&&is_array($s['statements'])&&isset($s['entries'])&&is_array($s['entries']); if($t==='cloud'||$t==='qa'||$t==='rating') return isset($s['entries'])&&is_array($s['entries']); return false; }
 function qff_live_path($code){ global $DATA; return $DATA.'/live/'.$code.'.json'; }
 function qff_safe_code($c){ $c=strtoupper((string)$c); $c=preg_replace('/[^A-Z0-9]/','',$c); return substr($c,0,12); }
-function qff_gen_code(){ global $DATA; $dir=$DATA.'/live'; if(!is_dir($dir)) @mkdir($dir,0775,true); $al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for($try=0;$try<64;$try++){ $c=''; for($i=0;$i<4;$i++) $c.=$al[random_int(0,strlen($al)-1)]; $fh=@fopen(qff_live_path($c),'x'); if($fh){ fclose($fh); return $c; } } return $c; }
+function qff_gen_code(){ global $DATA; $dir=$DATA.'/live'; if(!is_dir($dir)) @mkdir($dir,0775,true); $al='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for($try=0;$try<64;$try++){ $c=''; for($i=0;$i<4;$i++) $c.=$al[random_int(0,strlen($al)-1)]; $fh=@fopen(qff_live_path($c),'x'); if($fh){ fclose($fh); return $c; } } return ''; /* exhausted — caller MUST check for '' and fail loudly; returning a colliding code here would let qff_atomic's rename silently clobber another live session */ }
 function qff_live_load($code){ $f=qff_live_path($code); if(!file_exists($f)) return null; $fh=@fopen($f,'r'); if(!$fh){ $j=json_decode((string)@file_get_contents($f),true); return qff_live_valid($j)?$j:null; } @flock($fh,LOCK_SH); $raw=stream_get_contents($fh); @flock($fh,LOCK_UN); fclose($fh); $j=json_decode((string)$raw,true); return qff_live_valid($j)?$j:null; }
 if(!defined('QFF_SCHEMA')) define('QFF_SCHEMA',1);
 function qff_live_sweep(){ global $DATA; $dir=$DATA.'/live'; if(!is_dir($dir)) return; $cut=time()-86400; $files=@glob($dir.'/*.json'); if(!is_array($files)) return; foreach($files as $f){ $m=@filemtime($f); if($m!==false && $m<$cut) @unlink($f); } }
@@ -502,6 +529,10 @@ if($action !== null){
       $b=qff_body();
       $now=time();
       if(!empty($_SESSION['qff_fb_last']) && ($now-$_SESSION['qff_fb_last'])<FB_COOLDOWN) qff_err('please wait a moment',429);
+      /* the per-session cooldown above is gone the moment someone drops their cookie; this
+         per-IP hourly cap is what actually bounds how much junk feedback.txt can accumulate
+         (that file has no size cap of its own). */
+      if(!qff_rate_guard('feedback',qff_client_ip(),20,3600)) qff_err('please wait a moment',429);
       if(!empty($b['website'])) qff_err('spam',400); /* honeypot */
       $rating=(int)(isset($b['rating'])?$b['rating']:0); if($rating<1||$rating>5) qff_err('bad rating');
       $msg=qff_clip(isset($b['message'])?$b['message']:'',MAX_MSG); if($msg==='') qff_err('empty message');
@@ -594,6 +625,7 @@ if($action !== null){
     if($type==='game'){
       $quiz=qff_norm_quiz(isset($b['quiz'])?$b['quiz']:null);
       $s=array('code'=>qff_gen_code(),'type'=>'game','prompt'=>$quiz['title'],'quiz'=>$quiz,'open'=>true,'phase'=>'lobby','qIndex'=>-1,'qStart'=>0,'qStarts'=>array(),'created'=>(int)round(microtime(true)*1000),'players'=>array());
+      if($s['code']==='') qff_err('server busy, try again',503);
       $tms=(isset($b['teams'])&&is_array($b['teams']))?$b['teams']:array(); $teams=array();
       foreach($tms as $tm){ if(!is_array($tm)) continue; $tcol=(isset($tm['color'])&&is_string($tm['color'])&&preg_match('/^#[0-9a-fA-F]{3,8}$/',$tm['color']))?$tm['color']:'#888888'; $temo=str_replace(array('<','>','&','"',"'"),'',qff_clip(isset($tm['emoji'])?$tm['emoji']:'⚑',8)); if($temo==='')$temo='⚑'; $teams[]=array('name'=>qff_clip(isset($tm['name'])?$tm['name']:'Echipă',20),'emoji'=>$temo,'color'=>$tcol); if(count($teams)>=4) break; }
       if(count($teams)>=2) $s['teams']=$teams;
@@ -603,6 +635,7 @@ if($action !== null){
     if($type==='assign'){
       $quiz=qff_norm_quiz(isset($b['quiz'])?$b['quiz']:null);
       $s=array('code'=>qff_gen_code(),'type'=>'assign','prompt'=>$quiz['title'],'quiz'=>$quiz,'open'=>true,'created'=>(int)round(microtime(true)*1000),'players'=>array());
+      if($s['code']==='') qff_err('server busy, try again',503);
       if(!qff_live_write($s)) qff_err('write failed',500);
       qff_json(array('ok'=>true,'session'=>qff_assign_state($s,'',true)));
     }
@@ -621,6 +654,7 @@ if($action !== null){
       if(count($slides)<1) qff_err('need slides'); $slides=array_slice($slides,0,50);
       $title=qff_clip(isset($b['prompt'])?$b['prompt']:'',200); if($title==='') $title='Prezentare';
       $s=array('code'=>qff_gen_code(),'type'=>'deck','prompt'=>$title,'slides'=>$slides,'current'=>0,'open'=>true,'created'=>(int)round(microtime(true)*1000));
+      if($s['code']==='') qff_err('server busy, try again',503);
       if(!qff_live_write($s)) qff_err('write failed',500);
       qff_json(array('ok'=>true,'session'=>qff_deck_public($s,true)));
     }
@@ -630,6 +664,7 @@ if($action !== null){
       if(count($qs)<1) qff_err('need questions'); $qs=array_slice($qs,0,20);
       $title=qff_clip(isset($b['prompt'])?$b['prompt']:'',200); if($title==='') $title='Chestionar';
       $s=array('code'=>qff_gen_code(),'type'=>'survey','prompt'=>$title,'questions'=>$qs,'filter'=>!empty($b['filter']),'open'=>true,'created'=>(int)round(microtime(true)*1000),'done'=>array());
+      if($s['code']==='') qff_err('server busy, try again',503);
       if(!qff_live_write($s)) qff_err('write failed',500);
       qff_json(array('ok'=>true,'session'=>qff_survey_public($s,true)));
     }
@@ -642,12 +677,20 @@ if($action !== null){
     $scale=(int)(isset($b['scale'])?$b['scale']:5); if($scale!==10)$scale=5;
     $budget=(int)(isset($b['budget'])?$b['budget']:100); if($budget<10||$budget>1000)$budget=100;
     $s=array('code'=>qff_gen_code(),'type'=>$type,'prompt'=>$prompt,'options'=>$opts,'statements'=>$stmts,'multi'=>$multi,'scale'=>$scale,'budget'=>$budget,'mod'=>!empty($b['mod']),'filter'=>!empty($b['filter']),'open'=>true,'created'=>(int)round(microtime(true)*1000),'entries'=>array());
+    if($s['code']==='') qff_err('server busy, try again',503);
     if(!qff_live_write($s)) qff_err('write failed',500);
     qff_json(array('ok'=>true,'session'=>qff_live_public($s,true)));
   }
   if($action==='live_get'){
     $code=qff_safe_code(isset($_GET['code'])?$_GET['code']:''); if($code==='') qff_err('bad code');
-    $s=qff_live_load($code); if(!$s) qff_err('not found',404);
+    $s=qff_live_load($code);
+    if(!$s){
+      /* codes are only 4 chars (~1M combinations) — without this, an attacker could scan
+         the whole space with no CAPTCHA and no login, discovering (and then disrupting)
+         every live session on the server. Legitimate use never repeatedly misses. */
+      if(!qff_rate_guard('live_get_404',qff_client_ip(),40,60)){ usleep(400000); qff_err('slow down',429); }
+      qff_err('not found',404);
+    }
     if(($s['type']??'')==='assign') qff_json(array('session'=>qff_assign_state($s, qff_safe_pid(isset($_GET['pid'])?$_GET['pid']:''), qff_is_admin())));
     if(($s['type']??'')==='game') qff_json(array('session'=>qff_game_state($s, qff_safe_pid(isset($_GET['pid'])?$_GET['pid']:''), qff_is_admin())));
     if(($s['type']??'')==='deck') qff_json(array('session'=>qff_deck_public($s, qff_is_admin())));
@@ -660,6 +703,9 @@ if($action !== null){
     if(!empty($b['website'])) qff_err('spam');
     $now=microtime(true); $last=isset($_SESSION['live_last'][$code])?$_SESSION['live_last'][$code]:0;
     if(($now-$last)<1.0) qff_err('slow down',429);
+    /* the check above is a session cookie away from being bypassed entirely — this IP-keyed
+       backstop still caps the damage for whoever drops cookies between requests. */
+    if(!qff_rate_guard('live_submit',qff_client_ip().'|'.$code,30,10)) qff_err('slow down',429);
     $pre=qff_live_load($code); if(!$pre) qff_err('not found',404);
     if(empty($pre['open'])) qff_err('closed',423);
     if(($pre['type']??'')==='deck'){
@@ -737,6 +783,10 @@ if($action !== null){
     $code=qff_safe_code(isset($b['code'])?$b['code']:''); $id=preg_replace('/[^a-z0-9]/','',(string)(isset($b['id'])?$b['id']:''));
     $voter=substr(preg_replace('/[^a-z0-9]/i','',(string)(isset($b['voter'])?$b['voter']:'')),0,40);
     if($code===''||$id===''||$voter==='') qff_err('bad request');
+    /* this endpoint had zero throttling of any kind — a tight loop here forces a flock()
+       write on the same session file for every call, which is a real contention/DoS vector
+       against that specific session even before counting the vote-stuffing angle. */
+    if(!qff_rate_guard('live_vote',qff_client_ip().'|'.$code,20,10)) qff_err('slow down',429);
     list($s,$st)=qff_live_mutate($code,function($s) use($id,$voter){
       $tp=($s['type']??'');
       if($tp==='deck'){ $cur=(int)(isset($s['current'])?$s['current']:0); if(!isset($s['slides'][$cur])||($s['slides'][$cur]['type']??'')!=='qa') return false; $ch=false; foreach($s['slides'][$cur]['entries'] as $i=>$e){ if($e['id']===$id){ $v=isset($e['voters'])?$e['voters']:array(); if(!in_array($voter,$v,true)){ $v[]=$voter; $s['slides'][$cur]['entries'][$i]['voters']=$v; $ch=true; } break; } } return $ch?$s:false; }
@@ -789,6 +839,10 @@ if($action !== null){
   if($action==='live_join'){
     $b=qff_body();
     $code=qff_safe_code(isset($b['code'])?$b['code']:''); if($code==='') qff_err('bad code');
+    /* generous on purpose: a whole classroom can be behind one school IP and will legitimately
+       join within the same few seconds when the host shows the code. This only needs to slow
+       down a script trying to fill the 500-player cap with junk faster than a host could notice. */
+    if(!qff_rate_guard('live_join',qff_client_ip().'|'.$code,60,30)) qff_err('slow down',429);
     $name=qff_clip(isset($b['name'])?$b['name']:'',20); if($name==='') qff_err('name required');
     $avatar=(int)(isset($b['avatar'])?$b['avatar']:0); if($avatar<0||$avatar>63) $avatar=0;
     $team=(int)(isset($b['team'])?$b['team']:-1);
@@ -859,9 +913,16 @@ if($action !== null){
       if($st!=='ok') qff_err($st==='reject'?'not accepted':'not found', $st==='reject'?409:404);
       qff_json(array('ok'=>true,'correct'=>$fb['correct'],'correctIndex'=>$fb['correctIndex'],'points'=>$fb['points'],'done'=>$fb['done']));
     }
-    list($s,$st)=qff_live_mutate($code,function($s) use($pid,$choice,$atext){
+    $reqQi=(int)(isset($b['qi'])?$b['qi']:-1);
+    list($s,$st)=qff_live_mutate($code,function($s) use($pid,$choice,$atext,$reqQi){
       if(($s['type']??'')!=='game' || ($s['phase']??'')!=='question') return false;
-      $qi=(int)$s['qIndex']; if($qi<0) return false; $q=$s['quiz']['questions'][$qi];
+      $qi=(int)$s['qIndex']; if($qi<0) return false;
+      /* if the client told us which question it thinks it's answering, and the host has
+         already moved on (race between an impatient host and a slow/laggy client), reject
+         instead of silently recording the answer against the wrong question. A request with
+         no qi at all (older client) keeps the previous behaviour. */
+      if($reqQi>=0 && $reqQi!==$qi) return false;
+      $q=$s['quiz']['questions'][$qi];
       $pidx=-1; foreach($s['players'] as $i=>$p){ if($p['id']===$pid){ $pidx=$i; break; } } if($pidx<0) return false;
       if(isset($s['players'][$pidx]['answers'][$qi])) return false;
       if(($q['type']??'')==='type'){
@@ -908,6 +969,7 @@ if($action !== null){
     $code=qff_safe_code(isset($b['code'])?$b['code']:''); $e=(int)(isset($b['e'])?$b['e']:-1);
     if($code===''||$e<0||$e>5) qff_err('bad request');
     $rnow=microtime(true); $rl=isset($_SESSION['react_last'])?$_SESSION['react_last']:0; if(($rnow-$rl)<0.2) qff_err('slow down',429); $_SESSION['react_last']=$rnow;
+    if(!qff_rate_guard('live_react',qff_client_ip().'|'.$code,15,5)) qff_err('slow down',429);
     list($s,$st)=qff_live_mutate($code,function($s) use($e){
       if(($s['type']??'')!=='game') return false;
       $rx=isset($s['reactions'])?$s['reactions']:array();
@@ -1411,7 +1473,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .lh-main{display:grid;grid-template-columns:1fr 290px;gap:18px;align-items:start}
 .lh-stage{background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:var(--r);padding:22px;min-height:60vh;display:flex;flex-direction:column}
 .lh-prompt{font-size:26px;margin:0 0 16px;line-height:1.2}
-.live-viz{position:relative;flex:1;min-height:46vh;overflow:hidden}
+.live-viz{position:relative;flex:1;min-height:46vh;max-height:62vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .live-viz.qa{overflow:auto;display:block}
 .lh-foot{margin-top:14px;color:var(--muted)}
 .lh-count b{color:var(--text);font-size:18px}
@@ -14001,31 +14063,39 @@ function measCtx(){ if(!_measCtx){ const c=document.createElement("canvas"); _me
 function cloudFont(fs){ return "800 "+fs+"px "+FONT_STACK; }
 function layoutCloud(words, W, H){
   if(!words || !words.length) return {placements:[],W:W,H:H};
-  words=words.slice(0,110);
+  words=words.slice(0,150); /* match the server's aggregation cap (qff_live_public) — no extra client-side cap */
   const counts=words.map(w=>w.count); const maxC=Math.max.apply(null,counts), minC=Math.min.apply(null,counts);
-  const minFs=Math.max(13, Math.round(Math.min(W,H)/20));
-  const maxFs=Math.max(minFs+6, Math.round(Math.min(W*0.78, H/3.1)));
-  const ctx=measCtx(); const placed=[]; const cx=W/2, cy=H/2; const out=[]; let idx=0;
-  const aspect=W/H;
-  function fsFor(c){ if(maxC===minC) return Math.round((minFs+maxFs)/2); const tt=(c-minC)/(maxC-minC); return Math.round(minFs+Math.pow(tt,0.72)*(maxFs-minFs)); }
-  for(const w of words){
-    const fs=fsFor(w.count); ctx.font=cloudFont(fs);
-    const tw=ctx.measureText(w.text).width; const th=fs*1.0;
-    const hw=tw/2+5, hh=th/2+4;
-    let ok=false, px=cx, py=cy, t=0;
-    for(let k=0;k<3000;k++){
-      const r=2.3*t; px=cx+r*Math.cos(t); py=cy+(r*Math.sin(t))/aspect; t+=0.32;
-      const x0=px-hw,y0=py-hh,x1=px+hw,y1=py+hh;
-      if(x0<3||y0<3||x1>W-3||y1>H-3) continue;
-      let hit=false; for(let p=0;p<placed.length;p++){ const q=placed[p]; if(x0<q.x1&&x1>q.x0&&y0<q.y1&&y1>q.y0){ hit=true; break; } }
-      if(!hit){ ok=true; break; }
+  const minFs=Math.max(13, Math.round(Math.min(W,H)/22));
+  let maxFs=Math.min(64, Math.max(minFs+10, Math.round(Math.min(W*0.32, H*0.32))));
+  const ctx=measCtx();
+  const maxWorkH=H*8; /* hard ceiling: grow the canvas a fair bit before we'd rather shrink text than make an absurdly long scroll */
+  let areaMult=2.2, out=[], usedH=H;
+  for(let pass=0; pass<10; pass++){
+    function fsFor(c){ if(maxC===minC) return Math.round((minFs+maxFs)/2); const tt=(c-minC)/(maxC-minC); return Math.round(minFs+Math.pow(tt,0.72)*(maxFs-minFs)); }
+    let inkArea=0;
+    const sized=words.map(function(w){ const fs=fsFor(w.count); ctx.font=cloudFont(fs); const tw=ctx.measureText(w.text).width+10, th=fs+8; inkArea+=tw*th; return {w:w,fs:fs,tw:tw,th:th}; });
+    const workH=Math.min(maxWorkH, Math.max(H, Math.ceil(inkArea*areaMult/W)));
+    const cx=W/2, cy=workH/2, aspect=W/workH; const placed=[]; const placedOut=[]; let allOk=true;
+    for(const item of sized){
+      const fs=item.fs, hw=item.tw/2, hh=item.th/2;
+      let ok=false, px=cx, py=cy, t=0;
+      for(let k=0;k<6000;k++){
+        const r=2.3*t; px=cx+r*Math.cos(t); py=cy+(r*Math.sin(t))/aspect; t+=0.32;
+        const x0=px-hw,y0=py-hh,x1=px+hw,y1=py+hh;
+        if(x0<3||y0<3||x1>W-3||y1>workH-3) continue;
+        let hit=false; for(let p=0;p<placed.length;p++){ const q=placed[p]; if(x0<q.x1&&x1>q.x0&&y0<q.y1&&y1>q.y0){ hit=true; break; } }
+        if(!hit){ ok=true; break; }
+      }
+      if(!ok){ allOk=false; break; }
+      placed.push({x0:px-hw,y0:py-hh,x1:px+hw,y1:py+hh});
+      placedOut.push({text:item.w.text,count:item.w.count,x:px,y:py,fs:fs,color:CLOUD_COLORS[placedOut.length%CLOUD_COLORS.length]});
     }
-    if(!ok) continue;
-    placed.push({x0:px-hw,y0:py-hh,x1:px+hw,y1:py+hh});
-    out.push({text:w.text,count:w.count,x:px,y:py,fs:fs,color:CLOUD_COLORS[idx%CLOUD_COLORS.length]});
-    idx++;
+    out=placedOut; usedH=workH; /* always keep the best attempt so far, in case we run out of passes */
+    if(allOk) break;
+    if(workH<maxWorkH){ areaMult*=1.6; }
+    else { const avail=W*workH*0.42; const scale=avail<inkArea?Math.sqrt(avail/inkArea)*0.92:0.85; maxFs=Math.max(minFs+4, Math.round(maxFs*scale)); }
   }
-  return {placements:out, W:W, H:H};
+  return {placements:out, W:W, H:Math.round(usedH)};
 }
 function updateCloudDOM(container, lay){
   let map=container._cw; if(!map){ map=new Map(); container._cw=map; }
@@ -14118,10 +14188,12 @@ function renderPoints(s){
 }
 function renderResultsInto(viz, s, host, voted){
   const W=Math.max(300, viz.clientWidth||760), H=Math.max(220, viz.clientHeight||380);
+  if(s.type!=="cloud") viz.style.height="";
   if(s.type==="cloud"){
-    if(!s.results || !s.results.length){ viz.innerHTML='<div class="live-empty">'+esc(t("live_waiting"))+'</div>'; viz._cw=null; viz._mode="cloud0"; viz._lastLay=null; return; }
+    if(!s.results || !s.results.length){ viz.innerHTML='<div class="live-empty">'+esc(t("live_waiting"))+'</div>'; viz._cw=null; viz._mode="cloud0"; viz._lastLay=null; viz.style.height=""; return; }
     if(viz._mode!=="cloud"){ viz.innerHTML=""; viz._cw=null; viz._mode="cloud"; }
     const lay=layoutCloud(s.results, W, H); viz._lastLay=lay; updateCloudDOM(viz, lay);
+    viz.style.height=Math.max(H,lay.H)+"px"; /* absolutely-positioned words don't grow the container on their own — set it explicitly so overflow-y:auto has something to scroll */
   } else if(s.type==="poll"){
     updatePollViz(viz, s.results, s.count);
   } else if(s.type==="rating"){
@@ -14668,11 +14740,11 @@ function gameJoinSubmit(){ const j=state.join; const el=document.getElementById(
     .catch(e=>{ j.busy=false; toast(e.status===423?t("game_lobby_closed"):apiErr(e)); render(); }); }
 function gameAnswerText(text){ const j=state.join; const s=j&&j.session; if(!s||s.phase!=="question"||!s.question) return; if(s.question.answered) return; if(gameRemaining()<=0){ toast(t("game_times_up")); return; }
   const btn=document.querySelector('[data-action="gtype"]'); if(btn) btn.disabled=true; const inp=document.getElementById("gp-type"); if(inp) inp.disabled=true;
-  api("live_answer",{body:{code:s.code,pid:j.pid,text:text}}).then(()=>{ if(s.question){ s.question.answered=true; s.question.myText=text; } render(); })
+  api("live_answer",{body:{code:s.code,pid:j.pid,qi:s.question.index,text:text}}).then(()=>{ if(s.question){ s.question.answered=true; s.question.myText=text; } render(); })
     .catch(e=>{ toast(apiErr(e)); if(btn) btn.disabled=false; if(inp) inp.disabled=false; }); }
 function gameAnswer(i){ const j=state.join; const s=j&&j.session; if(!s||s.phase!=="question"||!s.question) return; if(s.question.answered) return; if(gameRemaining()<=0){ toast(t("game_times_up")); return; }
   document.querySelectorAll(".gp-ans").forEach(b=>b.disabled=true); const btn=document.querySelector('.gp-ans[data-i="'+i+'"]'); if(btn) btn.classList.add("chosen");
-  api("live_answer",{body:{code:s.code,pid:j.pid,choice:i}}).then(()=>{ if(s.question){ s.question.answered=true; s.question.myChoice=i; } render(); })
+  api("live_answer",{body:{code:s.code,pid:j.pid,qi:s.question.index,choice:i}}).then(()=>{ if(s.question){ s.question.answered=true; s.question.myChoice=i; } render(); })
     .catch(e=>{ toast(apiErr(e)); document.querySelectorAll(".gp-ans").forEach(b=>b.disabled=false); }); }
 
 function viewGameJoin(){ const j=state.join; const s=j.session;
