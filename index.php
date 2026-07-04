@@ -9,7 +9,37 @@
    Requires PHP 7.4+ and a writable ./data directory.
    ========================================================================== */
 
+/* ---- hardening: don't leak stack traces / paths to visitors; log instead ---- */
+error_reporting(E_ALL);
+ini_set('display_errors','0');
+ini_set('log_errors','1');
+
+/* ---- hardening: lock down the session cookie before the session is opened ---- */
+$QFF_HTTPS = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']!=='off')
+  || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT']===443)
+  || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO'])==='https');
+session_set_cookie_params(array(
+  'lifetime'=>0,'path'=>'/','domain'=>'','secure'=>$QFF_HTTPS,'httponly'=>true,'samesite'=>'Lax'
+));
 session_start();
+
+/* ---- hardening: baseline security headers for every response (HTML or JSON) ----
+   Note: script-src/style-src keep 'unsafe-inline' because the app ships as ONE inline
+   <script>/<style> block with no build step; a nonce would also silently break the
+   handful of legitimate inline oninput/onchange/onclick attributes used by the quiz
+   editor (nonces only cover <script> tags, not inline event-handler attributes).
+   Even with 'unsafe-inline', this still blocks remote script/style/frame injection,
+   clickjacking (frame-ancestors) and base-tag/form-action hijacking. */
+function qff_security_headers(){
+  global $QFF_HTTPS;
+  header("X-Content-Type-Options: nosniff");
+  header("X-Frame-Options: DENY");
+  header("Referrer-Policy: strict-origin-when-cross-origin");
+  header("Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()");
+  header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; frame-src 'none'; worker-src 'self'; manifest-src 'self'");
+  if($QFF_HTTPS) header("Strict-Transport-Security: max-age=15552000; includeSubDomains");
+}
+qff_security_headers();
 
 $BASE = __DIR__;
 $DATA = $BASE . '/data';
@@ -27,10 +57,22 @@ function qff_boot(){
   if(!is_dir($QDIR)) @mkdir($QDIR,0775,true);
   if(!is_dir($DATA.'/live')) @mkdir($DATA.'/live',0775,true);
   $ht=$DATA.'/.htaccess';
-  if(!file_exists($ht)) @file_put_contents($ht,"Require all denied\nDeny from all\nOptions -Indexes\n");
+  if(!file_exists($ht)) @file_put_contents($ht,
+    "<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n".
+    "<IfModule !mod_authz_core.c>\nOrder deny,allow\nDeny from all\n</IfModule>\n".
+    "Options -Indexes -FollowSymLinks\n"
+    /* Deliberately NOT disabling the PHP engine here: .config.php must stay
+       *executable* so a direct request to it (if this .htaccess is ever bypassed
+       by a server misconfiguration) yields an empty response, not a leaked
+       bcrypt hash. Disabling the engine would turn that failure mode from
+       "silent" into "discloses the password hash" — see audit report. */
+  );
   $ix=$DATA.'/index.html';
   if(!file_exists($ix)) @file_put_contents($ix,"<!doctype html><title>403</title>");
   if(!file_exists($FB)) @file_put_contents($FB,"# Quiz fara frontiere feedback (pipe-delimited). fields: ts|status|quizId|quizTitle|name|rating|message\n");
+  /* NOTE (see audit report): .htaccess only has effect under Apache with AllowOverride
+     enabled. If this is served by nginx/Caddy/IIS, add an equivalent server-level rule
+     to deny all requests under /data/ — .htaccess is silently ignored otherwise. */
 }
 qff_boot();
 
@@ -114,6 +156,26 @@ function qff_is_admin(){ return !empty($_SESSION['qff_admin']); }
 function qff_csrf(){ if(empty($_SESSION['qff_csrf'])) $_SESSION['qff_csrf']=bin2hex(random_bytes(16)); return $_SESSION['qff_csrf']; }
 function qff_check_csrf($b){ $tk=isset($b['csrf'])?$b['csrf']:''; if(!is_string($tk)||!hash_equals(qff_csrf(),$tk)) qff_err('bad csrf',403); }
 function qff_require_admin(){ if(!qff_is_admin()) qff_err('admin required',401); }
+/* Per-IP progressive backoff for failed admin logins. A flat delay only slows a
+   single sequential attacker; concurrent requests from many workers bypass it.
+   Tracking failures per IP in a small self-pruning file makes repeated guessing
+   from one address measurably slower without any hard lockout (a hard lockout on
+   a single shared admin account would let an attacker DoS the real admin instead). */
+function qff_login_guard($ip,$success){
+  global $DATA; $f=$DATA.'/.login_guard.json';
+  $fh=@fopen($f,'c+'); if(!$fh) return 0;
+  if(!flock($fh,LOCK_EX)){ fclose($fh); return 0; }
+  $raw=stream_get_contents($fh); $all=json_decode((string)$raw,true); if(!is_array($all)) $all=array();
+  $now=time();
+  foreach($all as $k=>$v){ if(!is_array($v) || ($now-(int)(isset($v['t'])?$v['t']:0))>3600) unset($all[$k]); }
+  $key=substr(preg_replace('/[^a-zA-Z0-9:._-]/','',(string)$ip),0,64); if($key==='') $key='unknown';
+  if($success){ unset($all[$key]); $n=0; }
+  else { $n=(isset($all[$key]['n'])?(int)$all[$key]['n']:0)+1; $all[$key]=array('n'=>$n,'t'=>$now); }
+  if(count($all)>2000) $all=array_slice($all,-500,null,true);
+  rewind($fh); ftruncate($fh,0); fwrite($fh, json_encode($all)); fflush($fh);
+  flock($fh,LOCK_UN); fclose($fh);
+  return $n;
+}
 function qff_safe_id($id){ $id=preg_replace('/[^A-Za-z0-9_-]/','',(string)$id); return substr($id,0,64); }
 function qff_gen_id(){ return 'q_'.base_convert((string)time(),10,36).'_'.bin2hex(random_bytes(3)); }
 function qff_clip($s,$n){ $s=is_string($s)?$s:''; $s=trim($s);
@@ -483,8 +545,15 @@ if($action !== null){
 
   if($action==='login'){
     $b=qff_body(); $cfg=qff_cfg(); $pw=(string)(isset($b['password'])?$b['password']:'');
+    $ip=isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0';
     if((isset($cfg['admin_hash'])?$cfg['admin_hash']:'')==='') qff_err('no admin set',409);
-    if(!password_verify($pw,$cfg['admin_hash'])){ usleep(300000); qff_err('wrong password',401); }
+    $ok=password_verify($pw,$cfg['admin_hash']);
+    $fails=qff_login_guard($ip,$ok);
+    if(!$ok){
+      $delay=300000*(int)pow(2,min($fails,4)); if($delay>4800000) $delay=4800000; /* 0.6s..4.8s */
+      usleep($delay);
+      qff_err('wrong password',401);
+    }
     session_regenerate_id(true); $_SESSION['qff_admin']=true;
     qff_json(array('ok'=>true,'csrf'=>qff_csrf()));
   }
@@ -495,11 +564,25 @@ if($action !== null){
   }
 
   if($action==='setup_admin'){
-    $b=qff_body(); $cfg=qff_cfg();
-    if((isset($cfg['admin_hash'])?$cfg['admin_hash']:'')!=='') qff_err('admin already set',409);
-    $pw=(string)(isset($b['password'])?$b['password']:''); if(strlen($pw)<6) qff_err('password too short');
+    $b=qff_body();
+    /* serialize concurrent setup attempts: without this, two near-simultaneous
+       requests could both pass the "no admin yet" check and race to write the
+       config, and — more importantly on a freshly deployed, not-yet-configured
+       instance — anyone who requests this URL before the real owner does would
+       permanently become the admin. flock() closes the multi-request race; see
+       the audit report for the residual "first visitor" exposure window, which
+       needs an operational fix (set the password immediately after deploying). */
+    $lockPath=$DATA.'/.setup.lock';
+    if(!file_exists($lockPath)) @touch($lockPath);
+    $lfh=@fopen($lockPath,'c');
+    if(!$lfh || !flock($lfh,LOCK_EX)) qff_err('try again',503);
+    $cfg=qff_cfg();
+    if((isset($cfg['admin_hash'])?$cfg['admin_hash']:'')!==''){ flock($lfh,LOCK_UN); fclose($lfh); qff_err('admin already set',409); }
+    $pw=(string)(isset($b['password'])?$b['password']:'');
+    if(strlen($pw)<6){ flock($lfh,LOCK_UN); fclose($lfh); qff_err('password too short'); }
     $cfg['admin_hash']=password_hash($pw,PASSWORD_DEFAULT);
     qff_cfg_save($cfg);
+    flock($lfh,LOCK_UN); fclose($lfh);
     session_regenerate_id(true); $_SESSION['qff_admin']=true;
     qff_json(array('ok'=>true,'csrf'=>qff_csrf()));
   }
@@ -1134,7 +1217,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .stage-strip{display:flex;align-items:center;gap:14px;padding:14px clamp(14px,4vw,28px);max-width:var(--maxw);margin:0 auto;width:100%}
 .pill{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px}
 .pill.score{margin-left:auto;background:var(--accent);color:#2a1000;border:none}
-.stage-main{flex:1;display:flex;flex-direction:column;max-width:var(--maxw);margin:0 auto;width:100%;padding:0 clamp(14px,4vw,28px) clamp(14px,3vw,24px)}
+.stage-main{flex:1;display:flex;flex-direction:column;max-width:var(--maxw);margin:0 auto;width:100%;padding:0 clamp(14px,4vw,28px) clamp(14px,3vw,24px);min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+.stage-strip{flex:none}
 
 /* countdown */
 .countdown{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}

@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<!-- NOTE: this meta tag cannot express frame-ancestors (clickjacking) or X-Frame-Options —
+     those only work as real HTTP response headers, which a static host such as GitHub Pages
+     does not let this file set. If you ever self-host this file behind your own web server,
+     add X-Frame-Options: DENY / Content-Security-Policy: frame-ancestors 'none' there instead.
+     See the audit report for the equivalent headers already added to index.php. -->
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="Quiz fara frontiere — joc de tip Kahoot, single-file, offline, fara conturi, fara reclame, fara telemetrie.">
 <title>Undava</title>
 <meta property="og:type" content="website">
@@ -248,7 +255,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .stage-strip{display:flex;align-items:center;gap:14px;padding:14px clamp(14px,4vw,28px);max-width:var(--maxw);margin:0 auto;width:100%}
 .pill{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-weight:800;font-size:14px;display:flex;align-items:center;gap:8px}
 .pill.score{margin-left:auto;background:var(--accent);color:#2a1000;border:none}
-.stage-main{flex:1;display:flex;flex-direction:column;max-width:var(--maxw);margin:0 auto;width:100%;padding:0 clamp(14px,4vw,28px) clamp(14px,3vw,24px)}
+.stage-main{flex:1;display:flex;flex-direction:column;max-width:var(--maxw);margin:0 auto;width:100%;padding:0 clamp(14px,4vw,28px) clamp(14px,3vw,24px);min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
+.stage-strip{flex:none}
 
 /* countdown */
 .countdown{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
