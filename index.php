@@ -9972,6 +9972,8 @@ const I18N = {
     "live_prompt_ph": "Ex: Ce cuvânt descrie viitorul?",
     "deck_add_slide": "Adaugă în prezentare",
     "deck_templates": "Exemple gata (ASFAN)",
+    "live_examples": "Exemple rapide",
+    "live_example_loaded": "Exemplu încărcat.",
     "deck_export": "Exportă",
     "deck_import": "Importă",
     "deck_launch": "Lansează prezentarea",
@@ -9980,6 +9982,8 @@ const I18N = {
     "sv_questions": "Întrebări (una pe linie)",
     "sv_questions_ph": "De ce ai venit?\nUn cuvânt pentru seara asta\nCe ai schimba?",
     "sv_questions_hint": "Fiecare linie devine o întrebare cu text liber. Răspunsurile se agregă într-un nor de cuvinte.",
+    "sv_templates": "Exemple gata",
+    "sv_tpl_loaded": (n)=>`Chestionar încărcat (${n} întrebări).`,
     "live_launch": "Pornește sesiunea",
     "live_title": "Sesiune live",
     "live_sub": "Nor de cuvinte, sondaje și întrebări — pe telefoanele publicului, în timp real.",
@@ -10390,6 +10394,8 @@ const I18N = {
     "live_prompt_ph": "E.g. Which word describes the future?",
     "deck_add_slide": "Add to presentation",
     "deck_templates": "Ready examples (ASFAN)",
+    "live_examples": "Quick examples",
+    "live_example_loaded": "Example loaded.",
     "deck_export": "Export",
     "deck_import": "Import",
     "deck_launch": "Launch presentation",
@@ -10398,6 +10404,8 @@ const I18N = {
     "sv_questions": "Questions (one per line)",
     "sv_questions_ph": "Why did you come?\nOne word for tonight\nWhat would you change?",
     "sv_questions_hint": "Each line becomes a free-text question. Answers aggregate into a word cloud.",
+    "sv_templates": "Ready examples",
+    "sv_tpl_loaded": (n)=>`Questionnaire loaded (${n} questions).`,
     "live_launch": "Start session",
     "live_title": "Live session",
     "live_sub": "Word cloud, polls and questions — on the audience's phones, in real time.",
@@ -10808,6 +10816,8 @@ const I18N = {
     "live_prompt_ph": "Ex. Quel mot décrit le futur ?",
     "deck_add_slide": "Ajouter à la présentation",
     "deck_templates": "Exemples prêts (ASFAN)",
+    "live_examples": "Exemples rapides",
+    "live_example_loaded": "Exemple chargé.",
     "deck_export": "Exporter",
     "deck_import": "Importer",
     "deck_launch": "Lancer la présentation",
@@ -10816,6 +10826,8 @@ const I18N = {
     "sv_questions": "Questions (une par ligne)",
     "sv_questions_ph": "Pourquoi es-tu venu ?\nUn mot pour ce soir\nQue changerais-tu ?",
     "sv_questions_hint": "Chaque ligne devient une question à texte libre. Les réponses s'agrègent en nuage de mots.",
+    "sv_templates": "Exemples prêts",
+    "sv_tpl_loaded": (n)=>`Questionnaire chargé (${n} questions).`,
     "live_launch": "Lancer la session",
     "live_title": "Session en direct",
     "live_sub": "Nuage de mots, sondages et questions — sur les téléphones du public, en temps réel.",
@@ -11226,6 +11238,8 @@ const I18N = {
     "live_prompt_ph": "Es. Quale parola descrive il futuro?",
     "deck_add_slide": "Aggiungi alla presentazione",
     "deck_templates": "Esempi pronti (ASFAN)",
+    "live_examples": "Esempi rapidi",
+    "live_example_loaded": "Esempio caricato.",
     "deck_export": "Esporta",
     "deck_import": "Importa",
     "deck_launch": "Avvia presentazione",
@@ -11234,6 +11248,8 @@ const I18N = {
     "sv_questions": "Domande (una per riga)",
     "sv_questions_ph": "Perché sei venuto?\nUna parola per stasera\nCosa cambieresti?",
     "sv_questions_hint": "Ogni riga diventa una domanda a testo libero. Le risposte si aggregano in una nuvola di parole.",
+    "sv_templates": "Esempi pronti",
+    "sv_tpl_loaded": (n)=>`Questionario caricato (${n} domande).`,
     "live_launch": "Avvia sessione",
     "live_title": "Sessione dal vivo",
     "live_sub": "Nuvola di parole, sondaggi e domande — sui telefoni del pubblico, in tempo reale.",
@@ -11644,6 +11660,8 @@ const I18N = {
     "live_prompt_ph": "P. ej. ¿Qué palabra describe el futuro?",
     "deck_add_slide": "Añadir a la presentación",
     "deck_templates": "Ejemplos listos (ASFAN)",
+    "live_examples": "Ejemplos rápidos",
+    "live_example_loaded": "Ejemplo cargado.",
     "deck_export": "Exportar",
     "deck_import": "Importar",
     "deck_launch": "Iniciar presentación",
@@ -11652,6 +11670,8 @@ const I18N = {
     "sv_questions": "Preguntas (una por línea)",
     "sv_questions_ph": "¿Por qué viniste?\nUna palabra para esta noche\n¿Qué cambiarías?",
     "sv_questions_hint": "Cada línea se convierte en una pregunta de texto libre. Las respuestas se agregan en una nube de palabras.",
+    "sv_templates": "Ejemplos listos",
+    "sv_tpl_loaded": (n)=>`Cuestionario cargado (${n} preguntas).`,
     "live_launch": "Iniciar sesión",
     "live_title": "Sesión en directo",
     "live_sub": "Nube de palabras, encuestas y preguntas — en los móviles del público, en tiempo real.",
@@ -12062,6 +12082,8 @@ const I18N = {
     "live_prompt_ph": "Ex. Que palavra descreve o futuro?",
     "deck_add_slide": "Adicionar à apresentação",
     "deck_templates": "Exemplos prontos (ASFAN)",
+    "live_examples": "Exemplos rápidos",
+    "live_example_loaded": "Exemplo carregado.",
     "deck_export": "Exportar",
     "deck_import": "Importar",
     "deck_launch": "Iniciar apresentação",
@@ -12070,6 +12092,8 @@ const I18N = {
     "sv_questions": "Perguntas (uma por linha)",
     "sv_questions_ph": "Porque vieste?\nUma palavra para esta noite\nO que mudarias?",
     "sv_questions_hint": "Cada linha torna-se uma pergunta de texto livre. As respostas agregam-se numa nuvem de palavras.",
+    "sv_templates": "Exemplos prontos",
+    "sv_tpl_loaded": (n)=>`Questionário carregado (${n} perguntas).`,
     "live_launch": "Iniciar sessão",
     "live_title": "Sessão ao vivo",
     "live_sub": "Nuvem de palavras, sondagens e perguntas — nos telemóveis do público, em tempo real.",
@@ -12480,6 +12504,8 @@ const I18N = {
     "live_prompt_ph": "Z. B. Welches Wort beschreibt die Zukunft?",
     "deck_add_slide": "Zur Präsentation hinzufügen",
     "deck_templates": "Fertige Beispiele (ASFAN)",
+    "live_examples": "Schnelle Beispiele",
+    "live_example_loaded": "Beispiel geladen.",
     "deck_export": "Exportieren",
     "deck_import": "Importieren",
     "deck_launch": "Präsentation starten",
@@ -12488,6 +12514,8 @@ const I18N = {
     "sv_questions": "Fragen (eine pro Zeile)",
     "sv_questions_ph": "Warum bist du gekommen?\nEin Wort für heute Abend\nWas würdest du ändern?",
     "sv_questions_hint": "Jede Zeile wird zu einer Freitextfrage. Antworten werden zu einer Wortwolke zusammengefasst.",
+    "sv_templates": "Fertige Beispiele",
+    "sv_tpl_loaded": (n)=>`Fragebogen geladen (${n} Fragen).`,
     "live_launch": "Sitzung starten",
     "live_title": "Live-Sitzung",
     "live_sub": "Wortwolke, Umfragen und Fragen — auf den Handys des Publikums, in Echtzeit.",
@@ -12600,6 +12628,8 @@ function samples(){ return [
      answers:[{text:{ro:"Adevărat",en:"True"},correct:true},{text:{ro:"Fals",en:"False"},correct:false}]},
     {text:{ro:"Ce instrument a detectat primele unde gravitaționale?",en:"Which instrument detected the first gravitational waves?"},time:25,points:2000,type:"quiz",
      answers:[{text:{ro:"LIGO",en:"LIGO"},correct:true},{text:{ro:"Hubble",en:"Hubble"},correct:false},{text:{ro:"LHC",en:"LHC"},correct:false},{text:{ro:"ALMA",en:"ALMA"},correct:false}]},
+    {text:{ro:"La ce distanță medie este Pământul de Soare, în milioane de kilometri? (aproximativ)",en:"What is the average Earth–Sun distance, in millions of kilometres? (approximately)"},time:20,points:1000,type:"num",tol:20,
+     answers:[{text:{ro:"150",en:"150"},correct:true}]},
   ]},
   {id:"s_tech", sample:true, color:"#18bd6b", title:{ro:"Tehnologie & Web",en:"Technology & Web"},
    desc:{ro:"Cum funcționează internetul și codul.",en:"How the internet and code work."},
@@ -12614,6 +12644,8 @@ function samples(){ return [
      answers:[{text:{ro:"Adevărat",en:"True"},correct:true},{text:{ro:"Fals",en:"False"},correct:false}]},
     {text:{ro:"Cine a inițiat kernelul Linux?",en:"Who started the Linux kernel?"},time:20,points:1000,type:"quiz",
      answers:[{text:{ro:"Linus Torvalds",en:"Linus Torvalds"},correct:true},{text:{ro:"Richard Stallman",en:"Richard Stallman"},correct:false},{text:{ro:"Ken Thompson",en:"Ken Thompson"},correct:false},{text:{ro:"Dennis Ritchie",en:"Dennis Ritchie"},correct:false}]},
+    {text:{ro:"Ce limbaj de programare a fost creat de Guido van Rossum?",en:"Which programming language was created by Guido van Rossum?"},time:20,points:1000,type:"type",
+     answers:[{text:{ro:"Python",en:"Python"},correct:true}]},
   ]},
 ];}
 
@@ -14376,6 +14408,7 @@ function viewLiveHub(){
   } else if(lb.type==="cloud"){
     extra='<div class="field"><label>'+esc(t("live_max_words"))+'</label><input id="lb-multi" class="input" type="number" min="1" max="10" value="'+(lb.multi||1)+'" style="max-width:130px"></div>'+'<div class="field"><label>'+esc(t("live_filter"))+'</label><div class="seg"><button class="seg-btn'+(!lb.filter?" on":"")+'" data-action="livefilterset" data-v="0">'+esc(t("live_filter_off"))+'</button><button class="seg-btn'+(lb.filter?" on":"")+'" data-action="livefilterset" data-v="1">'+esc(t("live_filter_on"))+'</button></div><div class="join-hint">'+esc(t("live_filter_hint"))+'</div></div>';
   }
+  const examplesRow='<div class="field"><label>'+esc(t("live_examples"))+'</label><div style="display:flex;flex-wrap:wrap;gap:8px">'+liveExamples(lb.type).map(function(ex,i){ return '<button class="btn btn-ghost sm" data-action="liveexample" data-type="'+lb.type+'" data-i="'+i+'">💡 '+esc(ex.label)+'</button>'; }).join("")+'</div></div>';
   const deckMode=(state.liveMode==="deck"); const surveyMode=(state.liveMode==="survey");
   const modeToggle = admin ? '<div class="live-mode-seg"><div class="seg"><button class="seg-btn'+((!deckMode&&!surveyMode)?" on":"")+'" data-action="livemode" data-v="single">'+esc(t("live_mode_single"))+'</button><button class="seg-btn'+(deckMode?" on":"")+'" data-action="livemode" data-v="deck">🎬 '+esc(t("live_mode_deck"))+'</button><button class="seg-btn'+(surveyMode?" on":"")+'" data-action="livemode" data-v="survey">📝 '+esc(t("live_mode_survey"))+'</button></div></div>' : '';
   let hostCard;
@@ -14386,7 +14419,7 @@ function viewLiveHub(){
       +'<div class="field"><label>'+esc(t("deck_title"))+'</label><input id="deck-title" class="input" maxlength="200" placeholder="'+esc(t("deck_title_ph"))+'" value="'+esc(state.deck.title||"")+'"></div>'
       +'<div class="deck-added-h">🎬 '+esc(t("deck_slides"))+' ('+dsl.length+')</div>'+list
       +'<div class="deck-compose"><div class="deck-compose-h">'+esc(t("deck_add_new"))+'</div>'
-        +'<div class="field"><label>'+esc(t("live_prompt"))+'</label><input id="lb-prompt" class="input" maxlength="200" placeholder="'+esc(t("live_prompt_ph"))+'" value="'+esc(lb.prompt||"")+'"></div>'+extra
+        +'<div class="field"><label>'+esc(t("live_prompt"))+'</label><input id="lb-prompt" class="input" maxlength="200" placeholder="'+esc(t("live_prompt_ph"))+'" value="'+esc(lb.prompt||"")+'"></div>'+examplesRow+extra
         +'<button class="btn btn-ghost btn-block" data-action="deckadd">➕ '+esc(t("deck_add_slide"))+'</button></div>'
       +'<div class="deck-added-h" style="margin-top:14px">'+esc(t("deck_templates"))+'</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">'+deckTemplates().map(function(tp){return '<button class="btn btn-ghost sm" data-action="decktpl" data-id="'+tp.id+'">📋 '+esc(tp.btn)+'</button>';}).join("")+'</div>'
       +'<div class="deck-io"><button class="btn btn-ghost sm" data-action="deckexport"'+(dsl.length<1?' disabled':'')+'>⬇ '+esc(t("deck_export"))+'</button><button class="btn btn-ghost sm" data-action="deckimport">⬆ '+esc(t("deck_import"))+'</button><input type="file" id="deck-file" accept="application/json,.json" style="display:none"></div>'
@@ -14398,9 +14431,10 @@ function viewLiveHub(){
       +'<div class="field"><label>'+esc(t("sv_questions"))+'</label><textarea id="sv-text" class="textarea" rows="6" placeholder="'+esc(t("sv_questions_ph"))+'">'+esc(sv.text||"")+'</textarea><div class="join-hint">'+esc(t("sv_questions_hint"))+'</div></div>'
       +'<div class="field"><label>'+esc(t("live_max_words"))+'</label><input id="sv-multi" class="input" type="number" min="1" max="5" value="'+(sv.multi||1)+'" style="max-width:130px"></div>'
       +'<div class="field"><label>'+esc(t("live_filter"))+'</label><div class="seg"><button class="seg-btn'+(!sv.filter?" on":"")+'" data-action="svfilter" data-v="0">'+esc(t("live_filter_off"))+'</button><button class="seg-btn'+(sv.filter?" on":"")+'" data-action="svfilter" data-v="1">'+esc(t("live_filter_on"))+'</button></div></div>'
+      +'<div class="field"><label>'+esc(t("sv_templates"))+'</label><div style="display:flex;flex-wrap:wrap;gap:8px">'+surveyTemplates().map(function(tp){return '<button class="btn btn-ghost sm" data-action="svtemplate" data-id="'+tp.id+'">📋 '+esc(tp.btn)+'</button>';}).join("")+'</div></div>'
       +'<button class="btn btn-primary btn-block" data-action="svlaunch">🚀 '+esc(t("live_launch"))+'</button>'
     +'</div>'; }
-  else { hostCard='<div class="panel"><div class="field"><label>'+esc(t("live_prompt"))+'</label><input id="lb-prompt" class="input" maxlength="200" placeholder="'+esc(t("live_prompt_ph"))+'" value="'+esc(lb.prompt||"")+'"></div>'+extra+'<button class="btn btn-primary btn-block" data-action="livestart">🚀 '+esc(t("live_launch"))+'</button></div>'; }
+  else { hostCard='<div class="panel"><div class="field"><label>'+esc(t("live_prompt"))+'</label><input id="lb-prompt" class="input" maxlength="200" placeholder="'+esc(t("live_prompt_ph"))+'" value="'+esc(lb.prompt||"")+'"></div>'+examplesRow+extra+'<button class="btn btn-primary btn-block" data-action="livestart">🚀 '+esc(t("live_launch"))+'</button></div>'; }
   return '<div class="wrap">'
     +'<a class="backlink" data-action="home">← '+esc(t("back_home"))+'</a>'
     +'<div class="page-head"><div><h2>📡 '+esc(t("live_title"))+'</h2><div class="sub">'+esc(t("live_sub"))+'</div></div></div>'
@@ -14414,10 +14448,67 @@ function viewLiveHub(){
 function afterLiveHub(){ const el=document.getElementById("lb-join"); if(el){ el.addEventListener("keydown",ev=>{ if(ev.key==="Enter"){ ev.preventDefault(); const v=(el.value||"").trim(); if(v) openJoin(v); else toast(t("live_need_code")); } }); }
   const df=document.getElementById("deck-file"); if(df && !df._b){ df._b=true; df.addEventListener("change",ev=>{ const file=ev.target.files&&ev.target.files[0]; if(file) deckImportFile(file); ev.target.value=""; }); } }
 function deckIcon(tp){ return ({cloud:"☁️",poll:"📊",qa:"💬",rating:"⭐",rank:"🔢",scale:"📈",points:"🎯"})[tp]||"•"; }
-function deckTemplates(){ return [{"id": "asfan_a", "btn": "ASFAN A · Așteptări (început)", "deck": {"title": "ASFAN · Seara OZN/UAP — Dorințe & așteptări", "slides": [{"type": "poll", "prompt": "De ce te-ai alăturat în această seară?", "options": ["Curiozitate despre OZN / fenomene aeriene neidentificate", "Interes pentru contactul cu inteligențe non-umane", "Comunitatea și prietenii din ASFAN", "Subiectele științifice și astronomice"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Într-un singur cuvânt: ce aștepți de la seara aceasta?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Ce subiect te-ar atrage cel mai mult?", "options": ["Observații OZN / UAP recente", "Căutarea vieții și programele SETI", "Protocoale de contact (Om · IA · NHI)", "SF și imaginarul despre întâlnirea cu Celălalt"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "rating", "prompt": "Cât de familiar ești cu ufologia? (0 = total novice, 10 = cercetător / practician)", "options": [], "statements": [], "scale": 10, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Ce întrebare ai vrea să primească răspuns în seara aceasta?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Cum ți-ar plăcea să arate viitoarele întâlniri ASFAN?", "options": ["Prezentări de la invitați + sesiune de întrebări", "Discuții libere, de grup", "Ateliere practice", "Observații / vizionări comune"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}]}}, {"id": "asfan_b", "btn": "ASFAN B · Feedback (final)", "deck": {"title": "ASFAN · Seara OZN/UAP — Feedback prezentări", "slides": [{"type": "rating", "prompt": "Cum evaluezi, în ansamblu, prezentările de azi? (1 = de îmbunătățit, 5 = excelente)", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Care prezentare ți-a plăcut cel mai mult?", "options": ["⟨Titlu prezentare 1⟩", "⟨Titlu prezentare 2⟩", "⟨Titlu prezentare 3⟩", "⟨Titlu prezentare 4⟩"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Informația a fost clară și ușor de urmărit?", "options": ["Foarte clară", "Destul de clară", "Pe alocuri confuză", "Greu de urmărit"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Ritmul întâlnirii ți s-a părut…?", "options": ["Prea lent", "Potrivit", "Prea alert"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Un singur cuvânt care descrie seara de azi.", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "qa", "prompt": "Ce ai schimba sau adăuga pentru data viitoare?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": true}, {"type": "poll", "prompt": "Ai recomanda o întâlnire ASFAN unui prieten?", "options": ["Cu siguranță da", "Probabil da", "Poate", "Probabil nu"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}]}}]; }
+function deckTemplates(){ return [{"id": "asfan_a", "btn": "ASFAN A · Așteptări (început)", "deck": {"title": "ASFAN · Seara OZN/UAP — Dorințe & așteptări", "slides": [{"type": "poll", "prompt": "De ce te-ai alăturat în această seară?", "options": ["Curiozitate despre OZN / fenomene aeriene neidentificate", "Interes pentru contactul cu inteligențe non-umane", "Comunitatea și prietenii din ASFAN", "Subiectele științifice și astronomice"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Într-un singur cuvânt: ce aștepți de la seara aceasta?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Ce subiect te-ar atrage cel mai mult?", "options": ["Observații OZN / UAP recente", "Căutarea vieții și programele SETI", "Protocoale de contact (Om · IA · NHI)", "SF și imaginarul despre întâlnirea cu Celălalt"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "rating", "prompt": "Cât de familiar ești cu ufologia? (0 = total novice, 10 = cercetător / practician)", "options": [], "statements": [], "scale": 10, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Ce întrebare ai vrea să primească răspuns în seara aceasta?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Cum ți-ar plăcea să arate viitoarele întâlniri ASFAN?", "options": ["Prezentări de la invitați + sesiune de întrebări", "Discuții libere, de grup", "Ateliere practice", "Observații / vizionări comune"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}]}}, {"id": "asfan_b", "btn": "ASFAN B · Feedback (final)", "deck": {"title": "ASFAN · Seara OZN/UAP — Feedback prezentări", "slides": [{"type": "rating", "prompt": "Cum evaluezi, în ansamblu, prezentările de azi? (1 = de îmbunătățit, 5 = excelente)", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Care prezentare ți-a plăcut cel mai mult?", "options": ["⟨Titlu prezentare 1⟩", "⟨Titlu prezentare 2⟩", "⟨Titlu prezentare 3⟩", "⟨Titlu prezentare 4⟩"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Informația a fost clară și ușor de urmărit?", "options": ["Foarte clară", "Destul de clară", "Pe alocuri confuză", "Greu de urmărit"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Ritmul întâlnirii ți s-a părut…?", "options": ["Prea lent", "Potrivit", "Prea alert"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Un singur cuvânt care descrie seara de azi.", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "qa", "prompt": "Ce ai schimba sau adăuga pentru data viitoare?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": true}, {"type": "poll", "prompt": "Ai recomanda o întâlnire ASFAN unui prieten?", "options": ["Cu siguranță da", "Probabil da", "Poate", "Probabil nu"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}]}}, {"id": "generic_workshop", "btn": "Curs/Atelier · Deschidere & feedback", "deck": {"title": "Curs/Atelier — Deschidere & feedback final", "slides": [{"type": "poll", "prompt": "De ce ai venit azi la acest curs/atelier?", "options": ["Să învăț ceva nou", "Interes pentru subiect", "Recomandare de la cineva", "Fac parte din curriculum/echipă"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Într-un cuvânt: ce aștepți de la sesiunea de azi?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "rating", "prompt": "Cât de familiar ești deja cu subiectul? (0 = deloc, 10 = expert)", "options": [], "statements": [], "scale": 10, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "scale", "prompt": "Cât de mult ești de acord cu afirmațiile despre sesiunea de azi?", "options": [], "statements": ["Explicațiile au fost clare", "Ritmul a fost potrivit", "Exemplele au fost utile", "Am avut timp să pun întrebări"], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "qa", "prompt": "Ce întrebări ai rămas la final?", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "poll", "prompt": "Cum ai evalua, per ansamblu, sesiunea de azi?", "options": ["Excelentă", "Bună", "Satisfăcătoare", "Slabă"], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}, {"type": "cloud", "prompt": "Un singur cuvânt care descrie experiența de azi.", "options": [], "statements": [], "scale": 5, "budget": 100, "multi": 1, "mod": false, "filter": false}]}}]; }
 function loadDeckTemplate(id){ var tpl=deckTemplates().find(function(x){return x.id===id;}); if(!tpl) return;
   state.deck={ title:tpl.deck.title, slides:tpl.deck.slides.map(function(sl){ return { type:sl.type, prompt:sl.prompt, options:(sl.options||[]).slice(), statements:(sl.statements||[]).slice(), scale:sl.scale||5, budget:sl.budget||100, multi:sl.multi||1, mod:!!sl.mod, filter:!!sl.filter }; }) };
   state.liveMode="deck"; render(); toast(t("deck_imported", state.deck.slides.length)); }
+/* ---- quick-start examples for single-shot audience activities (poll/rank/points/cloud/qa/rating/scale) ---- */
+function liveExamples(type){
+  const EX={
+    poll:[
+      {label:"Curs: ce a fost util azi?", prompt:"Ce parte a lecției de azi ți s-a părut cea mai utilă?", options:["Exemplele practice","Explicația teoretică","Discuția de grup","Exercițiile individuale"]},
+      {label:"ASFAN: temă preferată", prompt:"Ce subiect te-ar interesa cel mai mult la următoarea întâlnire ASFAN?", options:["Observații astronomice","OZN-uri și fenomene aeriene neidentificate","Călătorii spațiale","Căutarea vieții extraterestre (SETI)"]},
+      {label:"Echipă: canal de comunicare", prompt:"Cum preferi să comunicăm în echipă pentru subiectele urgente?", options:["Mesagerie instant (chat)","E-mail","Apel video","Discuție față în față"]}
+    ],
+    rank:[
+      {label:"Priorități quiz reușit", prompt:"Ordonează, după cât de importante ți se par, aceste calități ale unui quiz reușit:", options:["Întrebări clare","Timp suficient de gândire","Punctaj corect","Aspect vizual / distracție"]},
+      {label:"ASFAN: subiecte preferate", prompt:"Ordonează aceste subiecte astronomice după cât de mult te atrag:", options:["Exoplanete","Găuri negre","Programul spațial românesc","Viață extraterestră"]},
+      {label:"Retro eveniment", prompt:"Ordonează momentele evenimentului de azi, de la cel mai reușit la cel mai puțin reușit:", options:["Deschiderea","Prezentările","Sesiunea de întrebări","Networking-ul final"]}
+    ],
+    points:[
+      {label:"Buget priorități clasă", prompt:"Ai 100 de puncte de investit — cum le-ai împărți între aceste priorități pentru semestrul viitor?", options:["Mai multe teme practice","Mai multe recapitulări","Mai multe proiecte de grup","Mai multă teorie"]},
+      {label:"Buget echipă", prompt:"Împarte 100 de puncte între aceste direcții pentru bugetul echipei anul viitor:", options:["Formare & cursuri","Echipamente noi","Evenimente de echipă","Unelte software"]},
+      {label:"ASFAN: cicluri viitoare", prompt:"Ai 100 de puncte — cum le-ai distribui între aceste teme pentru viitorul ciclu de întâlniri ASFAN?", options:["Observații practice cu telescopul","Prelegeri teoretice","Dezbateri OZN/UAP","Proiecte SF & creativitate"]}
+    ],
+    cloud:[
+      {label:"Stare înainte de test", prompt:"Într-un singur cuvânt: cum te simți în legătură cu testul de mâine?", multi:1},
+      {label:"Asocieri: spațiu", prompt:"Ce cuvinte îți vin în minte când te gândești la spațiu?", multi:3},
+      {label:"Echipa în 3 cuvinte", prompt:"Descrie echipa noastră în trei cuvinte.", multi:3}
+    ],
+    qa:[
+      {label:"Întrebări pentru invitat", prompt:"Ce întrebări aveți pentru invitatul nostru?", mod:true, filter:false},
+      {label:"Neclarități din lecție", prompt:"Ce nu ați înțeles din lecția de azi? Întrebați aici, anonim.", mod:false, filter:false},
+      {label:"ASFAN: idei pentru viitor", prompt:"Idei și sugestii pentru următorul eveniment ASFAN", mod:false, filter:true}
+    ],
+    rating:[
+      {label:"Utilitate prezentare", prompt:"Cât de utilă a fost prezentarea de azi?", scale:5},
+      {label:"NPS curs", prompt:"Cât de probabil ești să recomanzi acest curs unui prieten sau coleg?", scale:10},
+      {label:"Claritate proces nou", prompt:"Cât de clar a fost explicat noul mod de lucru?", scale:5}
+    ],
+    scale:[
+      {label:"Evaluare curs (Likert)", prompt:"Cât de mult ești de acord cu următoarele afirmații despre curs?", statements:["Materialele au fost clare","Ritmul a fost potrivit","Am primit feedback util","Aș recomanda acest curs altcuiva"]},
+      {label:"Retro sprint echipă", prompt:"Evaluează afirmațiile despre ultimul sprint:", statements:["Obiectivele au fost clare","Comunicarea în echipă a fost bună","Am avut resursele necesare","Termenele au fost realiste"]},
+      {label:"ASFAN: seara de azi", prompt:"Cât de mult ești de acord cu următoarele, despre seara de azi?", statements:["Subiectele au fost interesante","Timpul de discuții a fost suficient","Organizarea a fost bună","Aș reveni la un eveniment similar"]}
+    ]
+  };
+  return EX[type]||[];
+}
+function loadLiveExample(type,i){ const ex=(liveExamples(type)||[])[i]; if(!ex) return; syncBuilder(); const lb=state.liveBuilder;
+  lb.prompt=ex.prompt||""; lb.options=(ex.options||["",""]).slice(); lb.statements=(ex.statements||["",""]).slice();
+  lb.scale=ex.scale||5; lb.budget=ex.budget||100; lb.multi=ex.multi||1; lb.mod=!!ex.mod; lb.filter=!!ex.filter;
+  render(); toast(t("live_example_loaded")); }
+/* ---- quick-start templates for the "Chestionar feedback" (survey) mode ---- */
+function surveyTemplates(){ return [
+  {id:"sv_course", btn:"Feedback curs", title:"Feedback curs", multi:1, filter:false,
+   questions:["Ce ți-a plăcut cel mai mult la curs?","Ce ai schimba pentru viitor?","Ce subiect ai vrea aprofundat?"]},
+  {id:"sv_event", btn:"Evaluare eveniment", title:"Evaluare eveniment", multi:1, filter:false,
+   questions:["Ce a fost cel mai valoros pentru tine astăzi?","Ce a lipsit sau ce ai adăuga?","Ai recomanda acest eveniment unui prieten? De ce?"]},
+  {id:"sv_asfan", btn:"Feedback întâlnire ASFAN", title:"Feedback întâlnire ASFAN", multi:1, filter:true,
+   questions:["Ce temă ți-a plăcut cel mai mult?","Ce ai vrea să discutăm data viitoare?","O propunere pentru un invitat sau un subiect nou"]}
+]; }
+function loadSurveyTemplate(id){ const tpl=surveyTemplates().find(function(x){return x.id===id;}); if(!tpl) return;
+  state.survey={ title:tpl.title, text:tpl.questions.join("\n"), multi:tpl.multi||1, filter:!!tpl.filter };
+  render(); toast(t("sv_tpl_loaded", tpl.questions.length)); }
 function deckAdd(){ syncBuilder(); const lb=state.liveBuilder;
   if(!lb.prompt.trim()){ toast(t("live_need_prompt")); return; }
   const sl={ type:lb.type, prompt:lb.prompt.trim(), scale:lb.scale||5, budget:lb.budget||100, multi:lb.multi||1, mod:!!lb.mod, filter:!!lb.filter, options:[], statements:[] };
@@ -14918,6 +15009,7 @@ document.addEventListener("click",(e)=>{
     case "decklaunch": syncBuilder(); createDeck(); break;
     case "svlaunch": createSurvey(); break;
     case "svfilter": if(state.survey) state.survey.filter=(v==="1"); render(); break;
+    case "svtemplate": loadSurveyTemplate(el.dataset.id); break;
     case "golivesurvey": state.liveMode="survey"; state.screen="livehub"; render(); break;
     case "livemodset": syncBuilder(); state.liveBuilder.mod=(v==="1"); render(); break;
     case "liveapprove": liveControl("approve", el.dataset.id); break;
@@ -14926,6 +15018,7 @@ document.addEventListener("click",(e)=>{
     case "deckprev": liveControl("prev"); break;
     case "decknext": liveControl("next"); break;
     case "livetype": syncBuilder(); state.liveBuilder.type=v; render(); break;
+    case "liveexample": loadLiveExample(el.dataset.type, parseInt(el.dataset.i,10)); break;
     case "liveaddopt": syncBuilder(); if(state.liveBuilder.options.length<10) state.liveBuilder.options.push(""); render(); break;
     case "livermopt": { syncBuilder(); const i=parseInt(el.dataset.i,10); if(state.liveBuilder.options.length>2) state.liveBuilder.options.splice(i,1); render(); break; }
     case "livestart": liveStart(); break;
