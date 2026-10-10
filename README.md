@@ -38,6 +38,7 @@ Undava este un joc de quiz: creezi propriile quiz-uri și joci singur sau cu pri
 - **Rețea:** pagina nu încarcă scripturi, fonturi sau imagini de pe alte site-uri (CSP: `default-src 'self'`, `connect-src 'self'`). Singurul `fetch` din cod este către `index.php?asset=manifest` de pe același site, folosit când deschizi „ediția server”; pe un host static care nu rulează PHP această verificare eșuează și aplicația afișează un ghid de instalare.
 - Metaetichetele Open Graph indică imagini de pe `chiuta.github.io` pentru previzualizarea linkului; ele sunt citite de platformele care afișează linkul, nu de aplicație.
 - Ediția `index.php` (dacă o găzduiești) are propriul server, parolă de administrator și fișier de feedback; ea nu face parte din pagina statică.
+- Atenție la ediția `index.php`: ea **stochează date pe server** (quiz-uri, feedback-ul vizitatorilor în `data/feedback.txt`), deci sloganul „fără telemetrie” se aplică la ce trimite aplicația către terți, nu la datele pe care serverul tău le primește. Pe o instanță proaspăt instalată, **primul vizitator care setează parola devine administrator**: setează parola imediat după instalare.
 
 ## Rulare locală / offline
 
@@ -54,3 +55,7 @@ Alexio — Alexandru-Ionuț Chiuță, contact: alexio@trom.tf
 ## English summary
 
 Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: create quizzes with four question types, play Solo or pass-and-play, import/export JSON, and use a random wheel. 7-language UI. Quizzes are kept in localStorage; the static page makes no third-party requests. A separate PHP server edition (`index.php`) in the repo adds the features that need a server.
+
+## Audit
+
+Audit: 2026-10-10 — verificat în browser (fără erori JS, axe WCAG 2.1 AA pe toate ecranele — acasă, bibliotecă, editor, joc, roată, ghid, import, setări — 0 probleme serious/critical după corectarea etichetelor din editor, a contrastului și a cuprinsului ghidului); `index.php` trece `php -l`, iar aceleași corecturi sunt aplicate și în ediția PHP.

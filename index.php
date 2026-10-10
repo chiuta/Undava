@@ -1069,7 +1069,7 @@ $QFF_CLIENT=array(
 :root{
   --ink:#16092e; --ink2:#241046; --ink3:#2f1659;
   --paper:#fdf7ff; --paper2:#f1e8fb;
-  --text:#ffffff; --muted:#b7a8da; --muted2:#8c7bb6;
+  --text:#ffffff; --muted:#b7a8da; --muted2:#9a8cc6;
   --line:rgba(255,255,255,.12);
   --accent:#ffd23f;   /* gold marquee */
   --accent2:#ff4e8a;  /* hot pink */
@@ -1151,8 +1151,8 @@ input,textarea,select{font-family:inherit}
 .btn:active{transform:translateY(3px)}
 .btn-primary{background:var(--accent);color:#2a1000;box-shadow:0 6px 0 #c79a17}
 .btn-primary:active{box-shadow:0 3px 0 #c79a17}
-.btn-pink{background:var(--accent2);color:#fff;box-shadow:0 6px 0 #c12d63}
-.btn-pink:active{box-shadow:0 3px 0 #c12d63}
+.btn-pink{background:#d92a68;color:#fff;box-shadow:0 6px 0 #a3235a}
+.btn-pink:active{box-shadow:0 3px 0 #a3235a}
 .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid var(--line);box-shadow:none}
 .btn-ghost:active{transform:translateY(2px)}
 .btn-teal{background:var(--teal);color:#04332b;box-shadow:0 6px 0 #1fae93}
@@ -1163,7 +1163,7 @@ input,textarea,select{font-family:inherit}
 .btn[disabled]{opacity:.45;pointer-events:none}
 .feat{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:42px;color:var(--muted2);font-size:13px;font-weight:600}
 .tf-foot{max-width:640px;margin:38px auto 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:22px;border-top:1px solid var(--line)}
-.tf-badge{display:inline-block;font-weight:800;font-size:13px;letter-spacing:.03em;color:#18bd6b;background:rgba(24,189,107,.12);border:1px solid rgba(24,189,107,.32);border-radius:999px;padding:6px 16px;text-decoration:none}
+.tf-badge{display:inline-block;font-weight:800;font-size:13px;letter-spacing:.03em;color:#5df0a8;background:rgba(24,189,107,.12);border:1px solid rgba(24,189,107,.32);border-radius:999px;padding:6px 16px;text-decoration:none}
 .tf-badge:hover{background:rgba(24,189,107,.2)}
 .tf-desc{color:var(--muted);font-size:13px;line-height:1.5;max-width:520px}
 .tf-links{display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:center;align-items:center;font-size:14px;font-weight:700}
@@ -1930,7 +1930,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .help-book.on{background:var(--accent);color:#2a1000;border-color:var(--accent);box-shadow:0 2px 10px rgba(255,210,63,.25)}
 .help-layout{display:grid;grid-template-columns:230px 1fr;gap:26px;align-items:start}
 .help-toc{position:sticky;top:16px;display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 40px);overflow:auto;border-right:1px solid var(--line,#2a2350);padding-right:12px}
-.help-toc-item{font-size:13px;font-weight:700;color:var(--muted,#9a93c0);padding:6px 8px;border-radius:7px;cursor:pointer;text-decoration:none;line-height:1.3;transition:background .12s}
+.help-toc-item{background:none;border:0;font-family:inherit;text-align:left;font-size:13px;font-weight:700;color:var(--muted,#9a93c0);padding:6px 8px;border-radius:7px;cursor:pointer;text-decoration:none;line-height:1.3;transition:background .12s}
 .help-toc-item:hover{background:rgba(255,255,255,.08);color:#fff}
 .md-body{min-width:0;line-height:1.65;font-size:15px}
 .md-body .md-h1{font-size:26px;font-weight:900;margin:0 0 6px;line-height:1.2}
@@ -12980,7 +12980,7 @@ function viewHelp(){
   var book=state.helpBook||"user"; var hasEli5=!!document.getElementById("manual-eli5"); if(book==="admin"&&!hasAdmin) book="user"; if(book==="eli5"&&!hasEli5) book="user";
   var lang=state.lang||"ro"; var el=document.getElementById("manual-"+book+"-"+lang)||document.getElementById("manual-"+book); var md=el?el.textContent:"";
   var toc=[]; md.replace(/\r\n/g,"\n").split("\n").forEach(function(l){ var m=l.match(/^##\s+(.*)$/); if(m) toc.push(m[1]); });
-  var tocHtml=toc.map(function(x){ return '<a class="help-toc-item" data-action="mdjump" data-t="mdh-'+mdSlug(x)+'">'+esc(x)+'</a>'; }).join("");
+  var tocHtml=toc.map(function(x){ return '<button type="button" class="help-toc-item" data-action="mdjump" data-t="mdh-'+mdSlug(x)+'">'+esc(x)+'</button>'; }).join("");
   var _books=[]; if(hasEli5)_books.push(["eli5","\ud83c\udfae",t("help_book_eli5")]); _books.push(["user","\ud83d\udcd8",t("help_book_user")]); if(hasAdmin)_books.push(["admin","\ud83d\udd27",t("help_book_admin")]);
   var switcher=_books.length>1?('<div class="help-books">'+_books.map(function(x){return '<button class="help-book'+(book===x[0]?" on":"")+'" data-action="helpbook" data-b="'+x[0]+'">'+x[1]+' '+esc(x[2])+'</button>';}).join("")+'</div>'):'';
   return '<div class="wrap help-wrap">'
@@ -13125,23 +13125,23 @@ function questionEditor(qq,i,times){
     body=`<div class="num-rows"><div class="num-row"><label class="num-lbl">${esc(t("num_target"))}</label><input class="input num-target" data-q="${i}" inputmode="decimal" placeholder="${esc(t("num_target_ph"))}" value="${esc(qq.answers[0]?qq.answers[0].text:"")}" maxlength="18"></div><div class="num-row"><label class="num-lbl">${esc(t("num_tol"))}</label><span class="num-pm">±</span><input class="input num-tol" data-q="${i}" inputmode="decimal" placeholder="0" value="${esc(qq.tol!=null?String(qq.tol):"0")}" maxlength="12"></div></div><div class="acc-hint">💡 ${esc(t("num_hint"))}</div>`;
   } else {
     const ansRows=qq.answers.map((a,j)=>{ const txt=tf?(j===0?t("tf_true"):t("tf_false")):a.text;
-      return `<div class="ans-row"><div class="shape sc${j+1}">${SHAPES[j]}</div><input class="input ans-text" data-q="${i}" data-a="${j}" placeholder="${esc(t("answer_ph"))}" value="${esc(txt)}" ${tf?"readonly":""} maxlength="90"><div class="corr"><input type="radio" name="corr-${i}" data-q="${i}" data-a="${j}" class="corr-radio" ${a.correct?"checked":""}><label>${esc(t("correct"))}</label></div>${(!tf && qq.answers.length>2)?`<button class="rm" data-action="rmans" data-q="${i}" data-a="${j}" title="✕">✕</button>`:`<span style="width:36px"></span>`}</div>`; }).join("");
+      return `<div class="ans-row"><div class="shape sc${j+1}">${SHAPES[j]}</div><input class="input ans-text" data-q="${i}" data-a="${j}" placeholder="${esc(t("answer_ph"))}" value="${esc(txt)}" ${tf?"readonly":""} maxlength="90"><div class="corr"><input type="radio" name="corr-${i}" data-q="${i}" data-a="${j}" class="corr-radio" id="corr-${i}-${j}" ${a.correct?"checked":""}><label for="corr-${i}-${j}">${esc(t("correct"))}</label></div>${(!tf && qq.answers.length>2)?`<button class="rm" data-action="rmans" data-q="${i}" data-a="${j}" title="✕">✕</button>`:`<span style="width:36px"></span>`}</div>`; }).join("");
     body=`<div class="ans-rows">${ansRows}</div>${(!tf && qq.answers.length<4)?`<button class="btn btn-ghost" style="margin-top:10px;font-size:14px;padding:9px 16px" data-action="addans" data-q="${i}">${esc(t("add_answer"))}</button>`:""}`;
   }
   return `<div class="qedit" data-qi="${i}">
     <div class="qhead">
       <span class="qnum">${esc(t("question_n",i+1))}</span>
       <div class="spacer"></div>
-      <select class="select" style="width:auto;min-width:150px;padding:9px 36px 9px 12px;font-size:14px" data-action="qtype" data-q="${i}">
+      <select class="select" style="width:auto;min-width:150px;padding:9px 36px 9px 12px;font-size:14px" data-action="qtype" data-q="${i}" aria-label="${esc(t("question_n",i+1))}">
         <option value="quiz" ${(!tf&&!isType&&!isNum)?"selected":""}>${esc(t("type_quiz"))}</option>
         <option value="tf" ${tf?"selected":""}>${esc(t("type_tf"))}</option>
         <option value="type" ${isType?"selected":""}>${esc(t("type_type"))}</option>
         <option value="num" ${isNum?"selected":""}>${esc(t("type_num"))}</option>
       </select>
-      <select class="select" style="width:auto;padding:9px 34px 9px 12px;font-size:14px" data-action="qtime" data-q="${i}">
+      <select class="select" style="width:auto;padding:9px 34px 9px 12px;font-size:14px" data-action="qtime" data-q="${i}" aria-label="${esc(t("question_n",i+1))}">
         ${times.map(s=>`<option value="${s}" ${qq.time===s?"selected":""}>${s}${esc(t("sec"))}</option>`).join("")}
       </select>
-      <select class="select" style="width:auto;padding:9px 34px 9px 12px;font-size:14px" data-action="qpoints" data-q="${i}">
+      <select class="select" style="width:auto;padding:9px 34px 9px 12px;font-size:14px" data-action="qpoints" data-q="${i}" aria-label="${esc(t("question_n",i+1))}">
         <option value="1000" ${qq.points===1000?"selected":""}>${esc(t("pts_std"))}</option>
         <option value="2000" ${qq.points===2000?"selected":""}>${esc(t("pts_dbl"))}</option>
       </select>
