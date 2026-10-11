@@ -15,6 +15,7 @@ Undava este un joc de quiz: creezi propriile quiz-uri și joci singur sau cu pri
 ## Funcții
 
 - **Joacă:** bibliotecă de quiz-uri (cu quiz-uri demonstrative), căutare și sortare (Implicit, Nume A-Z, Nr. întrebări), moduri de joc **Solo** și **Pe rând** (mai mulți jucători pe același dispozitiv), amestecarea întrebărilor și a variantelor, recapitulare a răspunsurilor la final.
+- **Record personal** pe quiz (modul Solo): cel mai bun scor este salvat local și apare pe cardul quiz-ului; la final apare „Record nou!” când îl depășești, iar butonul **Repetă greșelile** reia doar întrebările la care ai greșit (fără a modifica recordul).
 - **Creează:** editor de quiz cu titlu și descriere, patru tipuri de întrebări — Grilă (4 variante), Adevărat / Fals, Răspuns liber (cu variante acceptate), Numeric (cu toleranță) —, punctaj Standard sau Dublu, durată per întrebare, duplicarea întrebărilor.
 - **Importă / Exportă** quiz-uri ca fișiere JSON („Exportă”, „Salvează toate”, „Importă”), printare.
 - **Roata norocului:** selector aleatoriu din nume sau opțiuni (Învârte, Amestecă, Resetează, opțiunea de eliminare a câștigătorului).
@@ -36,7 +37,7 @@ Undava este un joc de quiz: creezi propriile quiz-uri și joci singur sau cu pri
 
 ## Confidențialitate și rețea
 
-- **Stocare locală:** `localStorage`, cheia `quizfarafrontiere_v1` (quiz-urile tale, limba, setarea de sunet etc.) și `quizfarafrontiere_v1_spin` (elementele Roții). Dacă ștergi datele site-ului, quiz-urile locale se pierd; folosește exportul JSON.
+- **Stocare locală:** `localStorage`, cheia `quizfarafrontiere_v1` (quiz-urile tale, limba, setarea de sunet etc.), `quizfarafrontiere_v1_spin` (elementele Roții) și `quizfarafrontiere_v1_best` (recordurile personale). Dacă ștergi datele site-ului, quiz-urile locale se pierd; folosește exportul JSON.
 - **Rețea:** pagina nu încarcă scripturi, fonturi sau imagini de pe alte site-uri (CSP: `default-src 'self'`, `connect-src 'self'`). Singurul `fetch` din cod este către `index.php?asset=manifest` de pe același site, folosit când deschizi „ediția server”; pe un host static care nu rulează PHP această verificare eșuează și aplicația afișează un ghid de instalare.
 - Metaetichetele Open Graph indică imagini de pe `chiuta.github.io` pentru previzualizarea linkului; ele sunt citite de platformele care afișează linkul, nu de aplicație.
 - Ediția `index.php` (dacă o găzduiești) are propriul server, parolă de administrator și fișier de feedback; ea nu face parte din pagina statică.
@@ -69,4 +70,5 @@ Audit: 2026-10-10 (rundă 2: 2026-10-11, cheie de instalare pentru administrator
 
 ## Istoric / Changelog
 
+- **11 octombrie 2026** — recorduri personale pe quiz în modul Solo, buton „Repetă greșelile” la final (texte în cele 7 limbi); testat în browser (0 erori JS, axe-core 0 violări la 1280×800 și 360×740).
 - **11 octombrie 2026** — rundă de verificare: reverificat în browser (fără erori JS, axe-core 0 violări la 1280×800 și 360×740, fără depășire orizontală); nu au fost necesare modificări de cod în `index.html`. Aplicația nu are număr de versiune.

@@ -367,6 +367,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .pod.p1{order:2} .pod.p2{order:1} .pod.p3{order:3}
 @keyframes rise{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
 .rest-list{width:100%;max-width:460px;display:grid;gap:8px}
+.new-best{text-align:center;font-weight:900;font-size:18px;color:var(--accent)}
 .solo-stats{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .stat{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:16px;padding:16px 22px;text-align:center;min-width:120px}
 .stat .v{font-size:32px;font-weight:900;color:var(--accent)}
@@ -5040,6 +5041,10 @@ const I18N = {
     "stat_acc": "Acuratețe",
     "stat_streak": "Serie max",
     "play_again": "Joacă din nou",
+    "best_label": "Record personal",
+    "new_best": "Record nou!",
+    "retry_wrong": "Repetă greșelile",
+    "best_short": "Record",
     "podium_title": "Felicitări!",
     "winner_is": "Câștigător",
     "type_need_answer": "Scrie un răspuns.",
@@ -5212,6 +5217,10 @@ const I18N = {
     "stat_acc": "Accuracy",
     "stat_streak": "Best streak",
     "play_again": "Play again",
+    "best_label": "Personal best",
+    "new_best": "New personal best!",
+    "retry_wrong": "Retry mistakes",
+    "best_short": "Best",
     "podium_title": "Congratulations!",
     "winner_is": "Winner",
     "type_need_answer": "Type an answer.",
@@ -5384,6 +5393,10 @@ const I18N = {
     "stat_acc": "Précision",
     "stat_streak": "Meilleure série",
     "play_again": "Rejouer",
+    "best_label": "Meilleur score",
+    "new_best": "Nouveau record !",
+    "retry_wrong": "Refaire les erreurs",
+    "best_short": "Record",
     "podium_title": "Félicitations !",
     "winner_is": "Gagnant",
     "type_need_answer": "Écris une réponse.",
@@ -5556,6 +5569,10 @@ const I18N = {
     "stat_acc": "Precisione",
     "stat_streak": "Serie migliore",
     "play_again": "Gioca ancora",
+    "best_label": "Record personale",
+    "new_best": "Nuovo record!",
+    "retry_wrong": "Ripeti gli errori",
+    "best_short": "Record",
     "podium_title": "Congratulazioni!",
     "winner_is": "Vincitore",
     "type_need_answer": "Scrivi una risposta.",
@@ -5728,6 +5745,10 @@ const I18N = {
     "stat_acc": "Precisión",
     "stat_streak": "Mejor racha",
     "play_again": "Jugar de nuevo",
+    "best_label": "Mejor marca",
+    "new_best": "¡Nuevo récord!",
+    "retry_wrong": "Repetir los fallos",
+    "best_short": "Récord",
     "podium_title": "¡Felicidades!",
     "winner_is": "Ganador",
     "type_need_answer": "Escribe una respuesta.",
@@ -5900,6 +5921,10 @@ const I18N = {
     "stat_acc": "Precisão",
     "stat_streak": "Melhor sequência",
     "play_again": "Jogar de novo",
+    "best_label": "Melhor marca",
+    "new_best": "Novo recorde!",
+    "retry_wrong": "Repetir os erros",
+    "best_short": "Recorde",
     "podium_title": "Parabéns!",
     "winner_is": "Vencedor",
     "type_need_answer": "Escreve uma resposta.",
@@ -6072,6 +6097,10 @@ const I18N = {
     "stat_acc": "Genauigkeit",
     "stat_streak": "Beste Serie",
     "play_again": "Nochmal spielen",
+    "best_label": "Persönlicher Rekord",
+    "new_best": "Neuer Rekord!",
+    "retry_wrong": "Fehler wiederholen",
+    "best_short": "Rekord",
     "podium_title": "Glückwunsch!",
     "winner_is": "Sieger",
     "type_need_answer": "Schreibe eine Antwort.",
@@ -6175,6 +6204,8 @@ function initStore(){
 }
 
 /* ---------------- utilities ---------------- */
+function bestLoad(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY+"_best"))||{}; }catch(e){ return {}; } }
+function bestSave(m){ try{ localStorage.setItem(STORE_KEY+"_best", JSON.stringify(m)); }catch(e){} }
 function uid(){ return "q_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 function safeColor(c){ return (typeof c==="string" && /^#[0-9a-fA-F]{3,8}$/.test(c)) ? c : "#2f6bff"; }
@@ -6418,7 +6449,7 @@ function quizCard(q){
     <div class="body">
       <h3>${esc(L(q.title))}</h3>
       <div class="desc">${esc(L(q.desc))||"&nbsp;"}</div>
-      <div class="meta"><span>📋 ${esc(t("q_count",n))}</span></div>
+      <div class="meta"><span>📋 ${esc(t("q_count",n))}</span>${(function(){ const b=bestLoad()[q.id]; return b?`<span title="${esc(t("best_label"))}">🏆 ${esc(t("best_short"))}: ${b.score}</span>`:""; })()}</div>
     </div>
     <div class="actions">
       <button class="btn btn-primary" data-action="setup" data-id="${q.id}">▶ ${esc(t("playbtn"))}</button>
@@ -6869,7 +6900,12 @@ function nextRound(){
   else { showPodium(); }
 }
 function showPodium(){
-  const p=state.play; p.phase="podium"; render();
+  const p=state.play; p.phase="podium";
+  if(p.mode==="solo" && !p.retry && p.quiz && p.quiz.id){
+    const me=p.participants[0]; const m=bestLoad(); const prev=m[p.quiz.id];
+    if(!prev || me.score>prev.score){ m[p.quiz.id]={score:me.score, correct:me.correct, total:p.quiz.questions.length}; bestSave(m); p.newBest=!!prev; }
+  }
+  render();
   Sound.fanfare();
   launchConfetti();
 }
@@ -7063,7 +7099,9 @@ function podiumView(){
         <div class="stat"><div class="v">${acc}%</div><div class="l">${esc(t("stat_acc"))}</div></div>
         <div class="stat"><div class="v">${me.best}</div><div class="l">${esc(t("stat_streak"))}</div></div>
       </div>
+      ${p.newBest?`<div class="new-best" role="status">🏆 ${esc(t("new_best"))}</div>`:""}
       <div class="cta-row">
+        ${me.correct<total?`<button class="btn btn-ghost btn-lg" data-action="retrywrong">🎯 ${esc(t("retry_wrong"))}</button>`:""}
         <button class="btn btn-ghost btn-lg" data-action="review">📋 ${esc(t("review_btn"))}</button>
         <button class="btn btn-primary btn-lg" data-action="playagain">↻ ${esc(t("play_again"))}</button>
         <button class="btn btn-ghost btn-lg" data-action="gohome">${esc(t("back_home"))}</button>
@@ -7293,6 +7331,7 @@ document.addEventListener("click",(e)=>{
     case "typesubmit": { const inp=document.getElementById("type-input"); const v=(inp&&inp.value||"").trim(); if(!v){ toast(t("type_need_answer")); break; } submitTextAnswer(v); break; }
     case "continue": afterReveal(); break;
     case "playagain": replayGame(); break;
+    case "retrywrong": retryWrong(); break;
     case "review": if(state.play){ state.play.phase="review"; window.scrollTo(0,0); render(); } break;
     case "reviewback": if(state.play){ state.play.phase="podium"; render(); } break;
     case "printquiz": { const pq=state.setup&&state.setup.quiz; if(pq){ const pr=document.getElementById("printroot"); if(pr){ pr.innerHTML=printableQuizHTML(pq); window.print(); } } break; }
@@ -7309,11 +7348,20 @@ function openSetup(id){
   state.screen="setup"; render();
 }
 
+function retryWrong(){
+  const p=state.play; if(!p||p.mode!=="solo") return;
+  const me=p.participants[0]; const qs=p.quiz.questions.filter((q,i)=>!(me.history[i]&&me.history[i].correct));
+  if(!qs.length) return;
+  const quiz=Object.assign({},p.quiz,{questions:qs}); const names=[me.name];
+  stopAll();
+  state.setup={quiz, mode:"solo", players:names, shuffle:false};
+  startGame(); if(state.play) state.play.retry=true;
+}
 function replayGame(){
-  const p=state.play; const quiz=p.quiz; const mode=p.mode; const names=p.participants.map(x=>x.name);
+  const p=state.play; const wasRetry=!!p.retry; const quiz=p.quiz; const mode=p.mode; const names=p.participants.map(x=>x.name);
   stopAll();
   state.setup={quiz, mode, players:names, shuffle:false};
-  startGame();
+  startGame(); if(state.play && wasRetry) state.play.retry=true;
 }
 
 function saveQuizFromEditor(){
