@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ecoEyRkIYoJKd/v4L8Ju7eJ7qFbVOBFlqdeB2I4PAI0='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <!-- NOTE: this meta tag cannot express frame-ancestors (clickjacking) or X-Frame-Options —
      those only work as real HTTP response headers, which a static host such as GitHub Pages
      does not let this file set. If you ever self-host this file behind your own web server,
@@ -7252,6 +7252,34 @@ function launchConfetti(){
   }
   confettiRAF=requestAnimationFrame(frame);
 }
+
+/* Accesibilitate de la tastatură: elementele cu data-action care nu sunt butoane native
+   (sigla „Acasă”, linkurile „← înapoi”, comutatorul de sunet) devin focalizabile și se activează cu Enter/Spațiu. */
+(function(){
+  const SEL=".brand[data-action],a[data-action]:not([href]),.switch[data-action]";
+  function fix(){
+    document.querySelectorAll(SEL).forEach(el=>{
+      if(el.hasAttribute("tabindex")) return;
+      el.setAttribute("tabindex","0");
+      if(el.classList.contains("switch")){
+        el.setAttribute("role","switch");
+        el.setAttribute("aria-checked",el.classList.contains("on")?"true":"false");
+        const lab=el.closest(".set-row"); const tt=lab&&lab.querySelector(".t");
+        if(tt) el.setAttribute("aria-label",tt.textContent);
+      } else el.setAttribute("role","button");
+    });
+  }
+  let pend=false;
+  new MutationObserver(()=>{ if(pend) return; pend=true; Promise.resolve().then(()=>{ pend=false; fix(); }); })
+    .observe(document.body,{childList:true,subtree:true});
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape" && state.modal){ state.modal=null; renderModal(); return; }
+    if(e.key!=="Enter" && e.key!==" ") return;
+    const el=e.target.closest&&e.target.closest(SEL);
+    if(el && el===e.target){ e.preventDefault(); el.click(); }
+  });
+  fix();
+})();
 
 /* =========================================================================
    ACTIONS (event delegation)
