@@ -2,6 +2,8 @@
 
 Joc de quiz în spiritul Kahoot — „Quiz fără frontiere”, într-un singur fișier HTML.
 
+**Ultima actualizare:** 11 octombrie 2026
+
 **Live:** https://chiuta.github.io/Undava/
 
 ![Captura de ecran](screenshot.png)
@@ -64,3 +66,7 @@ Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: cr
 ## Audit
 
 Audit: 2026-10-10 (rundă 2: 2026-10-11, cheie de instalare pentru administratorul inițial, notă GDPR pentru feedback, nume accesibile în formularul de feedback) — verificat în browser (fără erori JS, axe WCAG 2.1 AA pe toate ecranele — acasă, bibliotecă, editor, joc, roată, ghid, import, setări — 0 probleme serious/critical după corectarea etichetelor din editor, a contrastului și a cuprinsului ghidului); `index.php` trece `php -l`, iar aceleași corecturi sunt aplicate și în ediția PHP.
+
+## Istoric / Changelog
+
+- **11 octombrie 2026** — rundă de verificare: reverificat în browser (fără erori JS, axe-core 0 violări la 1280×800 și 360×740, fără depășire orizontală); nu au fost necesare modificări de cod în `index.html`. Aplicația nu are număr de versiune.
