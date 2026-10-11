@@ -7,6 +7,9 @@
      - data/feedback.txt        visitor feedback, one record per line
      - data/.config.php         admin password hash + settings (kept private)
    Requires PHP 7.4+ and a writable ./data directory.
+   First-administrator setup requires a setup key that exists only on the server:
+   a file setup.key next to this file (or ../undava-setup.key) or the UNDAVA_SETUP_KEY
+   environment variable (min. 12 characters). Without it, setup is refused.
    ========================================================================== */
 
 /* ---- hardening: don't leak stack traces / paths to visitors; log instead ---- */
@@ -132,6 +135,19 @@ function qff_cfg(){
   global $CFG;
   if(file_exists($CFG)){ $c=include $CFG; if(is_array($c)) return $c; }
   return array('admin_hash'=>'','moderate'=>false);
+}
+/* Setup key: the first administrator can only be created by someone who can read a secret
+   that exists ONLY on the server: the UNDAVA_SETUP_KEY environment variable, a file
+   setup.key next to index.php, or ../undava-setup.key (outside the web root, preferred).
+   Minimum 12 characters. A setup.key placed next to index.php is deleted after a successful setup. */
+function qff_setup_key(){
+  global $BASE;
+  $k=getenv('UNDAVA_SETUP_KEY');
+  if(is_string($k) && trim($k)!=='') return array(trim($k),'');
+  foreach(array($BASE.'/setup.key', dirname($BASE).'/undava-setup.key') as $f){
+    if(is_file($f) && is_readable($f)){ $c=trim((string)@file_get_contents($f)); if($c!=='') return array($c,$f); }
+  }
+  return array('','');
 }
 function qff_cfg_save($c){
   global $CFG;
@@ -596,13 +612,21 @@ if($action !== null){
 
   if($action==='setup_admin'){
     $b=qff_body();
+    $cfg0=qff_cfg(); if((isset($cfg0['admin_hash'])?$cfg0['admin_hash']:'')!=='') qff_err('admin already set',409);
+    $kinfo=qff_setup_key(); $skey=$kinfo[0]; $skeyFile=$kinfo[1];
+    if(strlen($skey)<12) qff_err('setup disabled: the server owner must create a setup key (min. 12 characters) in setup.key next to index.php or in the UNDAVA_SETUP_KEY environment variable',403);
+    $given=(string)(isset($b['setup_key'])?$b['setup_key']:'');
+    $sip=isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0';
+    $keyOk=hash_equals($skey,$given);
+    $sfails=qff_login_guard('setup:'.$sip,$keyOk);
+    if(!$keyOk){ $d=300000*(int)pow(2,min($sfails,4)); if($d>4800000) $d=4800000; usleep($d); qff_err('invalid setup key',403); }
     /* serialize concurrent setup attempts: without this, two near-simultaneous
        requests could both pass the "no admin yet" check and race to write the
        config, and — more importantly on a freshly deployed, not-yet-configured
        instance — anyone who requests this URL before the real owner does would
        permanently become the admin. flock() closes the multi-request race; see
-       the audit report for the residual "first visitor" exposure window, which
-       needs an operational fix (set the password immediately after deploying). */
+       the audit report for the "first visitor" exposure window: closed by the
+       setup key above (a secret that exists only on the server). */
     $lockPath=$DATA.'/.setup.lock';
     if(!file_exists($lockPath)) @touch($lockPath);
     $lfh=@fopen($lockPath,'c');
@@ -614,6 +638,7 @@ if($action !== null){
     $cfg['admin_hash']=password_hash($pw,PASSWORD_DEFAULT);
     qff_cfg_save($cfg);
     flock($lfh,LOCK_UN); fclose($lfh);
+    if($skeyFile!=='' && basename($skeyFile)==='setup.key') @unlink($skeyFile);
     session_regenerate_id(true); $_SESSION['qff_admin']=true;
     qff_json(array('ok'=>true,'csrf'=>qff_csrf()));
   }
@@ -1016,6 +1041,7 @@ $QFF_CLIENT=array(
   'server'      => true,
   'admin'       => qff_is_admin(),
   'adminExists' => ((isset($cfg['admin_hash'])?$cfg['admin_hash']:'')!==''),
+  'setupKeyReady' => (strlen(qff_setup_key()[0])>=12),
   'moderate'    => !empty($cfg['moderate']),
   'csrf'        => qff_csrf(),
 );
@@ -1169,7 +1195,7 @@ input,textarea,select{font-family:inherit}
 .tf-links{display:flex;flex-wrap:wrap;gap:8px 12px;justify-content:center;align-items:center;font-size:14px;font-weight:700}
 .tf-links a{color:var(--accent);text-decoration:none}
 .tf-links a:hover{text-decoration:underline}
-.tf-ver{font-size:11px;color:var(--muted);opacity:.6;margin-top:2px}
+.tf-ver{font-size:11px;color:var(--muted);opacity:1;margin-top:2px}
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
 .review-screen .rv-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .rv-row{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
@@ -6556,6 +6582,8 @@ On first use there is no password set. The first person who wants to **create** 
 4. The password is **hashed** (`password_hash`, PHP's default algorithm) and saved in `data/.config.php`. The password text is **not** stored anywhere.
 5. After setting it, you are automatically authenticated as host.
 
+> **Setup key (required):** to prevent the first visitor from becoming administrator, creating the first password requires a *setup key* that exists only on the server: create a file `setup.key` next to `index.php` (or `../undava-setup.key`, outside the web root, which is safer), containing a random string of **at least 12 characters**, or set the `UNDAVA_SETUP_KEY` environment variable. Enter this key in the setup dialog. A `setup.key` placed next to `index.php` is **deleted automatically** after a successful setup. Without a key on the server, setup is refused.
+
 **Subsequent logins:** you enter the password; the app verifies it with `password_verify`. On success, your session receives host rights and a CSRF token. There is a small delay on a wrong password, to discourage brute-force guessing.
 
 **Logout:** the logout button clears the host rights from the session.
@@ -7019,6 +7047,8 @@ Puis ouvre `http://localhost:8080/`. Le serveur intégré exécute PHP et crée 
 3. Comme il n'y a pas encore de mot de passe, on te demande d'en **définir** un. Saisis un mot de passe d'**au moins 6 caractères** (un mot bien plus long et unique est recommandé).
 4. Le mot de passe est **haché** (`password_hash`, l'algorithme par défaut de PHP) et enregistré dans `data/.config.php`. Le texte du mot de passe n'est stocké **nulle part**.
 5. Après l'avoir défini, tu es automatiquement authentifié comme hôte.
+
+> **Clé d'installation (obligatoire) :** pour éviter que le premier visiteur devienne administrateur, la création du premier mot de passe exige une *clé d'installation* qui n'existe que sur le serveur : crée un fichier `setup.key` à côté de `index.php` (ou `../undava-setup.key`, hors de la racine web, plus sûr) contenant une chaîne aléatoire d'**au moins 12 caractères**, ou définis la variable d'environnement `UNDAVA_SETUP_KEY`. Saisis cette clé dans la fenêtre de configuration. Un `setup.key` placé à côté de `index.php` est **supprimé automatiquement** après une configuration réussie. Sans clé sur le serveur, la configuration est refusée.
 
 **Authentifications ultérieures :** tu saisis le mot de passe ; l'application le vérifie avec `password_verify`. En cas de succès, ta session reçoit les droits d'hôte et un jeton CSRF. Il y a un petit délai en cas de mauvais mot de passe, pour décourager la devinette par force brute.
 
@@ -7484,6 +7514,8 @@ Al primo utilizzo non c'è alcuna password impostata. La prima persona che vuole
 4. La password viene **sottoposta a hash** (`password_hash`, l'algoritmo predefinito di PHP) e salvata in `data/.config.php`. Il testo della password **non** viene memorizzato da nessuna parte.
 5. Dopo averla impostata, sei automaticamente autenticato come conduttore.
 
+> **Chiave di installazione (obbligatoria):** per evitare che il primo visitatore diventi amministratore, la creazione della prima password richiede una *chiave di installazione* che esiste solo sul server: crea un file `setup.key` accanto a `index.php` (oppure `../undava-setup.key`, fuori dalla root web, più sicuro) con una stringa casuale di **almeno 12 caratteri**, oppure imposta la variabile d'ambiente `UNDAVA_SETUP_KEY`. Inserisci la chiave nella finestra di configurazione. Un `setup.key` accanto a `index.php` viene **eliminato automaticamente** dopo una configurazione riuscita. Senza chiave sul server la configurazione è rifiutata.
+
 **Autenticazioni successive:** inserisci la password; l'applicazione la verifica con `password_verify`. In caso di successo, la tua sessione riceve i diritti di conduttore e un token CSRF. C'è un piccolo ritardo in caso di password errata, per scoraggiare l'indovinare con forza bruta.
 
 **Disconnessione:** il pulsante di disconnessione cancella i diritti di conduttore dalla sessione.
@@ -7947,6 +7979,8 @@ En el primer uso no hay ninguna contraseña establecida. La primera persona que 
 3. Como aún no hay contraseña, se te pide **establecer** una. Introduce una contraseña de **al menos 6 caracteres** (recomendada mucho más larga y única).
 4. La contraseña se somete a **hash** (`password_hash`, el algoritmo predeterminado de PHP) y se guarda en `data/.config.php`. El texto de la contraseña **no** se almacena en ninguna parte.
 5. Tras establecerla, quedas automáticamente autenticado como anfitrión.
+
+> **Clave de instalación (obligatoria):** para evitar que el primer visitante se convierta en administrador, crear la primera contraseña exige una *clave de instalación* que solo existe en el servidor: crea un archivo `setup.key` junto a `index.php` (o `../undava-setup.key`, fuera de la raíz web, más seguro) con una cadena aleatoria de **al menos 12 caracteres**, o define la variable de entorno `UNDAVA_SETUP_KEY`. Introduce esa clave en el diálogo de configuración. Un `setup.key` junto a `index.php` se **elimina automáticamente** tras una configuración correcta. Sin clave en el servidor, la configuración se rechaza.
 
 **Autenticaciones posteriores:** introduces la contraseña; la aplicación la verifica con `password_verify`. En caso de éxito, tu sesión recibe los derechos de anfitrión y un token CSRF. Hay un pequeño retraso ante una contraseña incorrecta, para desalentar la adivinación por fuerza bruta.
 
@@ -8412,6 +8446,8 @@ No primeiro uso não há nenhuma palavra-passe definida. A primeira pessoa que q
 4. A palavra-passe é submetida a **hash** (`password_hash`, o algoritmo predefinido do PHP) e guardada em `data/.config.php`. O texto da palavra-passe **não** é armazenado em lado nenhum.
 5. Depois de a definir, ficas automaticamente autenticado como anfitrião.
 
+> **Chave de instalação (obrigatória):** para evitar que o primeiro visitante se torne administrador, criar a primeira palavra-passe exige uma *chave de instalação* que existe apenas no servidor: cria um ficheiro `setup.key` junto a `index.php` (ou `../undava-setup.key`, fora da raiz web, mais seguro) com uma cadeia aleatória de **pelo menos 12 caracteres**, ou define a variável de ambiente `UNDAVA_SETUP_KEY`. Introduz essa chave na janela de configuração. Um `setup.key` junto a `index.php` é **eliminado automaticamente** após uma configuração bem-sucedida. Sem chave no servidor, a configuração é recusada.
+
 **Autenticações posteriores:** introduzes a palavra-passe; a aplicação verifica-a com `password_verify`. Em caso de sucesso, a tua sessão recebe direitos de anfitrião e um token CSRF. Há um pequeno atraso em caso de palavra-passe errada, para desencorajar a adivinhação por força bruta.
 
 **Terminar sessão:** o botão de terminar sessão limpa os direitos de anfitrião da sessão.
@@ -8875,6 +8911,8 @@ Bei der ersten Nutzung ist kein Passwort festgelegt. Die erste Person, die Spiel
 3. Da es noch kein Passwort gibt, wirst du aufgefordert, eines **festzulegen**. Gib ein Passwort mit **mindestens 6 Zeichen** ein (ein viel längeres und einzigartiges wird empfohlen).
 4. Das Passwort wird **gehasht** (`password_hash`, der Standardalgorithmus von PHP) und in `data/.config.php` gespeichert. Der Passworttext wird **nirgends** gespeichert.
 5. Nach dem Festlegen bist du automatisch als Gastgeber authentifiziert.
+
+> **Einrichtungsschlüssel (erforderlich):** Damit nicht der erste Besucher Administrator wird, verlangt das Anlegen des ersten Passworts einen *Einrichtungsschlüssel*, der nur auf dem Server existiert: Lege eine Datei `setup.key` neben `index.php` an (oder `../undava-setup.key` außerhalb des Web-Roots, sicherer) mit einer zufälligen Zeichenfolge von **mindestens 12 Zeichen**, oder setze die Umgebungsvariable `UNDAVA_SETUP_KEY`. Gib den Schlüssel im Einrichtungsdialog ein. Eine `setup.key` neben `index.php` wird nach erfolgreicher Einrichtung **automatisch gelöscht**. Ohne Schlüssel auf dem Server wird die Einrichtung abgelehnt.
 
 **Spätere Anmeldungen:** du gibst das Passwort ein; die Anwendung prüft es mit `password_verify`. Bei Erfolg erhält deine Sitzung Gastgeberrechte und einen CSRF-Token. Bei einem falschen Passwort gibt es eine kleine Verzögerung, um das Erraten per Brute Force zu erschweren.
 
@@ -9368,6 +9406,8 @@ jocuri trebuie să stabilească parola de gazdă:
 4. Parola este **hash-uită** (`password_hash`, algoritmul implicit al PHP) și salvată în
    `data/.config.php`. Textul parolei **nu** se stochează nicăieri.
 5. După setare, ești autentificat automat ca gazdă.
+
+> **Cheie de instalare (obligatorie):** ca primul vizitator să nu devină administrator, crearea primei parole cere o *cheie de instalare* care există doar pe server: creează un fișier `setup.key` lângă `index.php` (sau `../undava-setup.key`, în afara rădăcinii web, mai sigur), cu un șir aleatoriu de **cel puțin 12 caractere**, sau setează variabila de mediu `UNDAVA_SETUP_KEY`. Introdu cheia în fereastra de configurare. Un `setup.key` lângă `index.php` este **șters automat** după o configurare reușită. Fără cheie pe server, configurarea este refuzată.
 
 **Autentificări ulterioare:** introduci parola; aplicația o verifică cu `password_verify`.
 La succes, sesiunea ta primește drept de gazdă și un token CSRF. Există o mică întârziere
@@ -9909,6 +9949,16 @@ const I18N = {
     "login": "Autentificare",
     "password": "Parolă",
     "password_again": "Repetă parola",
+    "admin_setup": "Configurare administrator",
+    "admin_setup_d": "Instanța nu are încă administrator. Alege o parolă și introdu cheia de instalare pe care proprietarul serverului a pus-o în fișierul setup.key.",
+    "admin_login": "Autentificare administrator",
+    "admin_login_d": "Introdu parola de administrator.",
+    "admin_create": "Creează administratorul",
+    "setup_key_ph": "Cheie de instalare (setup.key)",
+    "setup_key_d": "Cheia există doar pe server (fișier setup.key lângă index.php sau variabila UNDAVA_SETUP_KEY).",
+    "setup_key_missing": "Pe server nu este configurată nicio cheie de instalare: creează fișierul setup.key (minim 12 caractere) lângă index.php sau setează UNDAVA_SETUP_KEY.",
+    "err_setup_key": "Cheie de instalare lipsă sau greșită.",
+    "fb_privacy": "Numele și mesajul tău sunt salvate pe serverul care găzduiește această instanță (data/feedback.txt) și pot fi citite de administrator; nu scrie date personale sensibile. Pentru ștergere, cere-o administratorului instanței.",
     "fb_need_rating": "Alege o notă (1–5 stele).",
     "fb_need_msg": "Scrie un mesaj.",
     "fb_thanks_mod": "Mulțumim! Mesajul va apărea după aprobare.",
@@ -10331,6 +10381,16 @@ const I18N = {
     "login": "Sign in",
     "password": "Password",
     "password_again": "Repeat password",
+    "admin_setup": "Administrator setup",
+    "admin_setup_d": "This instance has no administrator yet. Choose a password and enter the setup key that the server owner placed in the setup.key file.",
+    "admin_login": "Administrator sign-in",
+    "admin_login_d": "Enter the administrator password.",
+    "admin_create": "Create administrator",
+    "setup_key_ph": "Setup key (setup.key)",
+    "setup_key_d": "The key exists only on the server (setup.key file next to index.php or the UNDAVA_SETUP_KEY variable).",
+    "setup_key_missing": "No setup key is configured on the server: create a setup.key file (at least 12 characters) next to index.php or set UNDAVA_SETUP_KEY.",
+    "err_setup_key": "Setup key missing or wrong.",
+    "fb_privacy": "Your name and message are stored on the server hosting this instance (data/feedback.txt) and can be read by its administrator; do not write sensitive personal data. To have them deleted, ask the instance administrator.",
     "fb_need_rating": "Pick a rating (1–5 stars).",
     "fb_need_msg": "Write a message.",
     "fb_thanks_mod": "Thanks! Your message will appear after approval.",
@@ -10753,6 +10813,16 @@ const I18N = {
     "login": "Se connecter",
     "password": "Mot de passe",
     "password_again": "Répète le mot de passe",
+    "admin_setup": "Configuration de l'administrateur",
+    "admin_setup_d": "Cette instance n'a pas encore d'administrateur. Choisis un mot de passe et saisis la clé d'installation placée par le propriétaire du serveur dans le fichier setup.key.",
+    "admin_login": "Connexion administrateur",
+    "admin_login_d": "Saisis le mot de passe administrateur.",
+    "admin_create": "Créer l'administrateur",
+    "setup_key_ph": "Clé d'installation (setup.key)",
+    "setup_key_d": "La clé n'existe que sur le serveur (fichier setup.key à côté de index.php ou variable UNDAVA_SETUP_KEY).",
+    "setup_key_missing": "Aucune clé d'installation n'est configurée sur le serveur : crée un fichier setup.key (12 caractères minimum) à côté de index.php ou définis UNDAVA_SETUP_KEY.",
+    "err_setup_key": "Clé d'installation manquante ou incorrecte.",
+    "fb_privacy": "Ton nom et ton message sont enregistrés sur le serveur qui héberge cette instance (data/feedback.txt) et peuvent être lus par son administrateur ; n'écris pas de données personnelles sensibles. Pour les faire supprimer, demande à l'administrateur de l'instance.",
     "fb_need_rating": "Choisis une note (1 à 5 étoiles).",
     "fb_need_msg": "Écris un message.",
     "fb_thanks_mod": "Merci ! Ton message apparaîtra après approbation.",
@@ -11175,6 +11245,16 @@ const I18N = {
     "login": "Accedi",
     "password": "Password",
     "password_again": "Ripeti la password",
+    "admin_setup": "Configurazione amministratore",
+    "admin_setup_d": "Questa istanza non ha ancora un amministratore. Scegli una password e inserisci la chiave di installazione che il proprietario del server ha messo nel file setup.key.",
+    "admin_login": "Accesso amministratore",
+    "admin_login_d": "Inserisci la password dell'amministratore.",
+    "admin_create": "Crea l'amministratore",
+    "setup_key_ph": "Chiave di installazione (setup.key)",
+    "setup_key_d": "La chiave esiste solo sul server (file setup.key accanto a index.php o variabile UNDAVA_SETUP_KEY).",
+    "setup_key_missing": "Sul server non è configurata alcuna chiave di installazione: crea un file setup.key (almeno 12 caratteri) accanto a index.php o imposta UNDAVA_SETUP_KEY.",
+    "err_setup_key": "Chiave di installazione mancante o errata.",
+    "fb_privacy": "Il tuo nome e il tuo messaggio sono salvati sul server che ospita questa istanza (data/feedback.txt) e possono essere letti dall'amministratore; non scrivere dati personali sensibili. Per farli cancellare, rivolgiti all'amministratore dell'istanza.",
     "fb_need_rating": "Scegli un voto (1–5 stelle).",
     "fb_need_msg": "Scrivi un messaggio.",
     "fb_thanks_mod": "Grazie! Il tuo messaggio apparirà dopo l'approvazione.",
@@ -11597,6 +11677,16 @@ const I18N = {
     "login": "Iniciar sesión",
     "password": "Contraseña",
     "password_again": "Repite la contraseña",
+    "admin_setup": "Configuración del administrador",
+    "admin_setup_d": "Esta instancia aún no tiene administrador. Elige una contraseña e introduce la clave de instalación que el propietario del servidor puso en el archivo setup.key.",
+    "admin_login": "Acceso de administrador",
+    "admin_login_d": "Introduce la contraseña del administrador.",
+    "admin_create": "Crear administrador",
+    "setup_key_ph": "Clave de instalación (setup.key)",
+    "setup_key_d": "La clave solo existe en el servidor (archivo setup.key junto a index.php o variable UNDAVA_SETUP_KEY).",
+    "setup_key_missing": "No hay ninguna clave de instalación configurada en el servidor: crea un archivo setup.key (mínimo 12 caracteres) junto a index.php o define UNDAVA_SETUP_KEY.",
+    "err_setup_key": "Clave de instalación ausente o incorrecta.",
+    "fb_privacy": "Tu nombre y tu mensaje se guardan en el servidor que aloja esta instancia (data/feedback.txt) y el administrador puede leerlos; no escribas datos personales sensibles. Para que los borren, pídeselo al administrador de la instancia.",
     "fb_need_rating": "Elige una valoración (1–5 estrellas).",
     "fb_need_msg": "Escribe un mensaje.",
     "fb_thanks_mod": "¡Gracias! Tu mensaje aparecerá tras la aprobación.",
@@ -12019,6 +12109,16 @@ const I18N = {
     "login": "Iniciar sessão",
     "password": "Palavra-passe",
     "password_again": "Repete a palavra-passe",
+    "admin_setup": "Configuração do administrador",
+    "admin_setup_d": "Esta instância ainda não tem administrador. Escolhe uma palavra-passe e introduz a chave de instalação que o proprietário do servidor colocou no ficheiro setup.key.",
+    "admin_login": "Início de sessão do administrador",
+    "admin_login_d": "Introduz a palavra-passe do administrador.",
+    "admin_create": "Criar administrador",
+    "setup_key_ph": "Chave de instalação (setup.key)",
+    "setup_key_d": "A chave existe apenas no servidor (ficheiro setup.key junto a index.php ou variável UNDAVA_SETUP_KEY).",
+    "setup_key_missing": "Não há nenhuma chave de instalação configurada no servidor: cria um ficheiro setup.key (mínimo 12 caracteres) junto a index.php ou define UNDAVA_SETUP_KEY.",
+    "err_setup_key": "Chave de instalação em falta ou incorreta.",
+    "fb_privacy": "O teu nome e a tua mensagem são guardados no servidor que aloja esta instância (data/feedback.txt) e podem ser lidos pelo administrador; não escrevas dados pessoais sensíveis. Para os apagar, pede ao administrador da instância.",
     "fb_need_rating": "Escolhe uma avaliação (1–5 estrelas).",
     "fb_need_msg": "Escreve uma mensagem.",
     "fb_thanks_mod": "Obrigado! A tua mensagem aparecerá após aprovação.",
@@ -12441,6 +12541,16 @@ const I18N = {
     "login": "Anmelden",
     "password": "Passwort",
     "password_again": "Passwort wiederholen",
+    "admin_setup": "Administrator einrichten",
+    "admin_setup_d": "Diese Instanz hat noch keinen Administrator. Wähle ein Passwort und gib den Einrichtungsschlüssel ein, den der Serverbetreiber in der Datei setup.key hinterlegt hat.",
+    "admin_login": "Administrator-Anmeldung",
+    "admin_login_d": "Gib das Administrator-Passwort ein.",
+    "admin_create": "Administrator anlegen",
+    "setup_key_ph": "Einrichtungsschlüssel (setup.key)",
+    "setup_key_d": "Der Schlüssel existiert nur auf dem Server (Datei setup.key neben index.php oder Variable UNDAVA_SETUP_KEY).",
+    "setup_key_missing": "Auf dem Server ist kein Einrichtungsschlüssel konfiguriert: Lege eine Datei setup.key (mindestens 12 Zeichen) neben index.php an oder setze UNDAVA_SETUP_KEY.",
+    "err_setup_key": "Einrichtungsschlüssel fehlt oder ist falsch.",
+    "fb_privacy": "Dein Name und deine Nachricht werden auf dem Server dieser Instanz gespeichert (data/feedback.txt) und können vom Administrator gelesen werden; schreibe keine sensiblen personenbezogenen Daten. Zum Löschen wende dich an den Administrator der Instanz.",
     "fb_need_rating": "Wähle eine Bewertung (1–5 Sterne).",
     "fb_need_msg": "Schreibe eine Nachricht.",
     "fb_thanks_mod": "Danke! Deine Nachricht erscheint nach der Freigabe.",
@@ -12713,7 +12823,7 @@ function samples(){ return [
 
 /* ---------------- state + storage ---------------- */
 const STORE_KEY="quizfarafrontiere_v1";
-const QFF=(typeof window!=="undefined"&&window.QFF)?window.QFF:{server:false,csrf:"",admin:false,adminExists:true,moderate:false};
+const QFF=(typeof window!=="undefined"&&window.QFF)?window.QFF:{server:false,csrf:"",admin:false,adminExists:true,moderate:false,setupKeyReady:false};
 const APP_VERSION="1.0.0";
 let libSort="default"; let libSearchQ="";
 let editorSnapshot=null; let editorSnapRef=null;
@@ -12761,7 +12871,7 @@ const Store={
   async approveFeedback(ts){ if(state.server){ await api("fbapprove",{body:{ts:Number(ts)}}); return; } const a=localFeedback(); const it=a.find(x=>String(x.ts)===String(ts)); if(it)it.status="pub"; setLocalFeedback(a); },
   async adminLogin(pw){ const d=await api("login",{body:{password:pw}}); state.admin=true; if(d.csrf)state.csrf=d.csrf; return d; },
   async adminLogout(){ await api("logout",{body:{}}); state.admin=false; },
-  async adminSetup(pw){ const d=await api("setup_admin",{body:{password:pw}}); state.admin=true; if(d.csrf)state.csrf=d.csrf; return d; }
+  async adminSetup(pw,key){ const d=await api("setup_admin",{body:{password:pw,setup_key:key||""}}); state.admin=true; if(d.csrf)state.csrf=d.csrf; return d; }
 };
 
 function apiErr(e){ if(e&&e.message){ if(/Failed to fetch|NetworkError|load failed/i.test(e.message)) return t("net_err"); return e.message; } return t("net_err"); }
@@ -13800,7 +13910,9 @@ function renderModal(){
       <h3>🔐 ${esc(t(setup?"admin_setup":"admin_login"))}</h3>
       <div class="about" style="margin:0 0 12px">${esc(t(setup?"admin_setup_d":"admin_login_d"))}</div>
       <input id="adm-pw" class="input" type="password" placeholder="${esc(t("password"))}" autocomplete="${setup?"new-password":"current-password"}">
-      ${setup?`<input id="adm-pw2" class="input" type="password" placeholder="${esc(t("password_again"))}" style="margin-top:8px" autocomplete="new-password">`:""}
+      ${setup?`<input id="adm-pw2" class="input" type="password" placeholder="${esc(t("password_again"))}" style="margin-top:8px" autocomplete="new-password">
+      <input id="adm-key" class="input" type="password" placeholder="${esc(t("setup_key_ph"))}" style="margin-top:8px" autocomplete="off">
+      <div class="about" style="margin:8px 0 0">${esc(t(QFF.setupKeyReady?"setup_key_d":"setup_key_missing"))}</div>`:""}
       <button type="button" class="btn btn-primary btn-block" style="margin-top:14px" data-action="${setup?"dosetup":"dologin"}">${esc(t(setup?"admin_create":"login"))}</button>
       <button type="button" class="btn btn-ghost btn-block" style="margin-top:8px" data-action="closemodal">${esc(t("close"))}</button>
     </div></div>`;
@@ -13836,9 +13948,9 @@ function submitFeedback(){
 function doLogin(){ const pw=(document.getElementById("adm-pw")||{}).value||""; if(!pw){ toast(t("err_pw")); return; }
   Store.adminLogin(pw).then(()=>{ QFF.adminExists=true; state.modal=null; renderModal(); render(); toast(t("admin_ok")); })
     .catch(e=>{ toast((e.status===401||e.status===409)?t("admin_bad"):apiErr(e)); }); }
-function doSetup(){ const pw=(document.getElementById("adm-pw")||{}).value||""; const pw2=(document.getElementById("adm-pw2")||{}).value||"";
-  if(pw.length<6){ toast(t("err_pw_short")); return; } if(pw!==pw2){ toast(t("err_pw_match")); return; }
-  Store.adminSetup(pw).then(()=>{ QFF.adminExists=true; state.modal=null; renderModal(); render(); toast(t("admin_ok")); }).catch(e=>{ toast(apiErr(e)); }); }
+function doSetup(){ const pw=(document.getElementById("adm-pw")||{}).value||""; const pw2=(document.getElementById("adm-pw2")||{}).value||""; const key=(document.getElementById("adm-key")||{}).value||"";
+  if(pw.length<6){ toast(t("err_pw_short")); return; } if(pw!==pw2){ toast(t("err_pw_match")); return; } if(!key){ toast(t("err_setup_key")); return; }
+  Store.adminSetup(pw,key).then(()=>{ QFF.adminExists=true; state.modal=null; renderModal(); render(); toast(t("admin_ok")); }).catch(e=>{ toast(e.status===403?t("err_setup_key"):apiErr(e)); }); }
 function doLogout(){ Store.adminLogout().then(()=>{ state.modal=null; renderModal(); render(); toast(t("admin_out")); }).catch(()=>{ state.modal=null; renderModal(); render(); }); }
 
 function viewGuestbook(){
@@ -13858,16 +13970,17 @@ function renderFbForm(){
   const stars=[1,2,3,4,5].map(n=>`<button type="button" class="star${n<=(ff.rating||0)?" on":""}" data-action="fbstar" data-v="${n}" aria-label="${n}/5">★</button>`).join("");
   return `<div class="panel fb-form">
     <div class="row">
-      <div class="field" style="margin-bottom:0"><label>${esc(t("fb_name"))}</label>
+      <div class="field" style="margin-bottom:0"><label for="fb-name">${esc(t("fb_name"))}</label>
         <input id="fb-name" class="input" maxlength="60" placeholder="${esc(t("fb_name_ph"))}" value="${esc(ff.name||"")}"></div>
-      <div class="field" style="margin-bottom:0"><label>${esc(t("fb_quiz"))}</label>
+      <div class="field" style="margin-bottom:0"><label for="fb-quiz">${esc(t("fb_quiz"))}</label>
         <select id="fb-quiz" class="select">${opts}</select></div>
     </div>
     <div class="field" style="margin:14px 0 0"><label>${esc(t("fb_rating"))}</label>
       <div class="stars" id="fb-stars">${stars}</div></div>
-    <div class="field" style="margin:14px 0 0"><label>${esc(t("fb_msg"))}</label>
+    <div class="field" style="margin:14px 0 0"><label for="fb-msg">${esc(t("fb_msg"))}</label>
       <textarea id="fb-msg" class="textarea" rows="3" maxlength="2000" placeholder="${esc(t("fb_msg_ph"))}">${esc(ff.msg||"")}</textarea></div>
     <input id="fb-hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    ${state.server?`<div class="about" style="margin:12px 0 0;font-size:.85em">${esc(t("fb_privacy"))}</div>`:""}
     <button class="btn btn-primary btn-block" style="margin-top:16px" data-action="fbsubmit"${state.fbBusy?" disabled":""}>${state.fbBusy?"…":"✓ "+esc(t("fb_send"))}</button>
   </div>`;
 }

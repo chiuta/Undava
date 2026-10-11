@@ -38,7 +38,8 @@ Undava este un joc de quiz: creezi propriile quiz-uri și joci singur sau cu pri
 - **Rețea:** pagina nu încarcă scripturi, fonturi sau imagini de pe alte site-uri (CSP: `default-src 'self'`, `connect-src 'self'`). Singurul `fetch` din cod este către `index.php?asset=manifest` de pe același site, folosit când deschizi „ediția server”; pe un host static care nu rulează PHP această verificare eșuează și aplicația afișează un ghid de instalare.
 - Metaetichetele Open Graph indică imagini de pe `chiuta.github.io` pentru previzualizarea linkului; ele sunt citite de platformele care afișează linkul, nu de aplicație.
 - Ediția `index.php` (dacă o găzduiești) are propriul server, parolă de administrator și fișier de feedback; ea nu face parte din pagina statică.
-- Atenție la ediția `index.php`: ea **stochează date pe server** (quiz-uri, feedback-ul vizitatorilor în `data/feedback.txt`), deci sloganul „fără telemetrie” se aplică la ce trimite aplicația către terți, nu la datele pe care serverul tău le primește. Pe o instanță proaspăt instalată, **primul vizitator care setează parola devine administrator**: setează parola imediat după instalare.
+- Atenție la ediția `index.php`: ea **stochează date pe server** (quiz-uri, feedback-ul vizitatorilor în `data/feedback.txt`: nume opțional, notă, mesaj, quiz), deci sloganul „fără telemetrie” se aplică la ce trimite aplicația către terți, nu la datele pe care serverul tău le primește. Formularul de feedback din ediția server afișează (în cele 7 limbi) o notă de confidențialitate: datele sunt păstrate pe serverul instanței și pot fi citite de administrator, iar ștergerea se cere administratorului. Dacă găzduiești public ediția server ești operatorul datelor (GDPR): informează vizitatorii, șterge la cerere (butonul de ștergere din ecranul de feedback sau fișierul `data/feedback.txt`) și nu păstra mesajele mai mult decât este necesar.
+- **Instalarea ediției server (cheie de instalare):** „primul vizitator devine administrator” nu mai este posibil. Crearea primei parole cere o *cheie de instalare* care există doar pe server: fișierul `setup.key` lângă `index.php` (sau `../undava-setup.key`, în afara rădăcinii web, mai sigur) cu cel puțin 12 caractere aleatorii, ori variabila de mediu `UNDAVA_SETUP_KEY`. Fără cheie, configurarea este refuzată; un `setup.key` din directorul aplicației este șters automat după configurare. Cheia se introduce în fereastra „Configurare administrator”. Încercările greșite sunt încetinite pe IP.
 
 ## Rulare locală / offline
 
@@ -47,6 +48,10 @@ Descarcă `index.html` și deschide-l în browser; ediția statică funcționeaz
 ## Licență
 
 CC0 1.0 Universal (domeniu public) — vezi fișierul LICENSE
+
+## Mărci
+
+Kahoot! este o marcă a deținătorului ei; Undava nu este afiliată cu Kahoot! și numele este folosit doar descriptiv („în spiritul…”). Alte nume comerciale menționate aparțin deținătorilor lor.
 
 ## Autor
 
@@ -58,4 +63,4 @@ Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: cr
 
 ## Audit
 
-Audit: 2026-10-10 — verificat în browser (fără erori JS, axe WCAG 2.1 AA pe toate ecranele — acasă, bibliotecă, editor, joc, roată, ghid, import, setări — 0 probleme serious/critical după corectarea etichetelor din editor, a contrastului și a cuprinsului ghidului); `index.php` trece `php -l`, iar aceleași corecturi sunt aplicate și în ediția PHP.
+Audit: 2026-10-10 (rundă 2: 2026-10-11, cheie de instalare pentru administratorul inițial, notă GDPR pentru feedback, nume accesibile în formularul de feedback) — verificat în browser (fără erori JS, axe WCAG 2.1 AA pe toate ecranele — acasă, bibliotecă, editor, joc, roată, ghid, import, setări — 0 probleme serious/critical după corectarea etichetelor din editor, a contrastului și a cuprinsului ghidului); `index.php` trece `php -l`, iar aceleași corecturi sunt aplicate și în ediția PHP.
