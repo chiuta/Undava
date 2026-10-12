@@ -1052,6 +1052,8 @@ $QFF_CLIENT=array(
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta name="application-version" content="1.0.1">
+<meta name="last-updated" content="2026-10-12">
 <meta name="description" content="Quiz fara frontiere — joc de tip Kahoot, single-file, offline, fara conturi, fara reclame, fara telemetrie.">
 <title>Undava</title>
 <?php
@@ -9789,6 +9791,7 @@ const I18N = {
     "feat_priv": "Zero telemetrie",
     "feat_open": "Un singur fișier",
     "tf_desc": "fără reclame, fără colectare de date, fără cont necesar, fără funcții blocate după plată",
+    "ver_label": "Versiune",
     "tf_tools": "alte unelte",
     "q_count": (n)=>n+(n===1?" întrebare":" întrebări"),
     "playbtn": "Joacă",
@@ -10221,6 +10224,7 @@ const I18N = {
     "feat_priv": "Zero telemetry",
     "feat_open": "Single file",
     "tf_desc": "no ads, no data collection, no account needed, no features locked behind payment",
+    "ver_label": "Version",
     "tf_tools": "other tools",
     "q_count": (n)=>n+(n===1?" question":" questions"),
     "playbtn": "Play",
@@ -10653,6 +10657,7 @@ const I18N = {
     "feat_priv": "Zéro télémétrie",
     "feat_open": "Fichier unique",
     "tf_desc": "sans publicité, sans collecte de données, sans compte requis, sans fonctions bloquées derrière un paiement",
+    "ver_label": "Version",
     "tf_tools": "autres outils",
     "q_count": (n)=>n+(n===1?" question":" questions"),
     "playbtn": "Jouer",
@@ -11085,6 +11090,7 @@ const I18N = {
     "feat_priv": "Zero telemetria",
     "feat_open": "File unico",
     "tf_desc": "senza pubblicità, senza raccolta dati, senza account, senza funzioni bloccate a pagamento",
+    "ver_label": "Versione",
     "tf_tools": "altri strumenti",
     "q_count": (n)=>n+(n===1?" domanda":" domande"),
     "playbtn": "Gioca",
@@ -11517,6 +11523,7 @@ const I18N = {
     "feat_priv": "Cero telemetría",
     "feat_open": "Archivo único",
     "tf_desc": "sin anuncios, sin recopilación de datos, sin cuenta necesaria, sin funciones bloqueadas tras pago",
+    "ver_label": "Versión",
     "tf_tools": "otras herramientas",
     "q_count": (n)=>n+(n===1?" pregunta":" preguntas"),
     "playbtn": "Jugar",
@@ -11949,6 +11956,7 @@ const I18N = {
     "feat_priv": "Zero telemetria",
     "feat_open": "Ficheiro único",
     "tf_desc": "sem anúncios, sem recolha de dados, sem conta necessária, sem funções bloqueadas por pagamento",
+    "ver_label": "Versão",
     "tf_tools": "outras ferramentas",
     "q_count": (n)=>n+(n===1?" pergunta":" perguntas"),
     "playbtn": "Jogar",
@@ -12381,6 +12389,7 @@ const I18N = {
     "feat_priv": "Keine Telemetrie",
     "feat_open": "Eine Datei",
     "tf_desc": "keine Werbung, keine Datensammlung, kein Konto nötig, keine hinter Bezahlung gesperrten Funktionen",
+    "ver_label": "Version",
     "tf_tools": "weitere Werkzeuge",
     "q_count": (n)=>n+(n===1?" Frage":" Fragen"),
     "playbtn": "Spielen",
@@ -12824,7 +12833,8 @@ function samples(){ return [
 /* ---------------- state + storage ---------------- */
 const STORE_KEY="quizfarafrontiere_v1";
 const QFF=(typeof window!=="undefined"&&window.QFF)?window.QFF:{server:false,csrf:"",admin:false,adminExists:true,moderate:false,setupKeyReady:false};
-const APP_VERSION="1.0.0";
+const APP_VERSION="1.0.1";
+const APP_UPDATED="2026-10-12";
 let libSort="default"; let libSearchQ="";
 let editorSnapshot=null; let editorSnapRef=null;
 const state={ lang:"ro", sound:true, screen:"home", quizzes:[], editing:null, play:null, setup:null, modal:null, importBuf:"",
@@ -13130,7 +13140,7 @@ function viewHome(){
       <a class="tf-badge" href="https://trade-free.org/" target="_blank" rel="noopener noreferrer">💚 Trade-free</a>
       <div class="tf-desc">${esc(t("tf_desc"))}</div>
       <div class="tf-links"><a href="https://www.patreon.com/c/alexio_tf" target="_blank" rel="noopener noreferrer">💜 Patreon</a><span class="tf-dot">·</span><a href="https://buymeacoffee.com/echo.of.the.strings" target="_blank" rel="noopener noreferrer">☕ Buy me a coffee</a><span class="tf-dot">·</span><a href="https://chiuta.github.io/" target="_blank" rel="noopener noreferrer">${esc(t("tf_tools"))}</a></div>
-      <div class="tf-ver">Undava v${APP_VERSION}</div>
+      <div class="tf-ver" id="app-version">${esc(t("ver_label"))} v ${APP_VERSION} · ${APP_UPDATED}</div>
     </footer>
   </div>`;
 }

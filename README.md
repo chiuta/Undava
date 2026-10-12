@@ -2,7 +2,7 @@
 
 Joc de quiz în spiritul Kahoot — „Quiz fără frontiere”, într-un singur fișier HTML.
 
-**Ultima actualizare:** 11 octombrie 2026
+**Versiune:** 1.0.1 · **Ultima actualizare:** 12 octombrie 2026
 
 **Live:** https://chiuta.github.io/Undava/
 
@@ -70,6 +70,7 @@ Audit: 2026-10-10 (rundă 2: 2026-10-11, cheie de instalare pentru administrator
 
 ## Istoric / Changelog
 
+- 1.0.1 — 2026-10-12: versiunea și data ultimei actualizări sunt afișate în aplicație
 - **11 octombrie 2026** (runda 7) — `script-src` pe hash SHA-256 în loc de `'unsafe-inline'`; sigla „Undava” (Acasă), linkurile „← înapoi” și comutatorul de sunet pot fi acum atinse cu Tab și activate cu Enter/Spațiu (înainte nu erau accesibile de la tastatură); Escape închide ferestrele modale; testat (0 erori/CSP, axe 0 violări la 1280×800 și 360×740). `index.php` (ediția server) nu a fost modificat.
 - **11 octombrie 2026** — recorduri personale pe quiz în modul Solo, buton „Repetă greșelile” la final (texte în cele 7 limbi); testat în browser (0 erori JS, axe-core 0 violări la 1280×800 și 360×740).
 - **11 octombrie 2026** — rundă de verificare: reverificat în browser (fără erori JS, axe-core 0 violări la 1280×800 și 360×740, fără depășire orizontală); nu au fost necesare modificări de cod în `index.html`. Aplicația nu are număr de versiune.
