@@ -13139,7 +13139,7 @@ function viewHome(){
     <footer class="tf-foot">
       <a class="tf-badge" href="https://trade-free.org/" target="_blank" rel="noopener noreferrer">💚 Trade-free</a>
       <div class="tf-desc">${esc(t("tf_desc"))}</div>
-      <div class="tf-links"><a href="https://www.patreon.com/c/alexio_tf" target="_blank" rel="noopener noreferrer">💜 Patreon</a><span class="tf-dot">·</span><a href="https://buymeacoffee.com/echo.of.the.strings" target="_blank" rel="noopener noreferrer">☕ Buy me a coffee</a><span class="tf-dot">·</span><a href="https://chiuta.github.io/" target="_blank" rel="noopener noreferrer">${esc(t("tf_tools"))}</a></div>
+      <div class="tf-links"><a href="https://buymeacoffee.com/echo.of.the.strings" target="_blank" rel="noopener noreferrer">☕ Buy me a coffee</a><span class="tf-dot">·</span><a href="https://chiuta.github.io/" target="_blank" rel="noopener noreferrer">${esc(t("tf_tools"))}</a></div>
       <div class="tf-ver" id="app-version">${esc(t("ver_label"))} v ${APP_VERSION} · ${APP_UPDATED}</div>
     </footer>
   </div>`;
