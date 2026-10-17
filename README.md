@@ -50,7 +50,7 @@ Descarcă `index.html` și deschide-l în browser; ediția statică funcționeaz
 
 ## Licență
 
-CC0 1.0 Universal (domeniu public) — vezi fișierul LICENSE
+MIT — vezi fișierul LICENSE
 
 ## Mărci
 
