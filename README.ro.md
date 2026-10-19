@@ -64,9 +64,9 @@ Kahoot! este o marcă a deținătorului ei; Undava nu este afiliată cu Kahoot! 
 
 Alexio — Alexandru-Ionuț Chiuță, contact: alexio@trom.tf
 
-## English summary
+## Rezumat
 
-Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: create quizzes with four question types, play Solo or pass-and-play, import/export JSON, and use a random wheel. 8-language UI. Quizzes are kept in localStorage; the static page makes no third-party requests. A separate PHP server edition (`index.php`) in the repo adds the features that need a server.
+Undava („Quiz fără frontiere”) este un joc de tip Kahoot într-un singur fișier HTML: creezi chestionare cu patru tipuri de întrebări, joci Solo sau pe rând, imporți/exporți JSON și folosești o roată aleatorie. Interfață în 8 limbi. Chestionarele se păstrează în localStorage; pagina statică nu face cereri către terți. O ediție separată cu server PHP (`index.php`) în depozit adaugă funcțiile care necesită server.
 
 ## Audit
 
