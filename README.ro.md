@@ -10,7 +10,7 @@ Joc de quiz în spiritul Kahoot — „Quiz fără frontiere”, într-un singur
 
 **Live:** https://chiuta.github.io/Undava/
 
-![Captura de ecran](screenshot.png)
+![Captura de ecran](screenshot.ro.png)
 
 ## Ce este
 

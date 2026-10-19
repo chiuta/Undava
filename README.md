@@ -10,7 +10,7 @@ A quiz game in the spirit of Kahoot — "Quiz without Borders", in a single HTML
 
 **Live:** https://chiuta.github.io/Undava/
 
-![Screenshot](screenshot.png)
+![Screenshot](screenshot.en.png)
 
 ## What it is
 

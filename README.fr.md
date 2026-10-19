@@ -10,7 +10,7 @@ Un jeu de quiz dans l'esprit de Kahoot — « Quiz sans frontières », dans un 
 
 **En ligne :** https://chiuta.github.io/Undava/
 
-![Capture d'écran](screenshot.png)
+![Capture d'écran](screenshot.fr.png)
 
 ## Ce que c'est
 

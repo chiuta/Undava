@@ -10,7 +10,7 @@ Kahoot-szellemű kvízjáték — „Kvíz határok nélkül”, egyetlen HTML-f
 
 **Élő verzió:** https://chiuta.github.io/Undava/
 
-![Képernyőkép](screenshot.png)
+![Képernyőkép](screenshot.hu.png)
 
 ## Mi ez
 
