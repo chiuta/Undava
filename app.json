@@ -11,9 +11,11 @@
     "serviceWorker",
     "localStorage"
   ],
-  "storageKeys": [],
-  "sizeBytes": 486700,
-  "sha256": "99d8255f8df60efa87c760ed02afd35c49fc4faadc9b6ec3cab5465bbaba3c1c",
+  "storageKeys": [
+    "quizfarafrontiere_v1"
+  ],
+  "sizeBytes": 487358,
+  "sha256": "e79bbde45f05d715e11a86790f50ac231db30af20e1c3a100ac160103b25bc6e",
   "csp": {
     "present": true,
     "directives": {
@@ -56,7 +58,7 @@
     ]
   },
   "kit": {
-    "version": "1.0.0",
+    "version": "1.1.1",
     "modules": [
       "core",
       "label",
