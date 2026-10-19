@@ -2,7 +2,9 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · **Português** · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Versão:** 1.1.0 · **Última atualização:** 2026-10-14
+**Versão:** 1.2.0 · **Última atualização:** 2026-10-19
+
+Idiomas da interface: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
 Um jogo de perguntas e respostas ao estilo do Kahoot — «Quiz sem fronteiras», num único ficheiro HTML.
 
@@ -12,7 +14,7 @@ Um jogo de perguntas e respostas ao estilo do Kahoot — «Quiz sem fronteiras»
 
 ## O que é
 
-O Undava é um jogo de quiz: crias os teus próprios quizzes e jogas sozinho ou com amigos no mesmo dispositivo. A aplicação descreve-se como «offline, gratuita, sem contas, sem anúncios, sem telemetria». A interface está em 7 línguas. O repositório contém também `index.php`, uma edição de servidor (armazenamento em ficheiros, sem base de dados SQL), descrita no cabeçalho do ficheiro e no manual da aplicação; a página no GitHub Pages é a edição estática `index.html`.
+O Undava é um jogo de quiz: crias os teus próprios quizzes e jogas sozinho ou com amigos no mesmo dispositivo. A aplicação descreve-se como «offline, gratuita, sem contas, sem anúncios, sem telemetria». A interface está em 8 línguas. O repositório contém também `index.php`, uma edição de servidor (armazenamento em ficheiros, sem base de dados SQL), descrita no cabeçalho do ficheiro e no manual da aplicação; a página no GitHub Pages é a edição estática `index.html`.
 
 ## Funcionalidades
 
@@ -24,7 +26,7 @@ O Undava é um jogo de quiz: crias os teus próprios quizzes e jogas sozinho ou 
 - Guia de utilização na aplicação (Guia rápido, Manual do utilizador, Manual do administrador).
 - Definições: língua, som.
 - As funcionalidades de jogo em direto síncrono, o tema autónomo e as atividades para o público são descritas no manual da aplicação como pertencentes à edição de servidor (`index.php`), e não à página estática.
-- Línguas: romeno, inglês, francês, italiano, espanhol, português, alemão.
+- Línguas: romeno, inglês, francês, italiano, espanhol, português, alemão, húngaro.
 
 ## Manual de utilização
 
@@ -43,7 +45,7 @@ O Undava é um jogo de quiz: crias os teus próprios quizzes e jogas sozinho ou 
 - **Rede:** a página não carrega scripts, tipos de letra nem imagens de outros sítios (CSP: `default-src 'self'`, `connect-src 'self'`). O único `fetch` no código é para `index.php?asset=manifest` no mesmo sítio, usado quando abres a «edição de servidor»; num alojamento estático que não executa PHP esta verificação falha e a aplicação apresenta um guia de instalação.
 - As meta etiquetas Open Graph apontam para imagens em `chiuta.github.io` para a pré-visualização da ligação; são lidas pelas plataformas que apresentam a ligação, não pela aplicação.
 - A edição `index.php` (se a alojares) tem o seu próprio servidor, palavra-passe de administrador e ficheiro de comentários; não faz parte da página estática.
-- Atenção à edição `index.php`: ela **armazena dados no servidor** (quizzes, comentários dos visitantes em `data/feedback.txt`: nome opcional, classificação, mensagem, quiz), pelo que o slogan «sem telemetria» se aplica ao que a aplicação envia a terceiros, e não aos dados que o teu servidor recebe. O formulário de comentários da edição de servidor apresenta (nas 7 línguas) uma nota de privacidade: os dados são mantidos no servidor da instância e podem ser lidos pelo administrador, e a eliminação pede-se ao administrador. Se alojares publicamente a edição de servidor és o responsável pelo tratamento dos dados (RGPD): informa os visitantes, elimina a pedido (o botão de eliminar no ecrã de comentários ou o ficheiro `data/feedback.txt`) e não guardes as mensagens mais tempo do que o necessário.
+- Atenção à edição `index.php`: ela **armazena dados no servidor** (quizzes, comentários dos visitantes em `data/feedback.txt`: nome opcional, classificação, mensagem, quiz), pelo que o slogan «sem telemetria» se aplica ao que a aplicação envia a terceiros, e não aos dados que o teu servidor recebe. O formulário de comentários da edição de servidor apresenta (nas 8 línguas) uma nota de privacidade: os dados são mantidos no servidor da instância e podem ser lidos pelo administrador, e a eliminação pede-se ao administrador. Se alojares publicamente a edição de servidor és o responsável pelo tratamento dos dados (RGPD): informa os visitantes, elimina a pedido (o botão de eliminar no ecrã de comentários ou o ficheiro `data/feedback.txt`) e não guardes as mensagens mais tempo do que o necessário.
 - **Instalação da edição de servidor (chave de instalação):** «o primeiro visitante torna-se administrador» já não é possível. A criação da primeira palavra-passe exige uma *chave de instalação* que existe apenas no servidor: o ficheiro `setup.key` junto de `index.php` (ou `../undava-setup.key`, fora da raiz web, mais seguro) com pelo menos 12 carateres aleatórios, ou a variável de ambiente `UNDAVA_SETUP_KEY`. Sem chave, a configuração é recusada; um `setup.key` na pasta da aplicação é eliminado automaticamente após a configuração. A chave introduz-se na janela «Configuração do administrador». As tentativas erradas são abrandadas por IP.
 
 ## Execução local / offline
@@ -64,7 +66,7 @@ Alexio — Alexandru-Ionuț Chiuță, contacto: alexio@trom.tf
 
 ## Resumo
 
-O Undava («Quiz sem fronteiras») é um jogo de quiz ao estilo do Kahoot num único ficheiro HTML: cria quizzes com quatro tipos de perguntas, joga a Solo ou à vez, importa/exporta JSON e usa uma roda aleatória. Interface em 7 línguas. Os quizzes ficam guardados em localStorage; a página estática não faz pedidos a terceiros. Uma edição de servidor PHP separada (`index.php`) no repositório acrescenta as funcionalidades que precisam de um servidor.
+O Undava («Quiz sem fronteiras») é um jogo de quiz ao estilo do Kahoot num único ficheiro HTML: cria quizzes com quatro tipos de perguntas, joga a Solo ou à vez, importa/exporta JSON e usa uma roda aleatória. Interface em 8 línguas. Os quizzes ficam guardados em localStorage; a página estática não faz pedidos a terceiros. Uma edição de servidor PHP separada (`index.php`) no repositório acrescenta as funcionalidades que precisam de um servidor.
 
 ## Auditoria
 

@@ -2,7 +2,9 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · **Italiano** · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Versione:** 1.1.0 · **Ultimo aggiornamento:** 2026-10-14
+**Versione:** 1.2.0 · **Ultimo aggiornamento:** 2026-10-19
+
+Lingue dell'interfaccia: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
 Un gioco a quiz nello spirito di Kahoot — «Quiz senza frontiere», in un unico file HTML.
 
@@ -12,7 +14,7 @@ Un gioco a quiz nello spirito di Kahoot — «Quiz senza frontiere», in un unic
 
 ## Che cos'è
 
-Undava è un gioco a quiz: crei i tuoi quiz e giochi da solo o con gli amici sullo stesso dispositivo. L'app si descrive come «offline, gratuita, senza account, senza pubblicità, senza telemetria». L'interfaccia è in 7 lingue. Il repository contiene anche `index.php`, un'edizione server (archiviazione su file, senza database SQL), descritta nell'intestazione del file e nel manuale dell'app; la pagina su GitHub Pages è l'edizione statica `index.html`.
+Undava è un gioco a quiz: crei i tuoi quiz e giochi da solo o con gli amici sullo stesso dispositivo. L'app si descrive come «offline, gratuita, senza account, senza pubblicità, senza telemetria». L'interfaccia è in 8 lingue. Il repository contiene anche `index.php`, un'edizione server (archiviazione su file, senza database SQL), descritta nell'intestazione del file e nel manuale dell'app; la pagina su GitHub Pages è l'edizione statica `index.html`.
 
 ## Funzioni
 
@@ -24,7 +26,7 @@ Undava è un gioco a quiz: crei i tuoi quiz e giochi da solo o con gli amici sul
 - Guida all'uso nell'app (Guida rapida, Manuale utente, Manuale amministratore).
 - Impostazioni: lingua, audio.
 - Le funzioni di gioco dal vivo sincrono, il tema autonomo e le attività per il pubblico sono descritte nel manuale dell'app come appartenenti all'edizione server (`index.php`), non alla pagina statica.
-- Lingue: rumeno, inglese, francese, italiano, spagnolo, portoghese, tedesco.
+- Lingue: rumeno, inglese, francese, italiano, spagnolo, portoghese, tedesco, ungherese.
 
 ## Manuale d'uso
 
@@ -43,7 +45,7 @@ Undava è un gioco a quiz: crei i tuoi quiz e giochi da solo o con gli amici sul
 - **Rete:** la pagina non carica script, font o immagini da altri siti (CSP: `default-src 'self'`, `connect-src 'self'`). L'unico `fetch` nel codice è verso `index.php?asset=manifest` sullo stesso sito, usato quando apri l'«edizione server»; su un host statico che non esegue PHP questo controllo fallisce e l'app mostra una guida all'installazione.
 - I meta tag Open Graph puntano a immagini su `chiuta.github.io` per l'anteprima del link; sono letti dalle piattaforme che mostrano il link, non dall'app.
 - L'edizione `index.php` (se la ospiti) ha un proprio server, una password di amministratore e un file di feedback; non fa parte della pagina statica.
-- Attenzione all'edizione `index.php`: essa **memorizza dati sul server** (quiz, feedback dei visitatori in `data/feedback.txt`: nome facoltativo, voto, messaggio, quiz), quindi lo slogan «senza telemetria» si applica a ciò che l'app invia a terzi, non ai dati che riceve il tuo server. Il modulo di feedback dell'edizione server mostra (nelle 7 lingue) una nota sulla privacy: i dati sono conservati sul server dell'istanza e possono essere letti dall'amministratore, e la cancellazione si richiede all'amministratore. Se ospiti pubblicamente l'edizione server sei il titolare del trattamento dei dati (GDPR): informa i visitatori, cancella su richiesta (il pulsante di cancellazione nella schermata di feedback o il file `data/feedback.txt`) e non conservare i messaggi più a lungo del necessario.
+- Attenzione all'edizione `index.php`: essa **memorizza dati sul server** (quiz, feedback dei visitatori in `data/feedback.txt`: nome facoltativo, voto, messaggio, quiz), quindi lo slogan «senza telemetria» si applica a ciò che l'app invia a terzi, non ai dati che riceve il tuo server. Il modulo di feedback dell'edizione server mostra (nelle 8 lingue) una nota sulla privacy: i dati sono conservati sul server dell'istanza e possono essere letti dall'amministratore, e la cancellazione si richiede all'amministratore. Se ospiti pubblicamente l'edizione server sei il titolare del trattamento dei dati (GDPR): informa i visitatori, cancella su richiesta (il pulsante di cancellazione nella schermata di feedback o il file `data/feedback.txt`) e non conservare i messaggi più a lungo del necessario.
 - **Installazione dell'edizione server (chiave di installazione):** «il primo visitatore diventa amministratore» non è più possibile. La creazione della prima password richiede una *chiave di installazione* che esiste solo sul server: il file `setup.key` accanto a `index.php` (o `../undava-setup.key`, fuori dalla radice web, più sicuro) con almeno 12 caratteri casuali, oppure la variabile d'ambiente `UNDAVA_SETUP_KEY`. Senza chiave, la configurazione viene rifiutata; un `setup.key` nella directory dell'applicazione viene eliminato automaticamente dopo la configurazione. La chiave si inserisce nella finestra «Configurazione amministratore». I tentativi errati vengono rallentati per IP.
 
 ## Esecuzione in locale / offline
@@ -64,7 +66,7 @@ Alexio — Alexandru-Ionuț Chiuță, contatto: alexio@trom.tf
 
 ## Riepilogo
 
-Undava («Quiz senza frontiere») è un gioco a quiz in stile Kahoot in un unico file HTML: crea quiz con quattro tipi di domande, gioca in Solo o a turno, importa/esporta JSON e usa una ruota casuale. Interfaccia in 7 lingue. I quiz sono conservati in localStorage; la pagina statica non effettua richieste a terzi. Un'edizione server PHP separata (`index.php`) nel repository aggiunge le funzioni che richiedono un server.
+Undava («Quiz senza frontiere») è un gioco a quiz in stile Kahoot in un unico file HTML: crea quiz con quattro tipi di domande, gioca in Solo o a turno, importa/esporta JSON e usa una ruota casuale. Interfaccia in 8 lingue. I quiz sono conservati in localStorage; la pagina statica non effettua richieste a terzi. Un'edizione server PHP separata (`index.php`) nel repository aggiunge le funzioni che richiedono un server.
 
 ## Audit
 

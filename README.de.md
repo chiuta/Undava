@@ -2,7 +2,9 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · **Deutsch** · [Magyar](README.hu.md)
 
-**Version:** 1.1.0 · **Zuletzt aktualisiert:** 2026-10-14
+**Version:** 1.2.0 · **Zuletzt aktualisiert:** 2026-10-19
+
+Oberflächensprachen: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
 Ein Quizspiel im Geiste von Kahoot — „Quiz ohne Grenzen“, in einer einzigen HTML-Datei.
 
@@ -12,7 +14,7 @@ Ein Quizspiel im Geiste von Kahoot — „Quiz ohne Grenzen“, in einer einzige
 
 ## Was es ist
 
-Undava ist ein Quizspiel: Du erstellst eigene Quizze und spielst allein oder mit Freunden auf demselben Gerät. Die App beschreibt sich als „offline, kostenlos, ohne Konten, ohne Werbung, ohne Telemetrie“. Die Oberfläche ist in 7 Sprachen verfügbar. Das Repository enthält außerdem `index.php`, eine Server-Edition (Dateispeicherung, ohne SQL-Datenbank), die im Dateikopf und im Handbuch der App beschrieben ist; die Seite auf GitHub Pages ist die statische Edition `index.html`.
+Undava ist ein Quizspiel: Du erstellst eigene Quizze und spielst allein oder mit Freunden auf demselben Gerät. Die App beschreibt sich als „offline, kostenlos, ohne Konten, ohne Werbung, ohne Telemetrie“. Die Oberfläche ist in 8 Sprachen verfügbar. Das Repository enthält außerdem `index.php`, eine Server-Edition (Dateispeicherung, ohne SQL-Datenbank), die im Dateikopf und im Handbuch der App beschrieben ist; die Seite auf GitHub Pages ist die statische Edition `index.html`.
 
 ## Funktionen
 
@@ -24,7 +26,7 @@ Undava ist ein Quizspiel: Du erstellst eigene Quizze und spielst allein oder mit
 - Anleitung in der App (Kurzanleitung, Benutzerhandbuch, Administratorhandbuch).
 - Einstellungen: Sprache, Ton.
 - Die Funktionen für synchrones Live-Spiel, das eigenständige Design und die Publikumsaktivitäten werden im Handbuch der App als Teil der Server-Edition (`index.php`) beschrieben, nicht der statischen Seite.
-- Sprachen: Rumänisch, Englisch, Französisch, Italienisch, Spanisch, Portugiesisch, Deutsch.
+- Sprachen: Rumänisch, Englisch, Französisch, Italienisch, Spanisch, Portugiesisch, Deutsch, Ungarisch.
 
 ## Bedienungsanleitung
 
@@ -43,7 +45,7 @@ Undava ist ein Quizspiel: Du erstellst eigene Quizze und spielst allein oder mit
 - **Netzwerk:** Die Seite lädt keine Skripte, Schriftarten oder Bilder von anderen Websites (CSP: `default-src 'self'`, `connect-src 'self'`). Der einzige `fetch` im Code geht an `index.php?asset=manifest` derselben Website und wird verwendet, wenn du die „Server-Edition“ öffnest; auf einem statischen Host ohne PHP schlägt diese Prüfung fehl, und die App zeigt eine Installationsanleitung.
 - Die Open-Graph-Metatags verweisen für die Link-Vorschau auf Bilder von `chiuta.github.io`; sie werden von den Plattformen gelesen, die den Link anzeigen, nicht von der App.
 - Die Edition `index.php` (wenn du sie hostest) hat einen eigenen Server, ein Administratorpasswort und eine Feedback-Datei; sie ist nicht Teil der statischen Seite.
-- Achtung bei der Edition `index.php`: Sie **speichert Daten auf dem Server** (Quizze, Besucher-Feedback in `data/feedback.txt`: optionaler Name, Bewertung, Nachricht, Quiz), daher gilt der Slogan „ohne Telemetrie“ für das, was die App an Dritte sendet, nicht für die Daten, die dein Server erhält. Das Feedback-Formular der Server-Edition zeigt (in den 7 Sprachen) einen Datenschutzhinweis: Die Daten werden auf dem Server der Instanz gespeichert und können vom Administrator eingesehen werden, die Löschung wird beim Administrator beantragt. Wenn du die Server-Edition öffentlich hostest, bist du Verantwortlicher für die Daten (DSGVO): informiere die Besucher, lösche auf Anfrage (die Löschschaltfläche im Feedback-Bildschirm oder die Datei `data/feedback.txt`) und bewahre Nachrichten nicht länger auf als nötig.
+- Achtung bei der Edition `index.php`: Sie **speichert Daten auf dem Server** (Quizze, Besucher-Feedback in `data/feedback.txt`: optionaler Name, Bewertung, Nachricht, Quiz), daher gilt der Slogan „ohne Telemetrie“ für das, was die App an Dritte sendet, nicht für die Daten, die dein Server erhält. Das Feedback-Formular der Server-Edition zeigt (in den 8 Sprachen) einen Datenschutzhinweis: Die Daten werden auf dem Server der Instanz gespeichert und können vom Administrator eingesehen werden, die Löschung wird beim Administrator beantragt. Wenn du die Server-Edition öffentlich hostest, bist du Verantwortlicher für die Daten (DSGVO): informiere die Besucher, lösche auf Anfrage (die Löschschaltfläche im Feedback-Bildschirm oder die Datei `data/feedback.txt`) und bewahre Nachrichten nicht länger auf als nötig.
 - **Installation der Server-Edition (Einrichtungsschlüssel):** „Der erste Besucher wird Administrator“ ist nicht mehr möglich. Das Anlegen des ersten Passworts erfordert einen *Einrichtungsschlüssel*, der nur auf dem Server existiert: die Datei `setup.key` neben `index.php` (oder `../undava-setup.key`, außerhalb des Web-Stammverzeichnisses, sicherer) mit mindestens 12 zufälligen Zeichen, oder die Umgebungsvariable `UNDAVA_SETUP_KEY`. Ohne Schlüssel wird die Einrichtung verweigert; eine `setup.key` im Anwendungsverzeichnis wird nach der Einrichtung automatisch gelöscht. Der Schlüssel wird im Fenster „Administrator-Einrichtung“ eingegeben. Falsche Versuche werden pro IP verlangsamt.
 
 ## Lokale Ausführung / offline
@@ -64,7 +66,7 @@ Alexio — Alexandru-Ionuț Chiuță, Kontakt: alexio@trom.tf
 
 ## Zusammenfassung
 
-Undava („Quiz ohne Grenzen“) ist ein Quizspiel im Kahoot-Stil in einer HTML-Datei: Erstelle Quizze mit vier Fragetypen, spiele Solo oder reihum, importiere/exportiere JSON und nutze ein Zufallsrad. Oberfläche in 7 Sprachen. Die Quizze werden in localStorage gehalten; die statische Seite stellt keine Anfragen an Dritte. Eine separate PHP-Server-Edition (`index.php`) im Repository ergänzt die Funktionen, die einen Server benötigen.
+Undava („Quiz ohne Grenzen“) ist ein Quizspiel im Kahoot-Stil in einer HTML-Datei: Erstelle Quizze mit vier Fragetypen, spiele Solo oder reihum, importiere/exportiere JSON und nutze ein Zufallsrad. Oberfläche in 8 Sprachen. Die Quizze werden in localStorage gehalten; die statische Seite stellt keine Anfragen an Dritte. Eine separate PHP-Server-Edition (`index.php`) im Repository ergänzt die Funktionen, die einen Server benötigen.
 
 ## Audit
 

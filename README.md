@@ -2,7 +2,9 @@
 
 **English** · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Version:** 1.1.0 · **Last updated:** 2026-10-14
+**Version:** 1.2.0 · **Last updated:** 2026-10-19
+
+Interface languages: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
 A quiz game in the spirit of Kahoot — "Quiz without Borders", in a single HTML file.
 
@@ -12,7 +14,7 @@ A quiz game in the spirit of Kahoot — "Quiz without Borders", in a single HTML
 
 ## What it is
 
-Undava is a quiz game: you create your own quizzes and play alone or with friends on the same device. The app describes itself as "offline, free, no accounts, no ads, no telemetry". The interface is in 7 languages. The repository also contains `index.php`, a server edition (file-based storage, no SQL database), described in the file header and in the in-app manual; the page on GitHub Pages is the static edition `index.html`.
+Undava is a quiz game: you create your own quizzes and play alone or with friends on the same device. The app describes itself as "offline, free, no accounts, no ads, no telemetry". The interface is in 8 languages. The repository also contains `index.php`, a server edition (file-based storage, no SQL database), described in the file header and in the in-app manual; the page on GitHub Pages is the static edition `index.html`.
 
 ## Features
 
@@ -24,7 +26,7 @@ Undava is a quiz game: you create your own quizzes and play alone or with friend
 - In-app usage guide (Quick guide, User manual, Administrator manual).
 - Settings: language, sound.
 - The synchronous live game features, the standalone theme and the audience activities are described in the in-app manual as belonging to the server edition (`index.php`), not to the static page.
-- Languages: Romanian, English, French, Italian, Spanish, Portuguese, German.
+- Languages: Romanian, English, French, Italian, Spanish, Portuguese, German, Hungarian.
 
 ## User guide
 
@@ -43,7 +45,7 @@ Undava is a quiz game: you create your own quizzes and play alone or with friend
 - **Network:** the page loads no scripts, fonts or images from other sites (CSP: `default-src 'self'`, `connect-src 'self'`). The only `fetch` in the code goes to `index.php?asset=manifest` on the same site, used when you open the "server edition"; on a static host that does not run PHP this check fails and the app shows an installation guide.
 - The Open Graph meta tags point to images on `chiuta.github.io` for link previews; they are read by the platforms that display the link, not by the app.
 - The `index.php` edition (if you host it) has its own server, administrator password and feedback file; it is not part of the static page.
-- Note on the `index.php` edition: it **stores data on the server** (quizzes, visitor feedback in `data/feedback.txt`: optional name, rating, message, quiz), so the slogan "no telemetry" applies to what the app sends to third parties, not to the data your server receives. The feedback form of the server edition shows (in the 7 languages) a privacy note: the data is kept on the instance's server and can be read by the administrator, and deletion is requested from the administrator. If you host the server edition publicly you are the data operator (GDPR): inform visitors, delete on request (the delete button on the feedback screen or the `data/feedback.txt` file) and do not keep messages longer than necessary.
+- Note on the `index.php` edition: it **stores data on the server** (quizzes, visitor feedback in `data/feedback.txt`: optional name, rating, message, quiz), so the slogan "no telemetry" applies to what the app sends to third parties, not to the data your server receives. The feedback form of the server edition shows (in the 8 languages) a privacy note: the data is kept on the instance's server and can be read by the administrator, and deletion is requested from the administrator. If you host the server edition publicly you are the data operator (GDPR): inform visitors, delete on request (the delete button on the feedback screen or the `data/feedback.txt` file) and do not keep messages longer than necessary.
 - **Installing the server edition (setup key):** "the first visitor becomes administrator" is no longer possible. Creating the first password requires a *setup key* that exists only on the server: a `setup.key` file next to `index.php` (or `../undava-setup.key`, outside the web root, safer) with at least 12 random characters, or the environment variable `UNDAVA_SETUP_KEY`. Without a key, setup is refused; a `setup.key` in the application directory is deleted automatically after setup. The key is entered in the "Administrator setup" window. Wrong attempts are slowed down per IP.
 
 ## Running locally / offline
@@ -64,7 +66,7 @@ Alexio — Alexandru-Ionuț Chiuță, contact: alexio@trom.tf
 
 ## Summary
 
-Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: create quizzes with four question types, play Solo or pass-and-play, import/export JSON, and use a random wheel. 7-language UI. Quizzes are kept in localStorage; the static page makes no third-party requests. A separate PHP server edition (`index.php`) in the repo adds the features that need a server.
+Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: create quizzes with four question types, play Solo or pass-and-play, import/export JSON, and use a random wheel. 8-language UI. Quizzes are kept in localStorage; the static page makes no third-party requests. A separate PHP server edition (`index.php`) in the repo adds the features that need a server.
 
 ## Audit
 

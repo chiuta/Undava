@@ -2,7 +2,9 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · **Magyar**
 
-**Verzió:** 1.1.0 · **Utolsó frissítés:** 2026-10-14
+**Verzió:** 1.2.0 · **Utolsó frissítés:** 2026-10-19
+
+A felület nyelvei: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
 Kahoot-szellemű kvízjáték — „Kvíz határok nélkül”, egyetlen HTML-fájlban.
 
@@ -12,7 +14,7 @@ Kahoot-szellemű kvízjáték — „Kvíz határok nélkül”, egyetlen HTML-f
 
 ## Mi ez
 
-Az Undava egy kvízjáték: saját kvízeket készíthetsz, és egyedül vagy barátokkal játszhatsz ugyanazon az eszközön. Az alkalmazás önmagát így írja le: „offline, ingyenes, fiókok nélkül, reklámok nélkül, telemetria nélkül”. A felület 7 nyelvű. A tároló tartalmazza az `index.php` fájlt is, amely egy szerveroldali kiadás (fájlalapú tárolás, SQL-adatbázis nélkül), amelyet a fájl fejléce és az alkalmazás kézikönyve ismertet; a GitHub Pages oldal a statikus `index.html` kiadás.
+Az Undava egy kvízjáték: saját kvízeket készíthetsz, és egyedül vagy barátokkal játszhatsz ugyanazon az eszközön. Az alkalmazás önmagát így írja le: „offline, ingyenes, fiókok nélkül, reklámok nélkül, telemetria nélkül”. A felület 8 nyelvű. A tároló tartalmazza az `index.php` fájlt is, amely egy szerveroldali kiadás (fájlalapú tárolás, SQL-adatbázis nélkül), amelyet a fájl fejléce és az alkalmazás kézikönyve ismertet; a GitHub Pages oldal a statikus `index.html` kiadás.
 
 ## Funkciók
 
@@ -24,7 +26,7 @@ Az Undava egy kvízjáték: saját kvízeket készíthetsz, és egyedül vagy ba
 - Használati útmutató az alkalmazásban (Gyors útmutató, Felhasználói kézikönyv, Adminisztrátori kézikönyv).
 - Beállítások: nyelv, hang.
 - A szinkron élő játék, az önálló téma és a közönségtevékenységek funkcióit az alkalmazás kézikönyve a szerveroldali kiadáshoz (`index.php`) tartozóként írja le, nem a statikus oldalhoz.
-- Nyelvek: román, angol, francia, olasz, spanyol, portugál, német.
+- Nyelvek: román, angol, francia, olasz, spanyol, portugál, német, magyar.
 
 ## Használati útmutató
 
@@ -43,7 +45,7 @@ Az Undava egy kvízjáték: saját kvízeket készíthetsz, és egyedül vagy ba
 - **Hálózat:** az oldal nem tölt be szkripteket, betűtípusokat vagy képeket más webhelyekről (CSP: `default-src 'self'`, `connect-src 'self'`). A kódban az egyetlen `fetch` ugyanazon webhely `index.php?asset=manifest` címére irányul, a „szerveroldali kiadás” megnyitásakor használva; PHP-t nem futtató statikus tárhelyen ez az ellenőrzés sikertelen, és az alkalmazás telepítési útmutatót jelenít meg.
 - Az Open Graph metacímkék a `chiuta.github.io` képeire mutatnak a hivatkozás előnézetéhez; ezeket a hivatkozást megjelenítő platformok olvassák, nem az alkalmazás.
 - Az `index.php` kiadásnak (ha te üzemelteted) saját szervere, adminisztrátori jelszava és visszajelzési fájlja van; nem része a statikus oldalnak.
-- Figyelem az `index.php` kiadásnál: ez **adatokat tárol a szerveren** (kvízek, a látogatók visszajelzései a `data/feedback.txt` fájlban: opcionális név, értékelés, üzenet, kvíz), így a „telemetria nélkül” jelmondat arra vonatkozik, amit az alkalmazás harmadik feleknek küld, nem azokra az adatokra, amelyeket a te szervered fogad. A szerveroldali kiadás visszajelzési űrlapja (a 7 nyelven) adatvédelmi megjegyzést jelenít meg: az adatokat a példány szervere őrzi, és az adminisztrátor elolvashatja őket, a törlést az adminisztrátortól kell kérni. Ha nyilvánosan üzemelteted a szerveroldali kiadást, te vagy az adatkezelő (GDPR): tájékoztasd a látogatókat, kérésre töröld az adatokat (a visszajelzési képernyő törlés gombja vagy a `data/feedback.txt` fájl), és ne őrizd meg az üzeneteket a szükségesnél tovább.
+- Figyelem az `index.php` kiadásnál: ez **adatokat tárol a szerveren** (kvízek, a látogatók visszajelzései a `data/feedback.txt` fájlban: opcionális név, értékelés, üzenet, kvíz), így a „telemetria nélkül” jelmondat arra vonatkozik, amit az alkalmazás harmadik feleknek küld, nem azokra az adatokra, amelyeket a te szervered fogad. A szerveroldali kiadás visszajelzési űrlapja (a 8 nyelven) adatvédelmi megjegyzést jelenít meg: az adatokat a példány szervere őrzi, és az adminisztrátor elolvashatja őket, a törlést az adminisztrátortól kell kérni. Ha nyilvánosan üzemelteted a szerveroldali kiadást, te vagy az adatkezelő (GDPR): tájékoztasd a látogatókat, kérésre töröld az adatokat (a visszajelzési képernyő törlés gombja vagy a `data/feedback.txt` fájl), és ne őrizd meg az üzeneteket a szükségesnél tovább.
 - **A szerveroldali kiadás telepítése (telepítési kulcs):** az „első látogató lesz az adminisztrátor” már nem lehetséges. Az első jelszó létrehozásához *telepítési kulcs* kell, amely csak a szerveren létezik: egy `setup.key` fájl az `index.php` mellett (vagy a `../undava-setup.key`, a webgyökéren kívül, biztonságosabb) legalább 12 véletlen karakterrel, vagy az `UNDAVA_SETUP_KEY` környezeti változó. Kulcs nélkül a beállítást elutasítja; az alkalmazás könyvtárában lévő `setup.key` a beállítás után automatikusan törlődik. A kulcsot az „Adminisztrátor beállítása” ablakban kell megadni. A hibás próbálkozásokat IP-címenként lassítja.
 
 ## Helyi futtatás / offline
@@ -64,7 +66,7 @@ Alexio — Alexandru-Ionuț Chiuță, kapcsolat: alexio@trom.tf
 
 ## Összefoglaló
 
-Az Undava („Kvíz határok nélkül”) egy Kahoot-stílusú kvízjáték egyetlen HTML-fájlban: készíts kvízeket négy kérdéstípussal, játssz Egyénileg vagy váltakozva, importálj/exportálj JSON-t, és használj véletlenszerű kereket. 7 nyelvű felület. A kvízek a localStorage-ban maradnak; a statikus oldal nem kezdeményez harmadik feleknek szóló kéréseket. A tárolóban egy különálló PHP szerveroldali kiadás (`index.php`) hozzáadja a szervert igénylő funkciókat.
+Az Undava („Kvíz határok nélkül”) egy Kahoot-stílusú kvízjáték egyetlen HTML-fájlban: készíts kvízeket négy kérdéstípussal, játssz Egyénileg vagy váltakozva, importálj/exportálj JSON-t, és használj véletlenszerű kereket. 8 nyelvű felület. A kvízek a localStorage-ban maradnak; a statikus oldal nem kezdeményez harmadik feleknek szóló kéréseket. A tárolóban egy különálló PHP szerveroldali kiadás (`index.php`) hozzáadja a szervert igénylő funkciókat.
 
 ## Audit
 

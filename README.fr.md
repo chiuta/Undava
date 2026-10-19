@@ -2,7 +2,9 @@
 
 [English](README.md) · [Română](README.ro.md) · **Français** · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Version :** 1.1.0 · **Dernière mise à jour :** 2026-10-14
+**Version :** 1.2.0 · **Dernière mise à jour :** 2026-10-19
+
+Langues de l'interface : **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
 Un jeu de quiz dans l'esprit de Kahoot — « Quiz sans frontières », dans un seul fichier HTML.
 
@@ -12,7 +14,7 @@ Un jeu de quiz dans l'esprit de Kahoot — « Quiz sans frontières », dans un 
 
 ## Ce que c'est
 
-Undava est un jeu de quiz : vous créez vos propres quiz et jouez seul ou avec des amis sur le même appareil. L'application se décrit comme « hors ligne, gratuite, sans comptes, sans publicité, sans télémétrie ». L'interface est en 7 langues. Le dépôt contient aussi `index.php`, une édition serveur (stockage dans des fichiers, sans base de données SQL), décrite dans l'en-tête du fichier et dans le manuel de l'application ; la page sur GitHub Pages est l'édition statique `index.html`.
+Undava est un jeu de quiz : vous créez vos propres quiz et jouez seul ou avec des amis sur le même appareil. L'application se décrit comme « hors ligne, gratuite, sans comptes, sans publicité, sans télémétrie ». L'interface est en 8 langues. Le dépôt contient aussi `index.php`, une édition serveur (stockage dans des fichiers, sans base de données SQL), décrite dans l'en-tête du fichier et dans le manuel de l'application ; la page sur GitHub Pages est l'édition statique `index.html`.
 
 ## Fonctionnalités
 
@@ -24,7 +26,7 @@ Undava est un jeu de quiz : vous créez vos propres quiz et jouez seul ou avec d
 - Guide d'utilisation dans l'application (Guide rapide, Manuel utilisateur, Manuel administrateur).
 - Paramètres : langue, son.
 - Les fonctions de jeu en direct synchrone, le thème autonome et les activités d'audience sont décrites dans le manuel de l'application comme relevant de l'édition serveur (`index.php`), et non de la page statique.
-- Langues : roumain, anglais, français, italien, espagnol, portugais, allemand.
+- Langues : roumain, anglais, français, italien, espagnol, portugais, allemand, hongrois.
 
 ## Mode d'emploi
 
@@ -43,7 +45,7 @@ Undava est un jeu de quiz : vous créez vos propres quiz et jouez seul ou avec d
 - **Réseau :** la page ne charge ni scripts, ni polices, ni images depuis d'autres sites (CSP : `default-src 'self'`, `connect-src 'self'`). Le seul `fetch` du code vise `index.php?asset=manifest` sur le même site, utilisé lorsque vous ouvrez l'« édition serveur » ; sur un hébergement statique qui n'exécute pas PHP, cette vérification échoue et l'application affiche un guide d'installation.
 - Les balises meta Open Graph pointent vers des images sur `chiuta.github.io` pour l'aperçu du lien ; elles sont lues par les plateformes qui affichent le lien, pas par l'application.
 - L'édition `index.php` (si vous l'hébergez) a son propre serveur, son mot de passe administrateur et son fichier de retours ; elle ne fait pas partie de la page statique.
-- Attention à l'édition `index.php` : elle **stocke des données sur le serveur** (quiz, retours des visiteurs dans `data/feedback.txt` : nom facultatif, note, message, quiz), de sorte que le slogan « sans télémétrie » s'applique à ce que l'application envoie à des tiers, et non aux données que reçoit votre serveur. Le formulaire de retours de l'édition serveur affiche (dans les 7 langues) une note de confidentialité : les données sont conservées sur le serveur de l'instance et peuvent être lues par l'administrateur, et la suppression se demande à l'administrateur. Si vous hébergez publiquement l'édition serveur, vous êtes l'opérateur des données (RGPD) : informez les visiteurs, supprimez sur demande (le bouton de suppression de l'écran de retours ou le fichier `data/feedback.txt`) et ne conservez pas les messages plus longtemps que nécessaire.
+- Attention à l'édition `index.php` : elle **stocke des données sur le serveur** (quiz, retours des visiteurs dans `data/feedback.txt` : nom facultatif, note, message, quiz), de sorte que le slogan « sans télémétrie » s'applique à ce que l'application envoie à des tiers, et non aux données que reçoit votre serveur. Le formulaire de retours de l'édition serveur affiche (dans les 8 langues) une note de confidentialité : les données sont conservées sur le serveur de l'instance et peuvent être lues par l'administrateur, et la suppression se demande à l'administrateur. Si vous hébergez publiquement l'édition serveur, vous êtes l'opérateur des données (RGPD) : informez les visiteurs, supprimez sur demande (le bouton de suppression de l'écran de retours ou le fichier `data/feedback.txt`) et ne conservez pas les messages plus longtemps que nécessaire.
 - **Installation de l'édition serveur (clé d'installation) :** « le premier visiteur devient administrateur » n'est plus possible. La création du premier mot de passe exige une *clé d'installation* qui n'existe que sur le serveur : un fichier `setup.key` à côté de `index.php` (ou `../undava-setup.key`, en dehors de la racine web, plus sûr) d'au moins 12 caractères aléatoires, ou la variable d'environnement `UNDAVA_SETUP_KEY`. Sans clé, la configuration est refusée ; un `setup.key` situé dans le répertoire de l'application est supprimé automatiquement après la configuration. La clé se saisit dans la fenêtre « Configuration de l'administrateur ». Les tentatives erronées sont ralenties par IP.
 
 ## Exécution locale / hors ligne
@@ -64,7 +66,7 @@ Alexio — Alexandru-Ionuț Chiuță, contact : alexio@trom.tf
 
 ## Résumé
 
-Undava (« Quiz sans frontières ») est un jeu de quiz de style Kahoot dans un seul fichier HTML : créez des quiz avec quatre types de questions, jouez en Solo ou à tour de rôle, importez/exportez du JSON et utilisez une roue aléatoire. Interface en 7 langues. Les quiz sont conservés dans localStorage ; la page statique n'effectue aucune requête vers des tiers. Une édition serveur PHP distincte (`index.php`) dans le dépôt ajoute les fonctions qui nécessitent un serveur.
+Undava (« Quiz sans frontières ») est un jeu de quiz de style Kahoot dans un seul fichier HTML : créez des quiz avec quatre types de questions, jouez en Solo ou à tour de rôle, importez/exportez du JSON et utilisez une roue aléatoire. Interface en 8 langues. Les quiz sont conservés dans localStorage ; la page statique n'effectue aucune requête vers des tiers. Une édition serveur PHP distincte (`index.php`) dans le dépôt ajoute les fonctions qui nécessitent un serveur.
 
 ## Audit
 
