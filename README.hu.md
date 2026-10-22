@@ -2,7 +2,7 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · **Magyar**
 
-**Verzió:** 1.2.2 · **Utolsó frissítés:** 2026-10-22
+**Verzió:** 1.2.3 · **Utolsó frissítés:** 2026-10-22
 
 A felület nyelvei: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -73,6 +73,9 @@ Az Undava („Kvíz határok nélkül”) egy Kahoot-stílusú kvízjáték egye
 Audit: 2026-10-10 (2. kör: 2026-10-11, telepítési kulcs a kezdeti adminisztrátorhoz, GDPR-megjegyzés a visszajelzésekhez, elérhető nevek a visszajelzési űrlapon) — böngészőben ellenőrizve (nincs JS-hiba, axe WCAG 2.1 AA minden képernyőn — kezdőlap, kvíztár, szerkesztő, játék, kerék, útmutató, importálás, beállítások — 0 serious/critical probléma a szerkesztő címkéinek, a kontrasztnak és az útmutató tartalomjegyzékének javítása után); az `index.php` átmegy a `php -l` ellenőrzésen, és ugyanezek a javítások a PHP-kiadásban is alkalmazva vannak.
 
 ## Előzmények / Changelog
+
+### 1.2.3 — 2026-10-22
+- fff-kit 1.1.2: PBKDF2 600 000 iterációval, clickjacking elleni védelem.
 
 ### 1.2.2 — 2026-10-22
 - A natív confirm() ablakokat (kilépés a szerkesztőből mentetlen módosításokkal, kvíz törlése, játék elhagyása) akadálymentes, az aktuális nyelvű párbeszédablak váltotta fel.
