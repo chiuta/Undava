@@ -2,7 +2,7 @@
 
 **English** · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Version:** 1.2.5 · **Last updated:** 2026-10-23
+**Version:** 1.2.6 · **Last updated:** 2026-10-23
 
 Interface languages: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -41,7 +41,7 @@ Undava is a quiz game: you create your own quizzes and play alone or with friend
 
 ## Privacy and network
 
-- **Local storage:** `localStorage`, key `quizfarafrontiere_v1` (your quizzes, language, sound setting etc.), `quizfarafrontiere_v1_spin` (the Wheel's items) and `quizfarafrontiere_v1_best` (personal bests). If you clear the site data, local quizzes are lost; use the JSON export.
+- **Local storage:** `localStorage`, key `undava.quiz_v1` (your quizzes, language, sound setting etc.), `undava.quiz_v1_spin` (the Wheel's items) and `undava.quiz_v1_best` (personal bests). If you clear the site data, local quizzes are lost; use the JSON export.
 - **Network:** the page loads no scripts, fonts or images from other sites (CSP: `default-src 'self'`, `connect-src 'self'`). The only `fetch` in the code goes to `index.php?asset=manifest` on the same site, used when you open the "server edition"; on a static host that does not run PHP this check fails and the app shows an installation guide.
 - The Open Graph meta tags point to images on `chiuta.github.io` for link previews; they are read by the platforms that display the link, not by the app.
 - The `index.php` edition (if you host it) has its own server, administrator password and feedback file; it is not part of the static page.
@@ -73,6 +73,10 @@ Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: cr
 Audit: 2026-10-10 (round 2: 2026-10-11, setup key for the initial administrator, GDPR note for feedback, accessible names in the feedback form) — verified in the browser (no JS errors, axe WCAG 2.1 AA on all screens — home, library, editor, game, wheel, guide, import, settings — 0 serious/critical problems after fixing the editor labels, the contrast and the guide's table of contents); `index.php` passes `php -l`, and the same fixes are applied in the PHP edition too.
 
 ## History / Changelog
+
+### 1.2.6 — 2026-10-23
+
+- Local storage keys now use the `undava.` prefix (`FFF.store.migrate` at startup, before any read): existing data is kept automatically, and old `.fff.json` backups can still be imported.
 
 ### 1.2.4 — 2026-10-22
 - fff-kit 1.1.4: touch targets and minimum text size

@@ -2,7 +2,7 @@
 
 [English](README.md) · [Română](README.ro.md) · **Français** · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Version :** 1.2.5 · **Dernière mise à jour :** 2026-10-23
+**Version :** 1.2.6 · **Dernière mise à jour :** 2026-10-23
 
 Langues de l'interface : **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -41,7 +41,7 @@ Undava est un jeu de quiz : vous créez vos propres quiz et jouez seul ou avec d
 
 ## Confidentialité et réseau
 
-- **Stockage local :** `localStorage`, clé `quizfarafrontiere_v1` (vos quiz, la langue, le réglage du son, etc.), `quizfarafrontiere_v1_spin` (les éléments de la Roue) et `quizfarafrontiere_v1_best` (les records personnels). Si vous effacez les données du site, les quiz locaux sont perdus ; utilisez l'export JSON.
+- **Stockage local :** `localStorage`, clé `undava.quiz_v1` (vos quiz, la langue, le réglage du son, etc.), `undava.quiz_v1_spin` (les éléments de la Roue) et `undava.quiz_v1_best` (les records personnels). Si vous effacez les données du site, les quiz locaux sont perdus ; utilisez l'export JSON.
 - **Réseau :** la page ne charge ni scripts, ni polices, ni images depuis d'autres sites (CSP : `default-src 'self'`, `connect-src 'self'`). Le seul `fetch` du code vise `index.php?asset=manifest` sur le même site, utilisé lorsque vous ouvrez l'« édition serveur » ; sur un hébergement statique qui n'exécute pas PHP, cette vérification échoue et l'application affiche un guide d'installation.
 - Les balises meta Open Graph pointent vers des images sur `chiuta.github.io` pour l'aperçu du lien ; elles sont lues par les plateformes qui affichent le lien, pas par l'application.
 - L'édition `index.php` (si vous l'hébergez) a son propre serveur, son mot de passe administrateur et son fichier de retours ; elle ne fait pas partie de la page statique.
@@ -73,6 +73,10 @@ Undava (« Quiz sans frontières ») est un jeu de quiz de style Kahoot dans un 
 Audit : 2026-10-10 (tour 2 : 2026-10-11, clé d'installation pour l'administrateur initial, note RGPD pour les retours, noms accessibles dans le formulaire de retours) — vérifié dans le navigateur (aucune erreur JS, axe WCAG 2.1 AA sur tous les écrans — accueil, bibliothèque, éditeur, jeu, roue, guide, import, paramètres — 0 problème serious/critical après correction des étiquettes de l'éditeur, du contraste et de la table des matières du guide) ; `index.php` passe `php -l`, et les mêmes corrections sont appliquées aussi dans l'édition PHP.
 
 ## Historique / Changelog
+
+### 1.2.6 — 2026-10-23
+
+- Les clés du stockage local utilisent désormais le préfixe `undava.` (`FFF.store.migrate` au démarrage, avant toute lecture) : les données existantes sont conservées automatiquement et les anciennes sauvegardes `.fff.json` restent importables.
 
 ### 1.2.4 — 2026-10-22
 - fff-kit 1.1.4 : cibles tactiles et taille de texte minimale

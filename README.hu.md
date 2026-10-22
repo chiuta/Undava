@@ -2,7 +2,7 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · **Magyar**
 
-**Verzió:** 1.2.5 · **Utolsó frissítés:** 2026-10-23
+**Verzió:** 1.2.6 · **Utolsó frissítés:** 2026-10-23
 
 A felület nyelvei: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -41,7 +41,7 @@ Az Undava egy kvízjáték: saját kvízeket készíthetsz, és egyedül vagy ba
 
 ## Adatvédelem és hálózat
 
-- **Helyi tárolás:** `localStorage`, kulcs: `quizfarafrontiere_v1` (a kvízeid, a nyelv, a hangbeállítás stb.), `quizfarafrontiere_v1_spin` (a Kerék elemei) és `quizfarafrontiere_v1_best` (a személyes rekordok). Ha törlöd az oldal adatait, a helyi kvízek elvesznek; használd a JSON-exportot.
+- **Helyi tárolás:** `localStorage`, kulcs: `undava.quiz_v1` (a kvízeid, a nyelv, a hangbeállítás stb.), `undava.quiz_v1_spin` (a Kerék elemei) és `undava.quiz_v1_best` (a személyes rekordok). Ha törlöd az oldal adatait, a helyi kvízek elvesznek; használd a JSON-exportot.
 - **Hálózat:** az oldal nem tölt be szkripteket, betűtípusokat vagy képeket más webhelyekről (CSP: `default-src 'self'`, `connect-src 'self'`). A kódban az egyetlen `fetch` ugyanazon webhely `index.php?asset=manifest` címére irányul, a „szerveroldali kiadás” megnyitásakor használva; PHP-t nem futtató statikus tárhelyen ez az ellenőrzés sikertelen, és az alkalmazás telepítési útmutatót jelenít meg.
 - Az Open Graph metacímkék a `chiuta.github.io` képeire mutatnak a hivatkozás előnézetéhez; ezeket a hivatkozást megjelenítő platformok olvassák, nem az alkalmazás.
 - Az `index.php` kiadásnak (ha te üzemelteted) saját szervere, adminisztrátori jelszava és visszajelzési fájlja van; nem része a statikus oldalnak.
@@ -73,6 +73,10 @@ Az Undava („Kvíz határok nélkül”) egy Kahoot-stílusú kvízjáték egye
 Audit: 2026-10-10 (2. kör: 2026-10-11, telepítési kulcs a kezdeti adminisztrátorhoz, GDPR-megjegyzés a visszajelzésekhez, elérhető nevek a visszajelzési űrlapon) — böngészőben ellenőrizve (nincs JS-hiba, axe WCAG 2.1 AA minden képernyőn — kezdőlap, kvíztár, szerkesztő, játék, kerék, útmutató, importálás, beállítások — 0 serious/critical probléma a szerkesztő címkéinek, a kontrasztnak és az útmutató tartalomjegyzékének javítása után); az `index.php` átmegy a `php -l` ellenőrzésen, és ugyanezek a javítások a PHP-kiadásban is alkalmazva vannak.
 
 ## Előzmények / Changelog
+
+### 1.2.6 — 2026-10-23
+
+- A helyi tárhely kulcsai mostantól a `undava.` előtagot használják (`FFF.store.migrate` induláskor, bármilyen olvasás előtt): a meglévő adatok automatikusan megmaradnak, a régi `.fff.json` mentések továbbra is importálhatók.
 
 ### 1.2.4 — 2026-10-22
 - fff-kit 1.1.4: érintési célpontok és minimális szövegméret

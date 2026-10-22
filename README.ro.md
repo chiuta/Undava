@@ -2,7 +2,7 @@
 
 [English](README.md) · **Română** · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Versiune:** 1.2.5 · **Ultima actualizare:** 2026-10-23
+**Versiune:** 1.2.6 · **Ultima actualizare:** 2026-10-23
 
 Limbile interfeței: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -41,7 +41,7 @@ Undava este un joc de quiz: creezi propriile quiz-uri și joci singur sau cu pri
 
 ## Confidențialitate și rețea
 
-- **Stocare locală:** `localStorage`, cheia `quizfarafrontiere_v1` (quiz-urile tale, limba, setarea de sunet etc.), `quizfarafrontiere_v1_spin` (elementele Roții) și `quizfarafrontiere_v1_best` (recordurile personale). Dacă ștergi datele site-ului, quiz-urile locale se pierd; folosește exportul JSON.
+- **Stocare locală:** `localStorage`, cheia `undava.quiz_v1` (quiz-urile tale, limba, setarea de sunet etc.), `undava.quiz_v1_spin` (elementele Roții) și `undava.quiz_v1_best` (recordurile personale). Dacă ștergi datele site-ului, quiz-urile locale se pierd; folosește exportul JSON.
 - **Rețea:** pagina nu încarcă scripturi, fonturi sau imagini de pe alte site-uri (CSP: `default-src 'self'`, `connect-src 'self'`). Singurul `fetch` din cod este către `index.php?asset=manifest` de pe același site, folosit când deschizi „ediția server”; pe un host static care nu rulează PHP această verificare eșuează și aplicația afișează un ghid de instalare.
 - Metaetichetele Open Graph indică imagini de pe `chiuta.github.io` pentru previzualizarea linkului; ele sunt citite de platformele care afișează linkul, nu de aplicație.
 - Ediția `index.php` (dacă o găzduiești) are propriul server, parolă de administrator și fișier de feedback; ea nu face parte din pagina statică.
@@ -73,6 +73,10 @@ Undava („Quiz fără frontiere”) este un joc de tip Kahoot într-un singur f
 Audit: 2026-10-10 (rundă 2: 2026-10-11, cheie de instalare pentru administratorul inițial, notă GDPR pentru feedback, nume accesibile în formularul de feedback) — verificat în browser (fără erori JS, axe WCAG 2.1 AA pe toate ecranele — acasă, bibliotecă, editor, joc, roată, ghid, import, setări — 0 probleme serious/critical după corectarea etichetelor din editor, a contrastului și a cuprinsului ghidului); `index.php` trece `php -l`, iar aceleași corecturi sunt aplicate și în ediția PHP.
 
 ## Istoric / Changelog
+
+### 1.2.6 — 2026-10-23
+
+- Cheile din stocarea locală folosesc acum prefixul `undava.` (`FFF.store.migrate` la pornire, înainte de orice citire): datele existente se păstrează automat, iar copiile `.fff.json` vechi se pot importa în continuare.
 
 ### 1.2.4 — 2026-10-22
 - fff-kit 1.1.4: ținte tactile și text minim

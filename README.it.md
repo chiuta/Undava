@@ -2,7 +2,7 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · **Italiano** · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Versione:** 1.2.5 · **Ultimo aggiornamento:** 2026-10-23
+**Versione:** 1.2.6 · **Ultimo aggiornamento:** 2026-10-23
 
 Lingue dell'interfaccia: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -41,7 +41,7 @@ Undava è un gioco a quiz: crei i tuoi quiz e giochi da solo o con gli amici sul
 
 ## Privacy e rete
 
-- **Memorizzazione locale:** `localStorage`, chiave `quizfarafrontiere_v1` (i tuoi quiz, la lingua, l'impostazione audio ecc.), `quizfarafrontiere_v1_spin` (gli elementi della Ruota) e `quizfarafrontiere_v1_best` (i record personali). Se cancelli i dati del sito, i quiz locali vanno persi; usa l'esportazione JSON.
+- **Memorizzazione locale:** `localStorage`, chiave `undava.quiz_v1` (i tuoi quiz, la lingua, l'impostazione audio ecc.), `undava.quiz_v1_spin` (gli elementi della Ruota) e `undava.quiz_v1_best` (i record personali). Se cancelli i dati del sito, i quiz locali vanno persi; usa l'esportazione JSON.
 - **Rete:** la pagina non carica script, font o immagini da altri siti (CSP: `default-src 'self'`, `connect-src 'self'`). L'unico `fetch` nel codice è verso `index.php?asset=manifest` sullo stesso sito, usato quando apri l'«edizione server»; su un host statico che non esegue PHP questo controllo fallisce e l'app mostra una guida all'installazione.
 - I meta tag Open Graph puntano a immagini su `chiuta.github.io` per l'anteprima del link; sono letti dalle piattaforme che mostrano il link, non dall'app.
 - L'edizione `index.php` (se la ospiti) ha un proprio server, una password di amministratore e un file di feedback; non fa parte della pagina statica.
@@ -73,6 +73,10 @@ Undava («Quiz senza frontiere») è un gioco a quiz in stile Kahoot in un unico
 Audit: 2026-10-10 (round 2: 2026-10-11, chiave di installazione per l'amministratore iniziale, nota GDPR per il feedback, nomi accessibili nel modulo di feedback) — verificato nel browser (nessun errore JS, axe WCAG 2.1 AA su tutte le schermate — home, libreria, editor, gioco, ruota, guida, importazione, impostazioni — 0 problemi serious/critical dopo la correzione delle etichette dell'editor, del contrasto e dell'indice della guida); `index.php` supera `php -l`, e le stesse correzioni sono applicate anche nell'edizione PHP.
 
 ## Cronologia / Changelog
+
+### 1.2.6 — 2026-10-23
+
+- Le chiavi dell'archiviazione locale usano ora il prefisso `undava.` (`FFF.store.migrate` all'avvio, prima di qualsiasi lettura): i dati esistenti vengono conservati automaticamente e i vecchi backup `.fff.json` si possono ancora importare.
 
 ### 1.2.4 — 2026-10-22
 - fff-kit 1.1.4: bersagli touch e testo minimo
