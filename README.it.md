@@ -2,7 +2,7 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · **Italiano** · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Versione:** 1.2.3 · **Ultimo aggiornamento:** 2026-10-22
+**Versione:** 1.2.4 · **Ultimo aggiornamento:** 2026-10-22
 
 Lingue dell'interfaccia: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -73,6 +73,9 @@ Undava («Quiz senza frontiere») è un gioco a quiz in stile Kahoot in un unico
 Audit: 2026-10-10 (round 2: 2026-10-11, chiave di installazione per l'amministratore iniziale, nota GDPR per il feedback, nomi accessibili nel modulo di feedback) — verificato nel browser (nessun errore JS, axe WCAG 2.1 AA su tutte le schermate — home, libreria, editor, gioco, ruota, guida, importazione, impostazioni — 0 problemi serious/critical dopo la correzione delle etichette dell'editor, del contrasto e dell'indice della guida); `index.php` supera `php -l`, e le stesse correzioni sono applicate anche nell'edizione PHP.
 
 ## Cronologia / Changelog
+
+### 1.2.4 — 2026-10-22
+- fff-kit 1.1.4: bersagli touch e testo minimo
 
 ### 1.2.3 — 2026-10-22
 - fff-kit 1.1.2: PBKDF2 a 600.000 iterazioni, protezione anti-clickjacking.
