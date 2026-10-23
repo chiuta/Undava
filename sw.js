@@ -1,6 +1,6 @@
 /* fff-pwa v1 · generat de fff-kit/pwa/pwa.mjs · fără cereri externe, fără importScripts */
 'use strict';
-var SLUG = "undava", VERSION = "1.2.6";
+var SLUG = "undava", VERSION = "1.2.7";
 var PREFIX = 'fff-' + SLUG + '-', CACHE = PREFIX + VERSION;   // versiunea nu conține '-', deci sufixul de după ultimul '-' e versiunea
 var SHELL = ['./manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
