@@ -2,7 +2,7 @@
 
 [English](README.md) · **Română** · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Versiune:** 1.2.8 · **Ultima actualizare:** 2026-10-26
+**Versiune:** 2.0.0 · **Ultima actualizare:** 2026-10-26
 
 Limbile interfeței: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -43,6 +43,7 @@ Undava este un joc de quiz: creezi propriile quiz-uri și joci singur sau cu pri
 
 - **Stocare locală:** `localStorage`, cheia `undava.quiz_v1` (quiz-urile tale, limba, setarea de sunet etc.), `undava.quiz_v1_spin` (elementele Roții) și `undava.quiz_v1_best` (recordurile personale). Dacă ștergi datele site-ului, quiz-urile locale se pierd; folosește exportul JSON.
 - **Rețea:** pagina nu încarcă scripturi, fonturi sau imagini de pe alte site-uri (CSP: `default-src 'self'`, `connect-src 'self'`). Singurul `fetch` din cod este către `index.php?asset=manifest` de pe același site, folosit când deschizi „ediția server”; pe un host static care nu rulează PHP această verificare eșuează și aplicația afișează un ghid de instalare.
+- **Joc live local (2.0.0):** conexiunea dintre gazdă și jucători e directă (WebRTC), fără server de semnalizare: codul QR/text conține adresele de rețea ale dispozitivului (IP local; opțional un server STUN, dezactivat implicit), deci ele se văd între cei conectați. Camera se pornește doar când apeși „Scanează cu camera”. Nu se trimite nimic către terți.
 - Metaetichetele Open Graph indică imagini de pe `chiuta.github.io` pentru previzualizarea linkului; ele sunt citite de platformele care afișează linkul, nu de aplicație.
 - Ediția `index.php` (dacă o găzduiești) are propriul server, parolă de administrator și fișier de feedback; ea nu face parte din pagina statică.
 - Atenție la ediția `index.php`: ea **stochează date pe server** (quiz-uri, feedback-ul vizitatorilor în `data/feedback.txt`: nume opțional, notă, mesaj, quiz), deci sloganul „fără telemetrie” se aplică la ce trimite aplicația către terți, nu la datele pe care serverul tău le primește. Formularul de feedback din ediția server afișează (în cele 8 limbi) o notă de confidențialitate: datele sunt păstrate pe serverul instanței și pot fi citite de administrator, iar ștergerea se cere administratorului. Dacă găzduiești public ediția server ești operatorul datelor (GDPR): informează vizitatorii, șterge la cerere (butonul de ștergere din ecranul de feedback sau fișierul `data/feedback.txt`) și nu păstra mesajele mai mult decât este necesar.
@@ -73,6 +74,11 @@ Undava („Quiz fără frontiere”) este un joc de tip Kahoot într-un singur f
 Audit: 2026-10-10 (rundă 2: 2026-10-11, cheie de instalare pentru administratorul inițial, notă GDPR pentru feedback, nume accesibile în formularul de feedback) — verificat în browser (fără erori JS, axe WCAG 2.1 AA pe toate ecranele — acasă, bibliotecă, editor, joc, roată, ghid, import, setări — 0 probleme serious/critical după corectarea etichetelor din editor, a contrastului și a cuprinsului ghidului); `index.php` trece `php -l`, iar aceleași corecturi sunt aplicate și în ediția PHP.
 
 ## Istoric / Changelog
+
+### 2.0.0 — 2026-10-26
+
+- **Joc live local, fără server** (modul nou la pregătirea jocului): acest dispozitiv e gazda, iar jucătorii se alătură de pe telefoane prin cod QR / cod text (WebRTC, modulul `p2p` al kitului). Gazda arată întrebarea și clasamentul, telefoanele arată variantele și rezultatul fiecărui jucător; punctajul (viteză + serie) e calculat de gazdă. Merge în aceeași rețea, pentru grupuri mici (~12); pentru clase mari rămâne ediția cu server. Adresele IP se văd între dispozitivele conectate.
+- Corecție: la „Pe rând” cu cel puțin doi jucători, din clasament nu se mai putea trece la întrebarea următoare.
 
 ### 1.2.7 — 2026-10-23
 - Robustețe: quiz-urile salvate local corupte (intrări nule, fără întrebări, tipuri greșite) sunt validate la pornire cu aceleași reguli ca la import, în loc să blocheze biblioteca.

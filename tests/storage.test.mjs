@@ -1,4 +1,4 @@
-// Undava 1.2.8 — date corupte în localStorage. Rulare: node storage.test.mjs <dir>   (rețea blocată, file://)
+// Undava 2.0.0 — date corupte în localStorage. Rulare: node storage.test.mjs <dir>   (rețea blocată, file://)
 import {createRequire} from "module"; const require = createRequire(process.env.PW_ROOT || import.meta.url); const {chromium} = require("playwright");
 let fails = 0; const check = (n, c, x) => { c ? console.log("  ok  " + n) : (fails++, console.log("FAIL  " + n + (x !== undefined ? "  -> " + JSON.stringify(x) : ""))); };
 const dir = process.argv[2] || process.cwd();

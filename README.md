@@ -2,7 +2,7 @@
 
 **English** · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Version:** 1.2.8 · **Last updated:** 2026-10-26
+**Version:** 2.0.0 · **Last updated:** 2026-10-26
 
 Interface languages: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -73,6 +73,11 @@ Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: cr
 Audit: 2026-10-10 (round 2: 2026-10-11, setup key for the initial administrator, GDPR note for feedback, accessible names in the feedback form) — verified in the browser (no JS errors, axe WCAG 2.1 AA on all screens — home, library, editor, game, wheel, guide, import, settings — 0 serious/critical problems after fixing the editor labels, the contrast and the guide's table of contents); `index.php` passes `php -l`, and the same fixes are applied in the PHP edition too.
 
 ## History / Changelog
+
+### 2.0.0 — 2026-10-26
+
+- **Local live game, no server** (new mode in game setup): this device is the host and players join from their phones with a QR/text code (WebRTC, the kit's `p2p` module). The host shows the question and leaderboard; phones show the choices and each player's result; scoring (speed + streak) is computed by the host. Works on the same network, for small groups (~12); large classes still use the server edition. IP addresses are visible between connected devices.
+- Fix: in "Pass & play" with two or more players, the scoreboard no longer blocked moving on to the next question.
 
 ### 1.2.7 — 2026-10-23
 - Robustness: corrupted locally saved quizzes (null entries, no questions, wrong types) are validated at start-up with the same rules as on import, instead of breaking the library.
