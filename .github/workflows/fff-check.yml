@@ -1,0 +1,22 @@
+# Șablon pentru depozitele de aplicații: copiază-l ca .github/workflows/fff-check.yml
+# (automat: node fff-kit/tools/add-ci.mjs <rădăcina-cu-depozite>). Nu necesită secrete; hubul trebuie să fie public.
+name: fff-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fff:
+    uses: chiuta/chiuta.github.io/.github/workflows/fff-check.yml@main
+    with:
+      # app-dir: '.'            # directorul cu index.html
+      # kit-ref: 'main'         # fixează o etichetă a hubului (ex. 'fff-kit-1.2.0') pentru rulări reproductibile
+      lax: false                # strict: politicile CSP și regulile noi (native-dialog, unprefixed-storage, cdn-without-sri, i18n-parity) sunt erori
+      # run-tests: true
+      # axe: true
