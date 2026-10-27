@@ -1,0 +1,208 @@
+{
+ "format": "fabrica-course",
+ "schema": 1,
+ "app": "Fabrica",
+ "version": "2.1.0",
+ "saved": "2026-10-27T00:00:00.000Z",
+ "course": {
+  "id": "mostra-fabrica",
+  "title": "Mostră Fabrica",
+  "description": "Curs de probă generat cu codul Fabrica 2.1.0",
+  "author": "Numele tău",
+  "license": "CC BY 4.0",
+  "lang": "ro",
+  "version": "1.0.0",
+  "disclaimers": [
+   {
+    "id": "d1",
+    "kind": "info",
+    "text": "Conținut cu scop informativ și educațional. Autorul nu garantează că este complet sau actual; verifică sursele oficiale."
+   }
+  ],
+  "domains": {
+   "health": false,
+   "legal": false,
+   "financial": false
+  },
+  "settings": {
+   "accent": "teal",
+   "srs": true,
+   "certificate": false
+  },
+  "levels": [
+   {
+    "id": "n1",
+    "title": "N1",
+    "lessons": [
+     {
+      "id": "l1",
+      "title": "L1",
+      "body": "x",
+      "optional": false,
+      "branches": [],
+      "questions": [
+       {
+        "id": "a1",
+        "type": "single",
+        "text": "Care este capitala **Franței**? Vezi [harta](https://example.org).",
+        "explain": "Paris.",
+        "okMsg": "",
+        "badMsg": "",
+        "options": [
+         {
+          "id": "o1",
+          "text": "Paris",
+          "correct": true
+         },
+         {
+          "id": "o2",
+          "text": "Lyon",
+          "correct": false
+         },
+         {
+          "id": "o3",
+          "text": "Nisa",
+          "correct": false
+         }
+        ]
+       },
+       {
+        "id": "a2",
+        "type": "multi",
+        "text": "Numere prime?",
+        "explain": "",
+        "okMsg": "",
+        "badMsg": "",
+        "options": [
+         {
+          "id": "o1",
+          "text": "2",
+          "correct": true
+         },
+         {
+          "id": "o2",
+          "text": "3",
+          "correct": true
+         },
+         {
+          "id": "o3",
+          "text": "4",
+          "correct": false
+         }
+        ]
+       },
+       {
+        "id": "a3",
+        "type": "tf",
+        "text": "Apa fierbe la 100 °C (presiune normală).",
+        "explain": "",
+        "okMsg": "",
+        "badMsg": "",
+        "answer": true
+       },
+       {
+        "id": "a4",
+        "type": "fill",
+        "text": "Un an obișnuit are [[365]] de zile.",
+        "explain": "",
+        "okMsg": "",
+        "badMsg": ""
+       },
+       {
+        "id": "a5",
+        "type": "short",
+        "text": "Cel mai mare ocean?",
+        "explain": "",
+        "okMsg": "",
+        "badMsg": "",
+        "answers": [
+         "Pacific",
+         "Oceanul Pacific"
+        ]
+       },
+       {
+        "id": "a6",
+        "type": "num",
+        "text": "Cât face 10 / 4?",
+        "explain": "Zecimal.",
+        "okMsg": "",
+        "badMsg": "",
+        "value": 2.5,
+        "tol": 0.1,
+        "unit": ""
+       },
+       {
+        "id": "a7",
+        "type": "order",
+        "text": "Ordonează",
+        "explain": "",
+        "okMsg": "",
+        "badMsg": "",
+        "items": [
+         "A",
+         "B"
+        ]
+       },
+       {
+        "id": "a8",
+        "type": "match",
+        "text": "Potrivește",
+        "explain": "",
+        "okMsg": "",
+        "badMsg": "",
+        "pairs": [
+         {
+          "l": "RO",
+          "r": "București"
+         },
+         {
+          "l": "IT",
+          "r": "Roma"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "glossary": [],
+  "evidence": [],
+  "finalTest": {
+   "enabled": true,
+   "threshold": 60,
+   "count": 0,
+   "seed": "quiz",
+   "shuffle": true,
+   "reseed": true,
+   "includeLessonQuestions": false,
+   "bank": [
+    {
+     "id": "b1",
+     "type": "fill",
+     "text": "Două [[a]] și [[b]].",
+     "explain": "",
+     "okMsg": "",
+     "badMsg": ""
+    },
+    {
+     "id": "b2",
+     "type": "single",
+     "text": "Fără alternative greșite",
+     "explain": "",
+     "okMsg": "",
+     "badMsg": "",
+     "options": [
+      {
+       "id": "o1",
+       "text": "Singur",
+       "correct": true
+      }
+     ]
+    }
+   ]
+  },
+  "assets": {},
+  "updated": "2026-10-27"
+ }
+}

@@ -2,6 +2,20 @@
 
 Format: [SemVer](https://semver.org/lang/ro/) (MAJOR.MINOR.PATCH). Istoricul complet al versiunilor anterioare este în secțiunea „Istoric / Changelog” din [README.ro.md](README.ro.md).
 
+## 2.2.0 — 2026-10-27
+
+Anterior: v2.1.0.
+
+### Adăugat
+- Import de cursuri Fabrica: `.course.json` (format `fabrica-course`, schema 1) și copia `.fabrica.fff.json`. Se convertesc alegerea unică, adevărat/fals, răspunsul scurt, numericul (cu toleranță) și completarea cu un singur gol; restul (alegere multiplă, ordonare, potrivire, completare cu mai multe goluri, texte prea lungi) sunt sărite și numărate în mesaj. Markdown-ul devine text simplu; peste 100 de întrebări se împart în mai multe quiz-uri.
+- Texte noi (`course_ok`, `course_err`) în 8 limbi (fr/it/es/pt/de/hu automate, nerevizuite de vorbitori nativi).
+- Test nou `tests/v22.test.mjs` (19 verificări) cu un fișier generat de codul Fabrica 2.1.0 (`tests/fixtures/mostra-fabrica.course.json`).
+
+### Nu s-a implementat
+- Tipurile multi, ordonare, potrivire din Fabrica (Undava nu are echivalent).
+- Aceleași funcții în ediția server `index.php` (copie separată, v1.0.1).
+- Testul cu fișiere `.course.json` produse de alte versiuni de Fabrica decât 2.1.0 (formatul `schema: 1` este același, dar nu am rulat altă versiune).
+
 ## 2.1.0 — 2026-10-27
 
 ### Adăugat
