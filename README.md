@@ -2,7 +2,9 @@
 
 **English** · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Version:** 2.0.0 · **Last updated:** 2026-10-26
+**Version:** 2.1.0 · **Last updated:** 2026-10-27
+
+**Status:** stable · **Offline:** complete
 
 Interface languages: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -27,6 +29,11 @@ Undava is a quiz game: you create your own quizzes and play alone or with friend
 - Settings: language, sound.
 - The synchronous live game features, the standalone theme and the audience activities are described in the in-app manual as belonging to the server edition (`index.php`), not to the static page.
 - Languages: Romanian, English, French, Italian, Spanish, Portuguese, German, Hungarian.
+- **Presenter mode (2.1.0):** the 📺 button in the game bar (also in Settings, and the `P` key during a game) enlarges the question, answers, timer, results, scoreboard and podium for a projector or TV, and asks the browser for full screen (if it refuses, only the larger layout applies). The choice is remembered. It is meant for the host device of a game with the other players on one screen or on their phones (live game); the scaling applies only on windows at least 900 px wide.
+- **Import from CSV (2.1.0):** "Import" accepts a `.csv` file or pasted CSV, with the **same columns as Fabrica** (`tip;întrebare;corect;greșit1;greșit2;greșit3;explicație`; delimiter `,` `;` or tab; RFC 4180 quoting; UTF-8 BOM accepted), plus a downloadable template. Recognised types: `unic` (multiple choice), `adevarat-fals`, `scurt` (variants separated by `|`) and `numeric` (the `greșit1` column is the tolerance). Rows of other types (multi, fill-in, ordering, matching) and incomplete rows are skipped and counted in the message. The file name becomes the quiz title; the usual limits apply (100 questions, text lengths). **Fabrica** can also export JSON directly for Undava ("Quiz for Undava"), which the existing JSON import reads; this version does not read Fabrica's `.course.json` itself.
+- **Demo bank in Romanian (2.1.0):** four more demo quizzes ("DEMO · RO", 31 questions: Romania - geography, Romania - history, Romanian literature, science and nature) with explanations for some answers. They exist **only in Romanian** (a note appears in the library for the other interface languages). **The questions were written by an AI assistant and have not been checked by a teacher or an editor: verify them before serious educational use.**
+- **Fix:** in play, the transparent container of the donation button covered the top bar and made ✕ (quit) unclickable with the mouse; now only the donation link itself receives clicks. (On very narrow screens the yellow button can still sit over the top bar.)
+- **Not changed:** the server edition `index.php` is a separate copy (version 1.0.1) and does not get these features.
 
 ## User guide
 
@@ -73,6 +80,12 @@ Undava ("Quiz without borders") is a Kahoot-style quiz game in one HTML file: cr
 Audit: 2026-10-10 (round 2: 2026-10-11, setup key for the initial administrator, GDPR note for feedback, accessible names in the feedback form) — verified in the browser (no JS errors, axe WCAG 2.1 AA on all screens — home, library, editor, game, wheel, guide, import, settings — 0 serious/critical problems after fixing the editor labels, the contrast and the guide's table of contents); `index.php` passes `php -l`, and the same fixes are applied in the PHP edition too.
 
 ## History / Changelog
+
+### 2.1.0 — 2026-10-27
+- Presenter mode (large text and full screen; button, setting and `P` key).
+- Import from CSV with the same columns as Fabrica, with a template; four demo quizzes in Romanian (31 questions, AI-written, unreviewed).
+- Fix: the donation container no longer blocks clicks on the game bar.
+- Texts in 8 languages (fr/it/es/pt/de/hu are automatic, not natively verified). Test: `tests/v21.test.mjs` (60 checks).
 
 ### 2.0.0 — 2026-10-26
 
