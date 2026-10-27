@@ -2,7 +2,9 @@
 
 [English](README.md) · **Română** · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-**Versiune:** 2.0.0 · **Ultima actualizare:** 2026-10-26
+**Versiune:** 2.1.0 · **Ultima actualizare:** 2026-10-27
+
+**Stare:** stabil · **Offline:** complet
 
 Limbile interfeței: **Română, English, Français, Italiano, Español, Português (PT), Deutsch, Magyar**
 
@@ -27,6 +29,11 @@ Undava este un joc de quiz: creezi propriile quiz-uri și joci singur sau cu pri
 - Setări: limbă, sunet.
 - Funcțiile de joc live sincron, tema autonomă și activitățile de audiență sunt descrise în manualul din aplicație ca aparținând ediției server (`index.php`), nu paginii statice.
 - Limbi: română, engleză, franceză, italiană, spaniolă, portugheză, germană, maghiară.
+- **Mod prezentator (2.1.0):** butonul 📺 din bara jocului (și din Setări, iar în timpul jocului tasta `P`) mărește întrebarea, răspunsurile, cronometrul, rezultatele, clasamentul și podiumul pentru proiector sau TV și cere browserului ecran complet (dacă refuză, se aplică doar aspectul mărit). Alegerea este reținută. Este gândit pentru dispozitivul gazdă al unui joc cu ceilalți jucători pe același ecran sau pe telefoane (joc live); scalarea se aplică doar ferestrelor late de cel puțin 900 px.
+- **Import din CSV (2.1.0):** „Importă” acceptă un fișier `.csv` sau CSV lipit, cu **aceleași coloane ca Fabrica** (`tip;întrebare;corect;greșit1;greșit2;greșit3;explicație`; separator `,` `;` sau tab; ghilimele RFC 4180; BOM UTF-8 acceptat), plus un șablon descărcabil. Tipuri recunoscute: `unic` (variante), `adevarat-fals`, `scurt` (variante separate cu `|`) și `numeric` (coloana `greșit1` este toleranța). Rândurile de alte tipuri (multi, completare, ordonare, potrivire) și cele incomplete sunt sărite și numărate în mesaj. Numele fișierului devine titlul quiz-ului; se aplică limitele obișnuite (100 de întrebări, lungimi de text). **Fabrica** poate exporta și direct JSON pentru Undava („Quiz pentru Undava”), pe care importul JSON existent îl citește; această versiune nu citește `.course.json`-ul Fabrica.
+- **Bancă demo în română (2.1.0):** încă patru quiz-uri demonstrative („DEMO · RO”, 31 de întrebări: România - geografie, România - istorie, Literatura română, Știință și natură), cu explicații la unele răspunsuri. Există **doar în română** (în bibliotecă apare o notă pentru celelalte limbi ale interfeței). **Întrebările au fost scrise de un asistent AI și nu au fost verificate de un profesor sau redactor: verifică-le înainte de o folosire educațională serioasă.**
+- **Reparat:** în joc, containerul transparent al butonului de donații acoperea bara de sus și făcea ✕ (ieșire) imposibil de apăsat cu mouse-ul; acum doar linkul de donație primește clicuri. (Pe ecrane foarte înguste butonul galben poate încă acoperi bara de sus.)
+- **Neschimbat:** ediția server `index.php` este o copie separată (versiunea 1.0.1) și nu primește aceste funcții.
 
 ## Manual de utilizare
 
@@ -74,6 +81,12 @@ Undava („Quiz fără frontiere”) este un joc de tip Kahoot într-un singur f
 Audit: 2026-10-10 (rundă 2: 2026-10-11, cheie de instalare pentru administratorul inițial, notă GDPR pentru feedback, nume accesibile în formularul de feedback) — verificat în browser (fără erori JS, axe WCAG 2.1 AA pe toate ecranele — acasă, bibliotecă, editor, joc, roată, ghid, import, setări — 0 probleme serious/critical după corectarea etichetelor din editor, a contrastului și a cuprinsului ghidului); `index.php` trece `php -l`, iar aceleași corecturi sunt aplicate și în ediția PHP.
 
 ## Istoric / Changelog
+
+### 2.1.0 — 2026-10-27
+- Mod prezentator (text mare și ecran complet; buton, setare și tasta `P`).
+- Import din CSV cu aceleași coloane ca Fabrica, cu șablon; patru quiz-uri demonstrative în română (31 de întrebări, scrise de AI, neverificate editorial).
+- Reparat: containerul butonului de donații nu mai blochează clicurile pe bara jocului.
+- Texte în 8 limbi (fr/it/es/pt/de/hu sunt automate, neverificate de vorbitori nativi). Test: `tests/v21.test.mjs` (60 de verificări).
 
 ### 2.0.0 — 2026-10-26
 
