@@ -1,4 +1,4 @@
-// Undava 2.2.0 — import de cursuri Fabrica (.course.json / .fabrica.fff.json). Rulare: node tests/v22.test.mjs
+// Undava 2.3.0 — import de cursuri Fabrica (.course.json / .fabrica.fff.json). Rulare: node tests/v22.test.mjs
 // Fixture: tests/fixtures/mostra-fabrica.course.json, generat cu codul Fabrica 2.1.0 (courseToJson), nu scris de mână.
 import {createRequire} from "module"; import {fileURLToPath} from "url"; import path from "path"; import fs from "fs";
 const require = createRequire(process.env.PW_ROOT || import.meta.url); const {chromium} = require("playwright");
