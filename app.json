@@ -14,8 +14,8 @@
   "storageKeys": [
     "undava.quiz_v1"
   ],
-  "sizeBytes": 780975,
-  "sha256": "797e2dc11e824c36ed294ed4f75dbbc9b81dbc3a4361ecc80210048e2e1aaeb3",
+  "sizeBytes": 812296,
+  "sha256": "9c3a581aea49e0eb531243af66388b6ca8af18e62ffb3b3bff6b02ff130460e5",
   "csp": {
     "present": true,
     "directives": {
@@ -60,6 +60,8 @@
       "bundle",
       "qr",
       "p2p",
+      "sync",
+      "history",
       "bridge"
     ]
   },
@@ -73,6 +75,8 @@
       "bundle",
       "qr",
       "p2p",
+      "sync",
+      "history",
       "bridge"
     ]
   },
