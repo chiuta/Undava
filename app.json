@@ -2,8 +2,8 @@
   "schema": 1,
   "slug": "undava",
   "name": "Undava",
-  "version": "2.3.0",
-  "updated": "2026-11-02",
+  "version": "2.3.1",
+  "updated": "2026-11-07",
   "description": "Quiz fara frontiere — joc de tip Kahoot, single-file, offline, fara conturi, fara reclame, fara telemetrie.",
   "egress": [],
   "permissions": [
@@ -14,8 +14,8 @@
   "storageKeys": [
     "undava.quiz_v1"
   ],
-  "sizeBytes": 812296,
-  "sha256": "9c3a581aea49e0eb531243af66388b6ca8af18e62ffb3b3bff6b02ff130460e5",
+  "sizeBytes": 813902,
+  "sha256": "5429cc395f4250f65bc9dc487c9778917840850bac26a18c81fb04820e060234",
   "csp": {
     "present": true,
     "directives": {
@@ -66,7 +66,7 @@
     ]
   },
   "kit": {
-    "version": "1.2.0",
+    "version": "1.2.1",
     "modules": [
       "core",
       "store",
