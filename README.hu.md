@@ -2,7 +2,7 @@
 
 [English](README.md) · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · **Magyar**
 
-**Verzió:** 2.3.4 · **Utolsó frissítés:** 2026-11-10
+**Verzió:** 2.3.5 · **Utolsó frissítés:** 2026-11-10
 
 **Állapot:** stabil · **Offline:** teljes
 
