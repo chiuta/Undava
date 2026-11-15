@@ -9,18 +9,19 @@
   "permissions": [
     "clipboard",
     "serviceWorker",
-    "localStorage"
+    "localStorage",
+    "WebGL"
   ],
   "storageKeys": [
     "undava.quiz_v1"
   ],
-  "sizeBytes": 866406,
-  "sha256": "cdc7846e8635c25434d19f188a01aa789074af075fcdadba602e0a00e01b9a2b",
+  "sizeBytes": 918561,
+  "sha256": "65c03302c3fe43bc7ac91a1b47e2c73b641ff3bcdfbcd12022334279a161841c",
   "csp": {
     "present": true,
     "directives": {
       "default-src": "'self'",
-      "script-src": "'self' sha256×5",
+      "script-src": "'self' sha256×6",
       "style-src": "'self' 'unsafe-inline'",
       "img-src": "'self' data:",
       "font-src": "'self'",
